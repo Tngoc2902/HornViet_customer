@@ -1,156 +1,81 @@
 "use client";
 
-import { products } from "@/data/products";
-import { createContext, ReactNode, useContext, useEffect, useMemo, useReducer } from "react";
-import { loadLocalStorage, saveLocalStorage } from "@/lib/storage";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { cartApi } from "@/lib/api/services";
+import type { Cart } from "@/lib/api/types";
+import { useAuth } from "./auth-context";
 
-type CartItem = {
-  id: string;
-  quantity: number;
-  size: string;
+// Mọi API giỏ hàng trả về toàn bộ giỏ hiện tại → chỉ cần thay state bằng result.
+
+type CartValue = {
+  cart: Cart | null;
+  count: number;
+  loading: boolean;
+  refresh: () => Promise<Cart | null>;
+  add: (productVariantId: number, quantity: number) => Promise<Cart>;
+  update: (cartItemId: number, quantity: number) => Promise<Cart>;
+  remove: (cartItemId: number) => Promise<Cart>;
+  /** Sau khi đặt hàng thành công, server đã làm trống giỏ. */
+  clearLocal: () => void;
 };
 
-type CartState = {
-  items: CartItem[];
-};
+const CartContext = createContext<CartValue | null>(null);
 
-type CartAction =
-  | { type: "ADD"; payload: { productId: string; size: string } }
-  | { type: "REMOVE"; payload: { productId: string; size: string } }
-  | { type: "UPDATE"; payload: { productId: string; quantity: number; size: string } }
-  | { type: "CLEAR" };
-
-const CartContext = createContext<
-  | {
-      items: CartItem[];
-      addToCart: (productId: string, size: string) => void;
-      removeFromCart: (productId: string, size: string) => void;
-      updateQuantity: (productId: string, quantity: number, size: string) => void;
-      clearCart: () => void;
-      getCartTotal: () => number;
-      getCartItems: () => { product: any; quantity: number; size: string }[];
-    }
-  | undefined
->(undefined);
-
-const STORAGE_CART_KEY = "monshoes-cart";
-
-const initialState: CartState = { items: [] };
-
-function initCart(): CartState {
-  return { items: loadLocalStorage<CartItem[]>(STORAGE_CART_KEY, []) };
-}
-
-function cartReducer(state: CartState, action: CartAction): CartState {
-  switch (action.type) {
-    case "ADD": {
-      const { productId, size } = action.payload;
-      const existingItem = state.items.find(
-        (item) => item.id === productId && item.size === size
-      );
-
-      if (existingItem) {
-        return {
-          items: state.items.map((item) =>
-            item.id === productId && item.size === size
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          ),
-        };
-      }
-
-      return {
-        items: [...state.items, { id: productId, quantity: 1, size }],
-      };
-    }
-    case "REMOVE": {
-      const { productId, size } = action.payload;
-      return {
-        items: state.items.filter(
-          (item) => !(item.id === productId && item.size === size)
-        ),
-      };
-    }
-    case "UPDATE": {
-      const { productId, quantity, size } = action.payload;
-      return {
-        items: state.items.map((item) =>
-          item.id === productId && item.size === size
-            ? { ...item, quantity }
-            : item
-        ),
-      };
-    }
-    case "CLEAR":
-      return { items: [] };
-    default:
-      return state;
-  }
-}
+const EMPTY: Cart = { items: [], totalQuantity: 0, subTotal: 0, canCheckout: false };
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, initialState, initCart);
+  const { session } = useAuth();
+  const loggedIn = !!session;
+  const [cart, setCart] = useState<Cart | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const refresh = useCallback(async () => {
+    if (!loggedIn) {
+      setCart(null);
+      return null;
+    }
+    setLoading(true);
+    try {
+      const c = await cartApi.get();
+      setCart(c);
+      return c;
+    } catch {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
-    saveLocalStorage(STORAGE_CART_KEY, state.items);
-  }, [state.items]);
+    void refresh();
+    // Tải lại khi đổi tài khoản.
+  }, [refresh, session?.userId]);
 
-  const addToCart = (productId: string, size: string) => {
-    dispatch({ type: "ADD", payload: { productId, size } });
-  };
+  const apply = useCallback(async (p: Promise<Cart>) => {
+    const c = await p;
+    setCart(c);
+    return c;
+  }, []);
 
-  const removeFromCart = (productId: string, size: string) => {
-    dispatch({ type: "REMOVE", payload: { productId, size } });
-  };
-
-  const updateQuantity = (productId: string, quantity: number, size: string) => {
-    dispatch({ type: "UPDATE", payload: { productId, quantity, size } });
-  };
-
-  const clearCart = () => {
-    dispatch({ type: "CLEAR" });
-  };
-
-  const getCartTotal = () =>
-    state.items.reduce((total, item) => {
-      const product = products.find((p) => String(p.id) === String(item.id));
-      if (!product) return total;
-      const price = parseFloat(product.price.replace(/[^0-9]/g, ""));
-      return total + price * item.quantity;
-    }, 0);
-
-  const getCartItems = () =>
-    state.items.map((item) => {
-      const product = products.find((p) => String(p.id) === String(item.id));
-      if (!product) throw new Error("Product not found");
-      return {
-        product,
-        quantity: item.quantity,
-        size: item.size,
-      };
-    });
-
-  return (
-    <CartContext.Provider
-      value={{
-        items: state.items,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        getCartTotal,
-        getCartItems,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const value = useMemo<CartValue>(
+    () => ({
+      cart,
+      count: cart?.totalQuantity ?? 0,
+      loading,
+      refresh,
+      add: (id, qty) => apply(cartApi.addItem(id, qty)),
+      update: (id, qty) => apply(cartApi.updateItem(id, qty)),
+      remove: (id) => apply(cartApi.deleteItem(id)),
+      clearLocal: () => setCart(EMPTY),
+    }),
+    [cart, loading, refresh, apply]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used within CartProvider");
+  return ctx;
 }

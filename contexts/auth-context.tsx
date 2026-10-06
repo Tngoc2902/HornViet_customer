@@ -1,71 +1,111 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { ReactNode } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ApiError, setUnauthorizedHandler, tokenStore } from "@/lib/api/http";
+import { authApi } from "@/lib/api/services";
+import type { RoleName } from "@/lib/api/types";
 import { loadLocalStorage, removeLocalStorage, saveLocalStorage } from "@/lib/storage";
 
-type User = {
-  id?: string;
+const SESSION_KEY = "hsv-session";
+
+export type Session = {
+  userId: number;
+  userName: string;
   name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  district?: string;
-  ward?: string;
-  postalCode?: string;
-  avatar?: string;
+  roles: RoleName[];
+  /** epoch ms — token hết hạn sau expireInSeconds (24 giờ). */
+  expiresAt: number;
 };
 
-type AuthContextType = {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (user: User) => void;
+type AuthValue = {
+  /** Phiên của Khách hàng; Nhân viên / Quản trị viên dùng repo quản trị riêng. */
+  session: Session | null;
+  /** Đăng nhập; tài khoản Nhân viên / Quản trị viên → ném ApiError 403 và không lưu phiên. */
+  login: (identifier: string, password: string) => Promise<Session>;
   logout: () => void;
-  updateUser: (updates: Partial<User>) => void;
+  setName: (name: string) => void;
 };
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const AUTH_USER_KEY = "monshoes-auth-user";
+export const STAFF_ACCOUNT_MESSAGE = "Tài khoản Nhân viên / Quản trị viên vui lòng đăng nhập tại trang quản trị.";
+
+const AuthContext = createContext<AuthValue | null>(null);
+
+function isStaffRoles(roles: RoleName[]) {
+  return roles.includes("Admin") || roles.includes("Staff");
+}
+
+function loadSession(): Session | null {
+  const s = loadLocalStorage<Session | null>(SESSION_KEY, null);
+  // Phiên quản trị lưu từ trước khi tách repo cũng bị bỏ.
+  if (!s || !tokenStore.get() || s.expiresAt <= Date.now() || isStaffRoles(s.roles)) {
+    tokenStore.clear();
+    removeLocalStorage(SESSION_KEY);
+    return null;
+  }
+  return s;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(loadSession);
 
-  useEffect(() => {
-    const storedUser = loadLocalStorage<User | null>(AUTH_USER_KEY, null);
-    if (storedUser) setUser(storedUser);
+  const persist = useCallback((s: Session | null) => {
+    setSession(s);
+    if (s) saveLocalStorage(SESSION_KEY, s);
+    else removeLocalStorage(SESSION_KEY);
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      saveLocalStorage(AUTH_USER_KEY, user);
-    } else {
-      removeLocalStorage(AUTH_USER_KEY);
-    }
-  }, [user]);
+  const logout = useCallback(() => {
+    // JWT không lưu phiên phía server: chỉ cần xóa token phía trình duyệt.
+    tokenStore.clear();
+    persist(null);
+  }, [persist]);
 
-  const value = useMemo(
+  // 401 (hết hạn / bị khóa) → xóa phiên; các trang cần đăng nhập tự chuyển về /login.
+  useEffect(() => {
+    setUnauthorizedHandler(() => persist(null));
+    return () => setUnauthorizedHandler(null);
+  }, [persist]);
+
+  // Tự đăng xuất đúng lúc token hết hạn.
+  useEffect(() => {
+    if (!session) return;
+    const t = setTimeout(logout, Math.max(0, session.expiresAt - Date.now()));
+    return () => clearTimeout(t);
+  }, [session, logout]);
+
+  const login = useCallback(
+    async (identifier: string, password: string) => {
+      const r = await authApi.authenticate(identifier.trim(), password);
+      if (isStaffRoles(r.roles ?? [])) throw new ApiError(403, STAFF_ACCOUNT_MESSAGE);
+      tokenStore.set(r.accessToken);
+      const s: Session = {
+        userId: r.userId,
+        userName: r.userName,
+        name: r.name,
+        roles: r.roles ?? [],
+        expiresAt: Date.now() + r.expireInSeconds * 1000,
+      };
+      persist(s);
+      return s;
+    },
+    [persist]
+  );
+
+  const value = useMemo<AuthValue>(
     () => ({
-      user,
-      isAuthenticated: Boolean(user),
-      login: (nextUser: User) => setUser(nextUser),
-      updateUser: (updates: Partial<User>) => {
-        if (user) {
-          setUser({ ...user, ...updates });
-        }
-      },
-      logout: () => setUser(null),
+      session,
+      login,
+      logout,
+      setName: (name: string) => session && persist({ ...session, name }),
     }),
-    [user]
+    [session, login, logout, persist]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 }

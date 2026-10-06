@@ -1,92 +1,56 @@
-import { CartProvider } from "@/contexts/cart-context";
-import { AuthProvider } from "@/contexts/auth-context";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ScrollToTop } from "@/components/scroll-to-top";
-import ClientOnly from "@/components/ClientOnly";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Script from "next/script";
+import { Be_Vietnam_Pro, Literata } from "next/font/google";
 import { Toaster } from "sonner";
+import ClientOnly from "@/components/ClientOnly";
+import { ConfirmProvider } from "@/components/hsv/confirm-provider";
+import { AuthProvider } from "@/contexts/auth-context";
+import { CartProvider } from "@/contexts/cart-context";
+import { CatalogProvider } from "@/contexts/catalog-context";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const beVietnam = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-be-vietnam",
+});
+
+const literata = Literata({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600"],
+  variable: "--font-literata",
+});
 
 export const metadata: Metadata = {
-  title: "MONSHOES - Giày thể thao chính hãng",
-  description:
-    "Cửa hàng giày thể thao chính hãng với đa dạng mẫu mã và kích cỡ",
+  title: "Hồn Sừng Việt – Trang sức & đồ mỹ nghệ từ sừng",
+  description: "Lược, trâm, vòng tay và đồ mỹ nghệ chế tác thủ công từ sừng trâu, sừng bò làng nghề Thụy Ứng.",
 };
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi">
-      <head>
-        <Script id="recover-stale-next-chunks" strategy="afterInteractive">{`
-          (function () {
-            var STORAGE_KEY = "monshoes:last-chunk-reload";
-            var RELOAD_COOLDOWN_MS = 10000;
-
-            function isChunkLoadError(value) {
-              var message = "";
-
-              if (typeof value === "string") {
-                message = value;
-              } else if (value && typeof value === "object") {
-                message = [value.name, value.message, value.type, value.src]
-                  .filter(Boolean)
-                  .join(" ");
-              }
-
-              return new RegExp("ChunkLoadError|Loading chunk|_next/static/chunks|webpack", "i").test(message);
-            }
-
-            function reloadOnce() {
-              var now = Date.now();
-              var lastReload = Number(window.sessionStorage.getItem(STORAGE_KEY) || "0");
-
-              if (now - lastReload < RELOAD_COOLDOWN_MS) return;
-
-              window.sessionStorage.setItem(STORAGE_KEY, String(now));
-              window.location.reload();
-            }
-
-            window.addEventListener(
-              "error",
-              function (event) {
-                if (isChunkLoadError(event.error) || isChunkLoadError(event.target)) {
-                  reloadOnce();
-                }
-              },
-              true
-            );
-
-            window.addEventListener("unhandledrejection", function (event) {
-              if (isChunkLoadError(event.reason)) {
-                reloadOnce();
-              }
-            });
-          })();
-        `}</Script>
-      </head>
-      <body className={inter.className} suppressHydrationWarning>
+    <html lang="vi" className={`${beVietnam.variable} ${literata.variable}`}>
+      <body suppressHydrationWarning>
+        {/* Phiên đăng nhập (JWT) lưu ở localStorage nên toàn bộ ứng dụng render phía client. */}
         <ClientOnly>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>
+          <AuthProvider>
+            <CatalogProvider>
               <CartProvider>
-                {children}
-                <ScrollToTop />
-                <Toaster />
+                <ConfirmProvider>
+                  {children}
+                  <Toaster
+                    position="bottom-center"
+                    duration={2600}
+                    toastOptions={{
+                      unstyled: true,
+                      classNames: {
+                        toast:
+                          "flex items-center whitespace-pre-line rounded-lg bg-[#111] px-[22px] py-[13px] text-sm font-medium text-white shadow-[0_10px_30px_rgba(0,0,0,.25)] font-sans",
+                      },
+                    }}
+                  />
+                </ConfirmProvider>
               </CartProvider>
-            </AuthProvider>
-          </ThemeProvider>
+            </CatalogProvider>
+          </AuthProvider>
         </ClientOnly>
       </body>
     </html>

@@ -1,0 +1,326 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { RequireCustomer } from "@/components/hsv/guards";
+import { EmptyState, ErrorBox, FieldError, FormAlert, notify, ProductImage, QtyStepper, Radio, Skeleton } from "@/components/hsv/ui";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
+import { useApi } from "@/hooks/use-api";
+import { toApiError } from "@/lib/api/http";
+import { orderApi, profileApi } from "@/lib/api/services";
+import { PaymentMethod, type CartItem } from "@/lib/api/types";
+import { BANK_INFO, formatVND } from "@/lib/hsv/format";
+import { isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
+import { cn } from "@/lib/utils";
+
+const PAYMENTS: { key: PaymentMethod; label: string; desc: string }[] = [
+  { key: PaymentMethod.Cod, label: "Thanh toán khi nhận hàng (COD)", desc: "Trả tiền mặt cho nhân viên giao hàng" },
+  { key: PaymentMethod.BankTransfer, label: "Chuyển khoản ngân hàng", desc: "Chuyển khoản trước, cửa hàng xác nhận rồi giao" },
+];
+
+type ShipKey = "receiverName" | "phoneNumber" | "shippingAddress";
+
+function CartLine({ item }: { item: CartItem }) {
+  const { update, remove } = useCart();
+  const [busy, setBusy] = useState(false);
+
+  const run = async (fn: () => Promise<unknown>, done?: string) => {
+    setBusy(true);
+    try {
+      await fn();
+      if (done) notify(done);
+    } catch (e) {
+      notify(toApiError(e).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const inc = () =>
+    run(async () => {
+      // Server tự giới hạn về tồn kho còn lại và trả về số lượng mới.
+      const c = await update(item.id, item.quantity + 1);
+      const after = c.items.find((i) => i.id === item.id)?.quantity ?? item.quantity;
+      if (after <= item.quantity) notify(`Biến thể này chỉ còn ${item.stockQuantity} sản phẩm`);
+    });
+
+  const over = item.quantity > item.stockQuantity;
+  const stockNote = !item.isAvailable
+    ? item.stockQuantity === 0
+      ? "Biến thể đã hết hàng hoặc ngừng kinh doanh"
+      : over
+        ? `Chỉ còn ${item.stockQuantity} sản phẩm`
+        : "Sản phẩm đã ngừng kinh doanh"
+    : item.quantity >= item.stockQuantity
+      ? "Đã đạt tối đa tồn kho"
+      : "";
+
+  return (
+    <div className={cn("flex gap-[18px] border-b border-line-2 py-5", busy && "opacity-60")}>
+      <Link href={`/products/${item.productId}`} className="shrink-0">
+        <ProductImage src={item.mainImage} seed={item.productId} alt={item.productName} className="h-28 w-[92px] rounded-card" />
+      </Link>
+      <div className="min-w-0 flex-1">
+        <div className="flex justify-between gap-3">
+          <div>
+            <Link href={`/products/${item.productId}`} className="text-[15px] font-semibold hover:text-gold-dark">
+              {item.productName}
+            </Link>
+            <p className="mt-1 text-[13px] text-muted2">Biến thể: {item.variantName}</p>
+            <p className="mt-0.5 text-[13px] text-muted2">Đơn giá {formatVND(item.unitPrice)}</p>
+          </div>
+          <button onClick={() => run(() => remove(item.id), "Đã xóa khỏi giỏ hàng")} disabled={busy} className="h-fit text-[13px] text-faint hover:text-danger">
+            Xóa
+          </button>
+        </div>
+        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <QtyStepper
+              value={item.quantity}
+              disabled={busy}
+              onDec={() => item.quantity > 1 && run(() => update(item.id, item.quantity - 1))}
+              onInc={inc}
+            />
+            {stockNote && (
+              <span className={cn("text-[12.5px] font-semibold", item.isAvailable ? "text-warn" : "text-danger")}>{stockNote}</span>
+            )}
+          </div>
+          <span className="text-[15px] font-bold">{formatVND(item.lineTotal)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CartView() {
+  const { session } = useAuth();
+  const { cart, refresh, clearLocal } = useCart();
+  const router = useRouter();
+  const addresses = useApi(() => profileApi.getAddresses(), []);
+  const profile = useApi(() => profileApi.get(), []);
+  const list = addresses.data?.items ?? [];
+
+  const [addrId, setAddrId] = useState<number | null | undefined>(undefined);
+  const [ship, setShip] = useState({ receiverName: "", phoneNumber: "", shippingAddress: "" });
+  const [note, setNote] = useState("");
+  const [pay, setPay] = useState<PaymentMethod>(PaymentMethod.Cod);
+  const [errors, setErrors] = useState<FieldErrors<ShipKey>>({});
+  const [coErr, setCoErr] = useState("");
+  const [placing, setPlacing] = useState(false);
+
+  // Mặc định chọn địa chỉ mặc định (đứng đầu danh sách); chưa có địa chỉ thì nhập tay.
+  useEffect(() => {
+    if (addresses.data && addrId === undefined) setAddrId(list[0]?.id ?? null);
+  }, [addresses.data, addrId, list]);
+  useEffect(() => {
+    if (profile.data) setShip((s) => ({ ...s, receiverName: s.receiverName || profile.data!.name, phoneNumber: s.phoneNumber || (profile.data!.phoneNumber ?? "") }));
+  }, [profile.data]);
+
+  if (placing && cart?.items.length === 0) return null;
+
+  if (!cart) {
+    return (
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+        <Skeleton className="h-64" />
+        <Skeleton className="h-96" />
+      </div>
+    );
+  }
+
+  if (!cart.items.length) {
+    return (
+      <EmptyState
+        title="Chưa có sản phẩm nào trong giỏ"
+        action={
+          <Link href="/products" className="hsv-btn-primary h-11">
+            Tiếp tục mua sắm
+          </Link>
+        }
+      />
+    );
+  }
+
+  const submit = async () => {
+    const picked = list.find((a) => a.id === addrId);
+    const info = picked ? { receiverName: picked.receiverName, phoneNumber: picked.phoneNumber, shippingAddress: picked.address } : ship;
+    const e: FieldErrors<ShipKey> = {};
+    if (!info.receiverName.trim()) e.receiverName = "Vui lòng nhập tên người nhận";
+    if (!info.phoneNumber.trim()) e.phoneNumber = "Vui lòng nhập số điện thoại";
+    else if (!isValidPhone(info.phoneNumber)) e.phoneNumber = "Số điện thoại không hợp lệ";
+    if (!info.shippingAddress.trim()) e.shippingAddress = "Vui lòng nhập địa chỉ giao hàng";
+    setErrors(e);
+    setCoErr(picked && Object.keys(e).length ? "Địa chỉ đã chọn thiếu thông tin, vui lòng chọn địa chỉ khác." : "");
+    if (Object.keys(e).length) return;
+
+    setPlacing(true);
+    try {
+      const order = await orderApi.create({
+        receiverName: info.receiverName.trim(),
+        phoneNumber: normalizePhone(info.phoneNumber),
+        shippingAddress: info.shippingAddress.trim(),
+        paymentMethod: pay,
+        note: note.trim() || undefined,
+      });
+      clearLocal();
+      router.push(`/order-success/${order.id}`);
+    } catch (err) {
+      const api = toApiError(err);
+      const f = api.fieldErrors() as FieldErrors<ShipKey>;
+      if (Object.keys(f).length) {
+        setAddrId(null);
+        setShip(info);
+        setErrors(f);
+      }
+      setCoErr(api.fullMessage);
+      // Thiếu hàng (400) hoặc tồn kho vừa đổi (409) → tải lại giỏ để thấy số còn lại mới nhất.
+      if (api.status === 400 || api.status === 409) void refresh();
+      setPlacing(false);
+    }
+  };
+
+  return (
+    <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div className="hsv-card px-6 py-2">
+        {cart.items.map((item) => (
+          <CartLine key={item.id} item={item} />
+        ))}
+        <div className="flex flex-col gap-2.5 py-5 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted2">Tạm tính ({cart.totalQuantity} sản phẩm)</span>
+            <span className="font-semibold">{formatVND(cart.subTotal)}</span>
+          </div>
+          <p className="text-[12.5px] text-faint">Đơn giá tính theo giá hiện tại của sản phẩm.</p>
+        </div>
+      </div>
+
+      <div className="hsv-card p-[26px] lg:sticky lg:top-[136px]">
+        <p className="mb-3.5 text-base font-bold">Thông tin giao hàng</p>
+        {addresses.error && <ErrorBox error={addresses.error} onRetry={addresses.reload} className="mb-2" />}
+        <div className="flex flex-col gap-2">
+          {list.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => {
+                setAddrId(a.id);
+                setErrors({});
+                setCoErr("");
+              }}
+              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left", addrId === a.id ? "border-navy" : "border-line")}
+            >
+              <span className="mt-0.5">
+                <Radio checked={addrId === a.id} />
+              </span>
+              <span className="flex-1">
+                <span className="block text-[13.5px] font-semibold">
+                  {a.receiverName} · {a.phoneNumber}
+                  {a.isDefault && <span className="ml-2 text-[11px] font-bold text-gold">Mặc định</span>}
+                </span>
+                <span className="mt-0.5 block text-[13px] leading-snug text-muted2">{a.address}</span>
+              </span>
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setAddrId(null)}
+            className={cn("flex items-center gap-3 rounded-card border px-3.5 py-3 text-left", addrId === null ? "border-navy" : "border-line")}
+          >
+            <Radio checked={addrId === null} />
+            <span className="text-[13.5px] font-semibold">{list.length ? "Giao đến địa chỉ khác" : "Nhập địa chỉ giao hàng"}</span>
+          </button>
+        </div>
+        {addrId === null && (
+          <div className="mt-3 grid grid-cols-2 gap-2.5">
+            {(
+              [
+                ["receiverName", "Tên người nhận", ""],
+                ["phoneNumber", "Số điện thoại", ""],
+                ["shippingAddress", "Địa chỉ nhận hàng chi tiết", "col-span-2"],
+              ] as const
+            ).map(([k, label, span]) => (
+              <div key={k} className={span}>
+                <input
+                  value={ship[k]}
+                  onChange={(e) => setShip({ ...ship, [k]: e.target.value })}
+                  placeholder={label}
+                  aria-label={label}
+                  className={cn("hsv-input h-11 text-sm", errors[k] && "hsv-input-error")}
+                />
+                <FieldError message={errors[k]} />
+              </div>
+            ))}
+            <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
+              Quản lý sổ địa chỉ →
+            </Link>
+          </div>
+        )}
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+          maxLength={500}
+          placeholder="Ghi chú cho cửa hàng (không bắt buộc)"
+          className="mt-2.5 w-full resize-y rounded-card border border-line px-3 py-2.5 text-sm outline-none focus:border-navy"
+        />
+
+        <p className="mb-3 mt-5 text-base font-bold">Phương thức thanh toán</p>
+        <div className="flex flex-col gap-2">
+          {PAYMENTS.map((m) => (
+            <button
+              key={m.key}
+              type="button"
+              onClick={() => setPay(m.key)}
+              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left", pay === m.key ? "border-navy" : "border-line")}
+            >
+              <span className="mt-0.5">
+                <Radio checked={pay === m.key} />
+              </span>
+              <span>
+                <span className="block text-[13.5px] font-semibold">{m.label}</span>
+                <span className="mt-0.5 block text-[12.5px] text-muted2">{m.desc}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+        {pay === PaymentMethod.BankTransfer && (
+          <div className="mt-2.5 rounded-card bg-surface px-3.5 py-3 text-[13px] leading-relaxed text-ink-2">
+            {BANK_INFO}
+            <br />
+            Nội dung: mã đơn hàng (hiển thị sau khi đặt)
+          </div>
+        )}
+
+        <div className="mt-5 flex items-baseline justify-between border-t border-line pt-4">
+          <span className="text-[15px] font-semibold">Tổng thanh toán</span>
+          <span className="text-2xl font-bold">{formatVND(cart.subTotal)}</span>
+        </div>
+        {!cart.canCheckout && (
+          <div className="mt-3">
+            <FormAlert message="Một số sản phẩm trong giỏ không đủ hàng hoặc đã ngừng kinh doanh. Vui lòng cập nhật lại giỏ trước khi đặt hàng." />
+          </div>
+        )}
+        {coErr && (
+          <div className="mt-3">
+            <FormAlert message={coErr} />
+          </div>
+        )}
+        <button onClick={submit} disabled={!cart.canCheckout || placing || !session} className="hsv-btn-gold mt-3.5 h-[52px] w-full text-[15px]">
+          {placing ? "Đang đặt hàng…" : "Đặt hàng"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <div className="hsv-container animate-hin pb-[72px] pt-9">
+      <h1 className="hsv-page-title mb-6">Giỏ hàng &amp; thanh toán</h1>
+      <RequireCustomer>
+        <CartView />
+      </RequireCustomer>
+    </div>
+  );
+}
