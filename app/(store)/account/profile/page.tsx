@@ -247,6 +247,8 @@ function AddressTab() {
 }
 
 function PasswordTab() {
+  const { logout } = useAuth();
+  const router = useRouter();
   const [pw, setPw] = useState({ cur: "", nw: "", cf: "" });
   const [errors, setErrors] = useState<FieldErrors<"cur" | "nw" | "cf">>({});
   const [busy, setBusy] = useState(false);
@@ -261,8 +263,11 @@ function PasswordTab() {
     setBusy(true);
     try {
       await profileApi.changePassword(pw.cur, pw.nw);
-      setPw({ cur: "", nw: "", cf: "" });
-      notify("Đã đổi mật khẩu");
+      // Backend thu hồi mọi phiên đăng nhập (kể cả phiên này) khi đổi mật khẩu → đăng nhập lại.
+      logout();
+      notify("Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.");
+      router.replace("/login?returnUrl=%2Faccount%2Fprofile");
+      return;
     } catch (err) {
       const api = toApiError(err);
       const f = api.fieldErrors();

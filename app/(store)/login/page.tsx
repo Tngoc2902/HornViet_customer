@@ -87,12 +87,21 @@ export default function LoginPage() {
         <form onSubmit={submit} className="p-8 sm:px-12 sm:py-[52px]" noValidate>
           <h1 className="text-[23px] font-bold uppercase tracking-[0.05em]">Đăng nhập</h1>
           <div className="mt-3.5 flex flex-col gap-2">
-            {retNote && <FormAlert tone="warn" message={retNote} />}
-            <FormAlert message={errors.form} />
-            {wrongArea && ADMIN_URL && (
-              <a href={`${ADMIN_URL.replace(/\/+$/, "")}/login`} className="text-[13.5px] font-semibold text-gold">
-                Đến trang đăng nhập quản trị →
-              </a>
+            {wrongArea ? (
+              // Tài khoản Nhân viên / Quản trị viên: không phải lỗi, chỉ là đăng nhập nhầm cổng — chỉ hiện một hướng dẫn.
+              <div className="rounded-card border border-warn-line bg-warn-soft px-3.5 py-3 text-[13.5px] leading-relaxed text-warn">
+                <p>Đây là tài khoản Nhân viên / Quản trị viên. Trang cửa hàng chỉ dành cho khách hàng — vui lòng đăng nhập tại trang quản trị.</p>
+                {ADMIN_URL && (
+                  <a href={`${ADMIN_URL.replace(/\/+$/, "")}/login`} className="mt-2 inline-block font-semibold underline">
+                    Mở trang đăng nhập quản trị →
+                  </a>
+                )}
+              </div>
+            ) : (
+              <>
+                {retNote && <FormAlert tone="warn" message={retNote} />}
+                <FormAlert message={errors.form} />
+              </>
             )}
           </div>
           <div className="mt-6 flex flex-col gap-4">
@@ -111,9 +120,14 @@ export default function LoginPage() {
               <FieldError message={errors.email} />
             </div>
             <div>
-              <label htmlFor="lg-pass" className="hsv-label">
-                Mật khẩu
-              </label>
+              <div className="flex items-baseline justify-between gap-3">
+                <label htmlFor="lg-pass" className="hsv-label">
+                  Mật khẩu
+                </label>
+                <Link href="/forgot-password" className="text-[13px] font-semibold text-gold">
+                  Quên mật khẩu?
+                </Link>
+              </div>
               <input
                 id="lg-pass"
                 type="password"
