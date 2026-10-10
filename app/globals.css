@@ -81,7 +81,12 @@
   }
 
   .hsv-page-title {
-    @apply text-[26px] font-bold uppercase tracking-[0.05em] text-navy;
+    @apply text-[22px] font-semibold text-navy sm:text-[24px];
+  }
+
+  /* Tiêu đề khu vực căn giữa ở trang chủ / danh sách. */
+  .hsv-section-title {
+    @apply text-center text-[20px] font-semibold text-navy sm:text-[24px];
   }
 }
 

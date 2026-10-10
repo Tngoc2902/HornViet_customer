@@ -1,9 +1,10 @@
 import { Suspense } from "react";
-import { StoreFooter, StoreHeader } from "@/components/hsv/store-header";
+import { FloatingContact, MobileBottomNav, StoreFooter, StoreHeader } from "@/components/hsv/store-header";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    // pb-[60px]: chừa chỗ cho thanh điều hướng đáy trên điện thoại.
+    <div className="flex min-h-screen flex-col pb-[60px] md:pb-0">
       <Suspense>
         <StoreHeader />
       </Suspense>
@@ -11,6 +12,8 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
         <Suspense>{children}</Suspense>
       </main>
       <StoreFooter />
+      <FloatingContact />
+      <MobileBottomNav />
     </div>
   );
 }

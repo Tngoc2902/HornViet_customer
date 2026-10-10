@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/hsv/confirm-provider";
 import { RequireCustomer } from "@/components/hsv/guards";
+import { AccountShell } from "@/components/hsv/page-shells";
 import { ErrorBox, FieldError, FormAlert, LoadingRows, notify } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { useApi } from "@/hooks/use-api";
@@ -63,7 +63,6 @@ function InfoTab() {
 
   return (
     <div className="flex max-w-[460px] flex-col gap-4">
-      <p className="text-[17px] font-bold">Thông tin cá nhân</p>
       <FormAlert message={formError} />
       <div>
         <label htmlFor="pf-name" className="hsv-label">Họ và tên</label>
@@ -289,7 +288,6 @@ function PasswordTab() {
 
   return (
     <div className="flex max-w-[420px] flex-col gap-4">
-      <p className="text-[17px] font-bold">Đổi mật khẩu</p>
       {fields.map(([k, label, ac]) => (
         <div key={k}>
           <label htmlFor={`pw-${k}`} className="hsv-label">{label}</label>
@@ -313,42 +311,24 @@ function PasswordTab() {
 
 function ProfileView() {
   const params = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const tab = TABS.find((t) => t.key === params.get("tab"))?.key ?? "info";
+  const tab = TABS.find((t) => t.key === params.get("tab")) ?? TABS[0];
 
+  // Menu chuyển tab nằm trong AccountShell (liên kết ?tab=addr / ?tab=pw).
   return (
-    <div className="grid items-start gap-7 md:grid-cols-[220px_minmax(0,1fr)]">
-      <nav className="flex flex-col gap-1">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => router.replace(t.key === "info" ? pathname : `${pathname}?tab=${t.key}`)}
-            className={cn("rounded-card px-3.5 py-[11px] text-left text-sm", tab === t.key ? "bg-surface-active font-semibold" : "hover:bg-surface")}
-          >
-            {t.label}
-          </button>
-        ))}
-        <Link href="/account/orders" className="rounded-card px-3.5 py-[11px] text-sm hover:bg-surface">
-          Đơn hàng của tôi
-        </Link>
-      </nav>
-      <div className="hsv-card p-[30px]">
-        {tab === "info" && <InfoTab />}
-        {tab === "addr" && <AddressTab />}
-        {tab === "pw" && <PasswordTab />}
+    <AccountShell title={tab.label}>
+      <div className="rounded-2xl border border-line bg-white p-6 sm:p-[30px]">
+        {tab.key === "info" && <InfoTab />}
+        {tab.key === "addr" && <AddressTab />}
+        {tab.key === "pw" && <PasswordTab />}
       </div>
-    </div>
+    </AccountShell>
   );
 }
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto max-w-[1000px] animate-hin px-4 pb-[72px] pt-9 sm:px-8">
-      <h1 className="hsv-page-title mb-6">Hồ sơ cá nhân</h1>
-      <RequireCustomer>
-        <ProfileView />
-      </RequireCustomer>
-    </div>
+    <RequireCustomer>
+      <ProfileView />
+    </RequireCustomer>
   );
 }

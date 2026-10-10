@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Check } from "lucide-react";
 import { RequireCustomer } from "@/components/hsv/guards";
+import { CheckoutSteps } from "@/components/hsv/page-shells";
 import { ErrorBox, Skeleton } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
 import { orderApi } from "@/lib/api/services";
@@ -31,18 +32,18 @@ function SuccessView() {
       <div className="mx-auto mb-[22px] flex h-16 w-16 items-center justify-center rounded-full bg-ok-solid text-white">
         <Check className="h-8 w-8" />
       </div>
-      <h1 className="text-2xl font-bold uppercase tracking-[0.05em]">Đặt hàng thành công</h1>
+      <h1 className="text-[22px] font-semibold text-navy">Đặt hàng thành công</h1>
       <p className="mt-2.5 text-[14.5px] leading-relaxed text-muted2">
         Đơn hàng đang ở trạng thái “Chờ xử lý”. Bạn có thể theo dõi hoặc hủy đơn trong mục Đơn hàng của tôi.
       </p>
       <div className="hsv-card my-7 grid grid-cols-2 gap-3.5 p-[22px] text-left">
         <div>
           <p className="text-xs text-subtle">Mã đơn hàng</p>
-          <p className="mt-1 text-lg font-bold">{order.code}</p>
+          <p className="mt-1 text-lg font-semibold text-navy">{order.code}</p>
         </div>
         <div>
           <p className="text-xs text-subtle">Tổng thanh toán</p>
-          <p className="mt-1 text-lg font-bold">{formatVND(order.totalAmount)}</p>
+          <p className="mt-1 text-lg font-semibold text-price">{formatVND(order.totalAmount)}</p>
         </div>
         <div className="col-span-2">
           <p className="text-xs text-subtle">Phương thức</p>
@@ -68,10 +69,17 @@ function SuccessView() {
 
 export default function OrderSuccessPage() {
   return (
-    <div className="mx-auto max-w-[560px] animate-hin px-4 py-[88px] sm:px-8">
-      <RequireCustomer>
-        <SuccessView />
-      </RequireCustomer>
+    <div className="animate-hin bg-surface-2 px-4 pb-20 pt-8 sm:px-8">
+      <div className="mx-auto max-w-[600px]">
+        <div className="mb-6 flex justify-center">
+          <CheckoutSteps current={2} />
+        </div>
+        <div className="rounded-2xl border border-line bg-white px-6 py-10 sm:px-10">
+          <RequireCustomer>
+            <SuccessView />
+          </RequireCustomer>
+        </div>
+      </div>
     </div>
   );
 }

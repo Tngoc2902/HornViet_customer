@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Package } from "lucide-react";
 import { useConfirm } from "@/components/hsv/confirm-provider";
 import { RequireCustomer } from "@/components/hsv/guards";
+import { AccountShell } from "@/components/hsv/page-shells";
 import { Chip, ErrorBox, LoadingRows, notify, OrderProgress, Pager, StatusBadge } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
@@ -134,7 +135,7 @@ function OrdersView() {
 
   return (
     <>
-      <div className="mb-[22px] mt-5 flex flex-wrap gap-2">
+      <div className="mb-[18px] flex flex-wrap gap-2">
         {ORDER_TABS.map((t, i) => (
           <Chip
             key={String(t.key)}
@@ -201,11 +202,10 @@ function OrdersView() {
 
 export default function MyOrdersPage() {
   return (
-    <div className="mx-auto max-w-[1000px] animate-hin px-4 pb-[72px] pt-9 sm:px-8">
-      <h1 className="hsv-page-title">Đơn hàng của tôi</h1>
-      <RequireCustomer>
+    <RequireCustomer>
+      <AccountShell title="Đơn hàng của tôi">
         <OrdersView />
-      </RequireCustomer>
-    </div>
+      </AccountShell>
+    </RequireCustomer>
   );
 }
