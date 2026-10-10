@@ -1,6 +1,6 @@
 # MONSHOES Website Documentation
 
-> **Lưu ý (10/2026):** Tài liệu này là thiết kế ban đầu của dự án MonShoes, trước khi repo trở thành cửa hàng **Hồn Sừng Việt** gọi backend `Website.Api` (repo `Tngoc2902/HornViet`).
+> **Lưu ý (10/2026):** Tài liệu này là thiết kế ban đầu của dự án MonShoes, trước khi repo trở thành cửa hàng **Hồn Sừng Việt** gọi backend `HornViet.Api` (repo `Tngoc2902/HornViet`).
 > Các mục "Backend Requirements", "API Endpoints Structure", "Database Schema" bên dưới **không còn đúng**. API thật (đường dẫn, quyền, DTO, Quên mật khẩu, thu hồi phiên) nằm ở `docs/API.md` của backend; client gọi API là `lib/api/services.ts`.
 
 ## Giới thiệu
@@ -144,7 +144,7 @@ MONSHOES là một ứng dụng cửa hàng giày thể thao được xây dựn
 - **Coupons Table**: code, discount_type, value, expires_at, usage_limit
 
 ### API Endpoints Structure
-> Danh sách dưới đây là thiết kế cũ, **không** khớp backend hiện tại. Backend thật dùng `/api/TokenAuth/Authenticate` và `/api/services/app/{Service}/{Action}`; ví dụ Quên mật khẩu là `POST /api/services/app/Account/ForgotPassword` và `POST /api/services/app/Account/ResetPassword`. Xem `docs/API.md` của `Website.Api`.
+> Danh sách dưới đây là thiết kế cũ, **không** khớp backend hiện tại. Backend thật dùng `/api/TokenAuth/Authenticate` và `/api/services/app/{Service}/{Action}`; ví dụ Quên mật khẩu là `POST /api/services/app/Account/ForgotPassword` và `POST /api/services/app/Account/ResetPassword`. Xem `docs/API.md` của repo `HornViet`.
 
 ```
 POST   /api/auth/register
