@@ -38,6 +38,11 @@ const config = {
         faint: "#8a94a3",
         line: { DEFAULT: "#e6e9ee", 2: "#eef1f5", 3: "#c3cbd6" },
         surface: { DEFAULT: "#f3f5f8", 2: "#f7f9fb", active: "#eef2f7" },
+        // Dải nền xanh nhạt sau các băng sản phẩm (kiểu trang trang sức lớn).
+        band: "#edf2f8",
+        // Giá sản phẩm (vàng nâu) và nền thẻ sản phẩm (xám nhạt).
+        price: "#b47a32",
+        tile: "#f6f6f6",
         danger: { DEFAULT: "#b42318", soft: "#fbe9e6", line: "#efc5bd" },
         warn: { DEFAULT: "#8a5a12", soft: "#fbf1dc", line: "#ecd29a" },
         ok: { DEFAULT: "#2f5d3c", soft: "#e7f0e8", line: "#bcd3c0", solid: "#3f7a50" },

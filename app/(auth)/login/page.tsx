@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { AuthShell } from "@/components/hsv/page-shells";
 import { FieldError, FormAlert, notify } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { toApiError } from "@/lib/api/http";
@@ -64,29 +65,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1080px] animate-hin px-4 pb-20 pt-12 sm:px-8">
-      <div className="grid overflow-hidden rounded-card border border-line bg-white md:grid-cols-2">
-        <div className="flex min-h-[560px] flex-col justify-between bg-[linear-gradient(160deg,#333333,#0f2a4a)] p-12 text-white max-md:hidden">
-          <p className="font-serif text-[22px]">Hồn Sừng Việt</p>
-          <div>
-            <p className="font-serif text-[32px] leading-tight">Chào mừng trở lại</p>
-            <p className="mt-3 text-sm leading-relaxed text-[#cfd6df]">Đăng nhập để quản lý giỏ hàng, đặt hàng và theo dõi đơn của bạn.</p>
-          </div>
-          <div className="rounded-card border border-white/10 bg-white/[.06] p-4">
-            <p className="mb-2.5 text-xs font-semibold text-[#c9a27a]">Quyền lợi thành viên</p>
-            <ul className="flex flex-col gap-2 text-[13px] text-[#e9edf2]">
-              {MEMBER_PERKS.map((p) => (
-                <li key={p} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-champagne" />
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <form onSubmit={submit} className="p-8 sm:px-12 sm:py-[52px]" noValidate>
-          <h1 className="text-[23px] font-bold uppercase tracking-[0.05em]">Đăng nhập</h1>
-          <div className="mt-3.5 flex flex-col gap-2">
+    <AuthShell title="Chào mừng trở lại" sub="Vui lòng đăng nhập để tiếp tục" perks={MEMBER_PERKS}>
+        <form onSubmit={submit} noValidate>
+          <div className="flex flex-col gap-2">
             {wrongArea ? (
               // Tài khoản Nhân viên / Quản trị viên: không phải lỗi, chỉ là đăng nhập nhầm cổng — chỉ hiện một hướng dẫn.
               <div className="rounded-card border border-warn-line bg-warn-soft px-3.5 py-3 text-[13.5px] leading-relaxed text-warn">
@@ -104,7 +85,7 @@ export default function LoginPage() {
               </>
             )}
           </div>
-          <div className="mt-6 flex flex-col gap-4">
+          <div className="mt-4 flex flex-col gap-4">
             <div>
               <label htmlFor="lg-email" className="hsv-label">
                 Email hoặc tên đăng nhập
@@ -150,7 +131,6 @@ export default function LoginPage() {
             </p>
           </div>
         </form>
-      </div>
-    </div>
+    </AuthShell>
   );
 }

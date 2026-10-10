@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Phone } from "lucide-react";
+import { ProductCarousel } from "@/components/hsv/product-card";
+import { Breadcrumbs, ServicePerks, STORE_INFO, ZALO_URL } from "@/components/hsv/store-ui";
 import { ErrorBox, notify, ProductImage, QtyStepper, Skeleton } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
@@ -20,7 +23,7 @@ function OptionButton({ label, on, empty, onClick }: { label: string; on: boolea
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "min-h-[44px] rounded-card border px-[18px] text-sm font-medium transition-colors",
+        "min-h-[42px] min-w-[52px] rounded-lg border px-4 text-sm font-medium transition-colors",
         on ? "border-navy bg-navy text-white" : "border-line bg-white hover:border-navy/50",
         !on && empty && "text-line-3 opacity-55",
         empty && "line-through"
@@ -34,6 +37,13 @@ function OptionButton({ label, on, empty, onClick }: { label: string; on: boolea
 const sizeOf = (v: ProductVariant) => v.size?.trim() ?? "";
 const styleOf = (v: ProductVariant) => v.style?.trim() ?? "";
 
+// Nội dung mẫu — chỉnh lại theo chính sách thật của cửa hàng.
+const POLICIES = [
+  ["Giao hàng", `Giao toàn quốc, miễn phí cho đơn từ ${STORE_INFO.freeShipFrom}. Thanh toán khi nhận hàng (COD) hoặc chuyển khoản.`],
+  ["Đổi sản phẩm", "Đổi trong vòng 7 ngày nếu sản phẩm còn nguyên vẹn, kèm hóa đơn mua hàng."],
+  ["Bảo quản", "Tránh ngâm nước lâu và để gần nguồn nhiệt; lau bằng khăn mềm, thỉnh thoảng thoa một lớp dầu dừa mỏng để sừng giữ độ bóng."],
+];
+
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const productId = Number(id);
@@ -43,16 +53,22 @@ export default function ProductDetailPage() {
 
   const { data: product, error, reload } = useApi(() => productApi.get(productId), [productId]);
   const related = useApi(
-    () => productApi.getAll({ categoryIds: [product!.categoryId], maxResultCount: 5 }),
+    () => productApi.getAll({ categoryIds: [product!.categoryId], maxResultCount: 11 }),
     [product?.categoryId],
     !!product
+  );
+  // "Sản phẩm tương tự": cùng chất liệu, khác danh mục với sản phẩm đang xem.
+  const similar = useApi(
+    () => productApi.getAll({ materialIds: [product!.material.id], maxResultCount: 20 }),
+    [product?.material?.id],
+    !!product?.material
   );
 
   const [selSize, setSelSize] = useState<string | null>(null);
   const [selStyle, setSelStyle] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
   const [gal, setGal] = useState(0);
-  const [tab, setTab] = useState<"desc" | "origin">("desc");
+  const [tab, setTab] = useState<"desc" | "origin" | "policy">("desc");
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
@@ -82,12 +98,12 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="hsv-container grid gap-14 pb-16 pt-14 lg:grid-cols-2">
-        <Skeleton className="aspect-[4/5]" />
+      <div className="hsv-container grid gap-10 pb-16 pt-12 lg:grid-cols-2">
+        <Skeleton className="aspect-square" />
         <div className="flex flex-col gap-4">
+          <Skeleton className="h-8 w-3/4" />
           <Skeleton className="h-5 w-40" />
-          <Skeleton className="h-9 w-3/4" />
-          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-9 w-40" />
           <Skeleton className="mt-6 h-40" />
         </div>
       </div>
@@ -125,10 +141,11 @@ export default function ProductDetailPage() {
         ? `Còn ${cur.stockQuantity} sản phẩm · bạn đã có ${inCart} trong giỏ`
         : `Còn ${cur.stockQuantity} sản phẩm`;
 
-  const addLabel =
-    !cur || !cur.inStock ? "Hết hàng" : !session ? "Đăng nhập để mua" : avail === 0 ? "Đã đạt tối đa tồn kho" : adding ? "Đang thêm…" : "Thêm vào giỏ";
+  const soldOut = !cur || !cur.inStock;
+  const buyLabel = soldOut ? "Hết hàng" : !session ? "Đăng nhập để mua" : avail === 0 ? "Đã đạt tối đa tồn kho" : adding ? "Đang xử lý…" : "Mua ngay";
 
-  const onAdd = async () => {
+  /** goCart = true: "Mua ngay" — thêm vào giỏ rồi chuyển sang trang giỏ hàng. */
+  const onAdd = async (goCart: boolean) => {
     if (!cur || !canAdd) return;
     if (!session) {
       notify("Vui lòng đăng nhập để thêm vào giỏ hàng");
@@ -138,8 +155,12 @@ export default function ProductDetailPage() {
     setAdding(true);
     try {
       await add(cur.id, quantity);
-      notify("Đã thêm vào giỏ hàng");
       setQty(1);
+      if (goCart) {
+        router.push("/cart");
+        return;
+      }
+      notify("Đã thêm vào giỏ hàng");
     } catch (e) {
       notify(toApiError(e).message);
       void reload(); // tồn kho có thể vừa thay đổi
@@ -150,45 +171,77 @@ export default function ProductDetailPage() {
 
   const showSizes = sizes.some(Boolean);
   const showStyles = forSize.some((v) => styleOf(v));
+  const relatedItems = (related.data?.items ?? []).filter((p) => p.id !== product.id).slice(0, 10);
+  const similarItems = (similar.data?.items ?? []).filter((p) => p.id !== product.id && p.categoryId !== product.categoryId).slice(0, 10);
 
   return (
-    <div className="hsv-container animate-hin pb-[72px] pt-7">
-      <p className="mb-[22px] text-[12.5px] text-subtle">
-        <Link href="/">Trang chủ</Link> / <Link href="/products">Sản phẩm</Link> /{" "}
-        <Link href={`/products?cat=${product.categoryId}`}>{product.categoryName}</Link>
-      </p>
-      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14">
-        <div className={cn("grid gap-3.5", shots.length > 1 && "grid-cols-[64px_minmax(0,1fr)] sm:grid-cols-[80px_minmax(0,1fr)]")}>
+    <div className="animate-hin">
+      <div className="border-b border-line-2 bg-surface-2">
+        <div className="hsv-container py-3">
+          <Breadcrumbs
+            items={[
+              { label: "Sản phẩm", href: "/products" },
+              { label: product.categoryName, href: `/products?cat=${product.categoryId}` },
+              { label: product.name },
+            ]}
+          />
+        </div>
+      </div>
+
+      <div className="hsv-container grid grid-cols-[minmax(0,1fr)] items-start gap-8 pb-12 pt-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12">
+        {/* Ảnh */}
+        <div className={cn("grid gap-3", shots.length > 1 && "sm:grid-cols-[76px_minmax(0,1fr)]")}>
+          <ProductImage src={main} seed={product.id} alt={product.name} className="aspect-square rounded-2xl border border-line sm:order-2" />
           {shots.length > 1 && (
-            <div className="flex flex-col gap-3">
+            <div className="scrollbar-none flex gap-2.5 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
               {shots.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setGal(i)}
                   aria-label={`Ảnh ${i + 1}`}
-                  className={cn("rounded-card outline outline-2 outline-offset-2", gal === i ? "outline-navy" : "outline-transparent")}
+                  className={cn("w-[68px] shrink-0 rounded-xl border-2 p-0.5 sm:w-full", gal === i ? "border-navy" : "border-transparent hover:border-line-3")}
                 >
-                  <ProductImage src={src} seed={product.id + i} className="aspect-square w-full rounded-card" />
+                  <ProductImage src={src} seed={product.id + i} className="aspect-square w-full rounded-lg" />
                 </button>
               ))}
             </div>
           )}
-          <ProductImage src={main} seed={product.id} alt={product.name} className="aspect-[4/5] rounded-card" />
         </div>
 
-        <div>
-          <p className="text-[13px] font-semibold text-gold">
-            {product.categoryName} · {product.material?.name}
-          </p>
-          <h1 className="mt-2.5 text-[27px] font-bold uppercase leading-[1.15] tracking-[0.05em]">{product.name}</h1>
-          <p className="mt-4 text-[28px] font-bold">{formatVND(product.price)}</p>
+        {/* Thông tin mua hàng */}
+        <div className="lg:sticky lg:top-[140px] lg:row-span-2">
+          <h1 className="text-[20px] font-medium leading-snug text-navy sm:text-[24px]">{product.name}</h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] font-light text-subtle">
+            <span>Mã: HSV{String(product.id).padStart(5, "0")}</span>
+            <span className="text-line-3">|</span>
+            <Link href={`/products?cat=${product.categoryId}`} className="hover:text-navy">
+              {product.categoryName}
+            </Link>
+            {product.material?.name && (
+              <>
+                <span className="text-line-3">|</span>
+                <Link href={`/products?mat=${product.material.id}`} className="text-gold-dark hover:underline">
+                  {product.material.name}
+                </Link>
+              </>
+            )}
+          </div>
+
+          <p className="mt-4 text-[26px] font-semibold leading-none text-price sm:text-[28px]">{formatVND(product.price)}</p>
+          <p className="mt-1.5 text-[12.5px] font-light italic text-subtle">(Miễn phí giao hàng cho đơn từ {STORE_INFO.freeShipFrom})</p>
+          <a href={ZALO_URL} target="_blank" rel="noreferrer" className="mt-2.5 inline-flex items-center gap-1.5 text-[13.5px] text-[#0068ff] hover:underline">
+            Ưu đãi riêng cho bạn – Tư vấn ngay qua
+            <span className="rounded-full border border-[#0068ff] px-1.5 text-[10px] font-bold leading-4">Zalo</span>
+          </a>
 
           {(showSizes || showStyles) && (
-            <div className="mt-6 border-t border-line pt-[22px]">
+            <div className="mt-5 flex flex-col gap-4">
               {showSizes && (
-                <>
-                  <p className="mb-2.5 text-sm font-semibold">Kích thước</p>
-                  <div className="mb-5 flex flex-wrap gap-2">
+                <div>
+                  <p className="mb-2 text-[13.5px] font-medium text-navy">
+                    Chọn kích thước{size && <span className="font-normal text-subtle">: {size}</span>}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     {sizes.map((sz) => (
                       <OptionButton
                         key={sz || "_"}
@@ -203,11 +256,13 @@ export default function ProductDetailPage() {
                       />
                     ))}
                   </div>
-                </>
+                </div>
               )}
               {showStyles && (
-                <>
-                  <p className="mb-2.5 text-sm font-semibold">Kiểu dáng</p>
+                <div>
+                  <p className="mb-2 text-[13.5px] font-medium text-navy">
+                    Kiểu dáng{style && <span className="font-normal text-subtle">: {style}</span>}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {forSize.map((v) => (
                       <OptionButton
@@ -222,12 +277,12 @@ export default function ProductDetailPage() {
                       />
                     ))}
                   </div>
-                </>
+                </div>
               )}
             </div>
           )}
 
-          <div className="mt-[22px] flex items-center gap-2">
+          <div className="mt-5 flex items-center gap-2">
             <span className={cn("h-2 w-2 rounded-full", stockTone === "danger" ? "bg-danger" : stockTone === "warn" ? "bg-[#d39a2c]" : "bg-ok-solid")} />
             <span className={cn("text-sm font-semibold", stockTone === "danger" ? "text-danger" : stockTone === "warn" ? "text-warn" : "text-ok")}>
               {stockLabel}
@@ -235,103 +290,133 @@ export default function ProductDetailPage() {
             {cur && <span className="text-[13px] text-faint">· {cur.displayName}</span>}
           </div>
 
-          <div className="mt-[18px] flex gap-3">
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-[13px] font-light text-subtle">Số lượng</span>
             <QtyStepper
-              size="lg"
               value={quantity}
+              disabled={soldOut}
               onDec={() => setQty(Math.max(1, quantity - 1))}
               onInc={() => setQty(Math.min(Math.max(1, avail), quantity + 1))}
             />
-            <button
-              onClick={onAdd}
-              disabled={!canAdd}
-              className={cn(
-                "h-[52px] flex-1 rounded-lg text-[15px] font-semibold transition-colors",
-                canAdd ? "bg-navy text-white hover:bg-navy-deep" : "cursor-not-allowed bg-line-2 text-faint"
-              )}
-            >
-              {addLabel}
-            </button>
           </div>
 
-          <div className="mt-8">
-            <div role="tablist" className="flex gap-7 border-b border-line">
-              {(
-                [
-                  ["desc", "Mô tả sản phẩm"],
-                  ["origin", "Nguồn gốc nguyên liệu"],
-                ] as const
-              ).map(([k, l]) => (
-                <button
-                  key={k}
-                  role="tab"
-                  aria-selected={tab === k}
-                  onClick={() => setTab(k)}
-                  className={cn("-mb-px border-b-2 pb-3 text-[14.5px] font-semibold", tab === k ? "border-navy text-navy" : "border-transparent text-subtle")}
-                >
-                  {l}
-                </button>
+          <ServicePerks variant="compact" className="mt-5" />
+
+          {/* Một nút đặt mua lớn như PNJ: thêm vào giỏ rồi chuyển sang trang giỏ hàng */}
+          <button
+            onClick={() => onAdd(true)}
+            disabled={!canAdd}
+            className={cn(
+              "mt-4 flex h-[54px] w-full flex-col items-center justify-center rounded-md transition-colors",
+              canAdd ? "bg-navy text-white hover:bg-navy-deep" : "cursor-not-allowed bg-line-2 text-faint"
+            )}
+          >
+            <span className="text-[14.5px] font-semibold uppercase tracking-[0.05em]">{buyLabel === "Mua ngay" ? "Đặt mua" : buyLabel}</span>
+            {canAdd && session && <span className="text-[11px] font-light text-white/75">Giao tận nơi hoặc nhận tại cửa hàng</span>}
+          </button>
+          {canAdd && (
+            <button onClick={() => onAdd(false)} className="mt-2.5 w-full text-center text-[13px] font-light text-navy underline-offset-2 hover:underline">
+              Thêm vào giỏ hàng và tiếp tục mua sắm
+            </button>
+          )}
+
+          <a
+            href={`tel:${STORE_INFO.hotlineTel}`}
+            className="mt-4 flex items-center justify-center gap-2 rounded-md border border-line px-4 py-3 text-[13px] font-light text-ink-2"
+          >
+            <Phone className="h-4 w-4 text-gold" />
+            Gọi đặt mua <span className="font-medium text-navy">{STORE_INFO.hotline}</span>
+            <span className="text-faint">({STORE_INFO.hours})</span>
+          </a>
+        </div>
+
+        {/* Mô tả / nguồn gốc / chính sách */}
+        <div className="lg:col-start-1">
+          <div role="tablist" className="scrollbar-none flex gap-1 overflow-x-auto rounded-xl bg-surface p-1">
+            {(
+              [
+                ["desc", "Mô tả sản phẩm"],
+                ["origin", "Nguồn gốc nguyên liệu"],
+                ["policy", "Chính sách"],
+              ] as const
+            ).map(([k, l]) => (
+              <button
+                key={k}
+                role="tab"
+                aria-selected={tab === k}
+                onClick={() => setTab(k)}
+                className={cn(
+                  "flex-1 whitespace-nowrap rounded-lg px-4 py-2.5 text-[13.5px] transition-colors",
+                  tab === k ? "bg-white font-medium text-navy shadow-sm" : "font-light text-subtle hover:text-navy"
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          {tab === "desc" && (
+            <div className="pt-5">
+              <p className="whitespace-pre-line text-[14px] font-light leading-[1.8] text-ink-2">{product.description || "Đang cập nhật mô tả."}</p>
+              {vs.length > 0 && (
+                <div className="mt-5 overflow-hidden rounded-xl border border-line bg-white">
+                  <div className="grid grid-cols-[1fr_100px] bg-surface px-4 py-2.5 text-xs font-bold text-muted2">
+                    <span>Biến thể</span>
+                    <span className="text-right">Tồn kho</span>
+                  </div>
+                  {vs.map((v) => (
+                    <div key={v.id} className="grid grid-cols-[1fr_100px] border-t border-line-2 px-4 py-2.5 text-[13.5px]">
+                      <span>{v.displayName}</span>
+                      <span className={cn("text-right font-semibold", v.inStock ? "text-navy" : "text-danger")}>{v.inStock ? v.stockQuantity : "Hết hàng"}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {tab === "origin" && (
+            <div className="pt-5">
+              <div className="overflow-hidden rounded-xl border border-line">
+                {[
+                  ["Nguyên liệu", product.material?.name],
+                  ["Xuất xứ", product.material?.origin || "Đang cập nhật"],
+                  ["Danh mục", product.categoryName],
+                ].map(([k, v], i) => (
+                  <div key={k} className={cn("grid grid-cols-[130px_1fr] px-4 py-3 text-sm", i % 2 === 0 ? "bg-surface-2" : "bg-white")}>
+                    <span className="text-muted2">{k}</span>
+                    <span className="font-semibold">{v}</span>
+                  </div>
+                ))}
+              </div>
+              {product.material?.description && <p className="mt-4 text-sm leading-[1.75] text-ink-2">{product.material.description}</p>}
+            </div>
+          )}
+          {tab === "policy" && (
+            <div className="flex flex-col gap-3 pt-5">
+              {POLICIES.map(([t, d]) => (
+                <div key={t} className="rounded-xl border border-line px-4 py-3.5">
+                  <p className="text-sm font-bold text-navy">{t}</p>
+                  <p className="mt-1 text-[13.5px] leading-relaxed text-ink-2">{d}</p>
+                </div>
               ))}
             </div>
-            {tab === "desc" ? (
-              <div className="pt-[18px]">
-                <p className="whitespace-pre-line text-[14.5px] leading-[1.7] text-ink-2">{product.description || "Đang cập nhật mô tả."}</p>
-                {vs.length > 0 && (
-                  <div className="mt-[18px] overflow-hidden rounded-card border border-line bg-white">
-                    <div className="grid grid-cols-[1fr_100px] bg-surface px-4 py-2.5 text-xs font-bold text-muted2">
-                      <span>Biến thể</span>
-                      <span className="text-right">Tồn kho</span>
-                    </div>
-                    {vs.map((v) => (
-                      <div key={v.id} className="grid grid-cols-[1fr_100px] border-t border-line-2 px-4 py-2.5 text-[13.5px]">
-                        <span>{v.displayName}</span>
-                        <span className={cn("text-right font-semibold", v.inStock ? "text-navy" : "text-danger")}>
-                          {v.inStock ? v.stockQuantity : "Hết hàng"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="pt-[18px]">
-                <div className="rounded-card bg-line-2 px-[22px] py-5">
-                  <div className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2.5 text-sm">
-                    <span className="text-muted2">Nguyên liệu</span>
-                    <span className="font-semibold">{product.material?.name}</span>
-                    <span className="text-muted2">Xuất xứ</span>
-                    <span className="font-semibold">{product.material?.origin || "Đang cập nhật"}</span>
-                  </div>
-                  {product.material?.description && (
-                    <p className="mt-3.5 border-t border-[#dddddd] pt-3.5 text-sm leading-[1.7] text-ink-2">{product.material.description}</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
-      {(related.data?.items ?? []).some((p) => p.id !== product.id) && (
-        <section className="mt-16">
-          <h2 className="mb-5 text-[19px] font-bold uppercase tracking-[0.05em]">Sản phẩm liên quan</h2>
-          <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {related
-              .data!.items.filter((p) => p.id !== product.id)
-              .slice(0, 4)
-              .map((p) => (
-                <Link key={p.id} href={`/products/${p.id}`} className="group flex flex-col gap-3">
-                  <ProductImage src={p.mainImage} seed={p.id} alt={p.name} className="aspect-[4/5] w-full rounded-card" />
-                  <div>
-                    <p className="text-xs text-subtle">{p.categoryName}</p>
-                    <p className="mt-1 text-[15px] font-semibold group-hover:text-gold-dark">{p.name}</p>
-                    <p className="mt-1.5 text-[15px] font-bold">{formatVND(p.price)}</p>
-                  </div>
-                </Link>
-              ))}
-          </div>
-        </section>
-      )}
+      <div className="hsv-container flex flex-col gap-12 pb-16">
+        {relatedItems.length > 0 && (
+          <section>
+            <h2 className="mb-5 text-[19px] font-medium text-navy sm:text-[21px]">Sản phẩm cùng danh mục</h2>
+            <ProductCarousel items={relatedItems} />
+          </section>
+        )}
+        {similarItems.length > 0 && (
+          <section>
+            <h2 className="mb-5 text-[19px] font-medium text-navy sm:text-[21px]">Sản phẩm tương tự</h2>
+            <ProductCarousel items={similarItems} />
+          </section>
+        )}
+      </div>
     </div>
   );
 }

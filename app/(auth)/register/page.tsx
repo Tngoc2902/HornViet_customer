@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AuthShell } from "@/components/hsv/page-shells";
 import { FieldError, FormAlert, notify } from "@/components/hsv/ui";
 import { toApiError } from "@/lib/api/http";
 import { authApi } from "@/lib/api/services";
@@ -66,16 +67,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[560px] animate-hin px-4 pb-20 pt-12 sm:px-8">
-      <form onSubmit={submit} noValidate className="hsv-card p-8 sm:p-11">
-        <h1 className="text-[23px] font-bold uppercase tracking-[0.05em]">Tạo tài khoản</h1>
-        <p className="mt-2 text-sm text-muted2">Tài khoản mới có quyền Khách hàng.</p>
+    <AuthShell
+      title="Tạo tài khoản"
+      sub="Đăng ký để đặt hàng và theo dõi đơn dễ dàng"
+      perks={["Theo dõi trạng thái đơn hàng", "Lưu sổ địa chỉ giao hàng", "Nhận thông tin bộ sưu tập mới sớm nhất"]}
+    >
+      <form onSubmit={submit} noValidate>
         {formError && (
-          <div className="mt-4">
+          <div className="mb-4">
             <FormAlert message={formError} />
           </div>
         )}
-        <div className="mt-[26px] flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {FIELDS.map((f) => (
             <div key={f.key}>
               <label htmlFor={`rg-${f.key}`} className="hsv-label">
@@ -104,6 +107,6 @@ export default function RegisterPage() {
           </p>
         </div>
       </form>
-    </div>
+    </AuthShell>
   );
 }

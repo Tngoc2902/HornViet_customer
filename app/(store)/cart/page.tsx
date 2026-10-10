@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import { RequireCustomer } from "@/components/hsv/guards";
-import { EmptyState, ErrorBox, FieldError, FormAlert, notify, ProductImage, QtyStepper, Radio, Skeleton } from "@/components/hsv/ui";
+import { CheckoutSteps } from "@/components/hsv/page-shells";
+import { ErrorBox, FieldError, FormAlert, notify, ProductImage, QtyStepper, Radio, Skeleton } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { useApi } from "@/hooks/use-api";
@@ -65,7 +67,7 @@ function CartLine({ item }: { item: CartItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex justify-between gap-3">
           <div>
-            <Link href={`/products/${item.productId}`} className="text-[15px] font-semibold hover:text-gold-dark">
+            <Link href={`/products/${item.productId}`} className="text-[14.5px] font-medium text-navy hover:text-gold-dark">
               {item.productName}
             </Link>
             <p className="mt-1 text-[13px] text-muted2">Biến thể: {item.variantName}</p>
@@ -87,7 +89,7 @@ function CartLine({ item }: { item: CartItem }) {
               <span className={cn("text-[12.5px] font-semibold", item.isAvailable ? "text-warn" : "text-danger")}>{stockNote}</span>
             )}
           </div>
-          <span className="text-[15px] font-bold">{formatVND(item.lineTotal)}</span>
+          <span className="text-[15px] font-semibold text-price">{formatVND(item.lineTotal)}</span>
         </div>
       </div>
     </div>
@@ -131,14 +133,13 @@ function CartView() {
 
   if (!cart.items.length) {
     return (
-      <EmptyState
-        title="Chưa có sản phẩm nào trong giỏ"
-        action={
-          <Link href="/products" className="hsv-btn-primary h-11">
-            Tiếp tục mua sắm
-          </Link>
-        }
-      />
+      <div className="flex flex-col items-center py-14 text-center">
+        <EmptyCartArt />
+        <p className="mt-4 text-[15px] font-light text-ink-2">Giỏ hàng trống</p>
+        <Link href="/products" className="mt-5 inline-flex h-10 items-center rounded-md bg-navy px-6 text-[13.5px] font-medium text-white hover:bg-navy-deep">
+          Tiếp tục mua sắm
+        </Link>
+      </div>
     );
   }
 
@@ -182,7 +183,7 @@ function CartView() {
 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-      <div className="hsv-card px-6 py-2">
+      <div className="rounded-2xl border border-line bg-white px-4 py-2 sm:px-6">
         {cart.items.map((item) => (
           <CartLine key={item.id} item={item} />
         ))}
@@ -195,8 +196,8 @@ function CartView() {
         </div>
       </div>
 
-      <div className="hsv-card p-[26px] lg:sticky lg:top-[136px]">
-        <p className="mb-3.5 text-base font-bold">Thông tin giao hàng</p>
+      <div className="rounded-2xl bg-surface-2 p-5 sm:p-[26px] lg:sticky lg:top-[140px]">
+        <p className="mb-3.5 text-[15px] font-medium text-navy">Thông tin giao hàng</p>
         {addresses.error && <ErrorBox error={addresses.error} onRetry={addresses.reload} className="mb-2" />}
         <div className="flex flex-col gap-2">
           {list.map((a) => (
@@ -265,7 +266,7 @@ function CartView() {
           className="mt-2.5 w-full resize-y rounded-card border border-line px-3 py-2.5 text-sm outline-none focus:border-navy"
         />
 
-        <p className="mb-3 mt-5 text-base font-bold">Phương thức thanh toán</p>
+        <p className="mb-3 mt-5 text-[15px] font-medium text-navy">Phương thức thanh toán</p>
         <div className="flex flex-col gap-2">
           {PAYMENTS.map((m) => (
             <button
@@ -293,8 +294,8 @@ function CartView() {
         )}
 
         <div className="mt-5 flex items-baseline justify-between border-t border-line pt-4">
-          <span className="text-[15px] font-semibold">Tổng thanh toán</span>
-          <span className="text-2xl font-bold">{formatVND(cart.subTotal)}</span>
+          <span className="text-[15px] font-medium text-navy">Tổng thanh toán</span>
+          <span className="text-[22px] font-semibold text-price">{formatVND(cart.subTotal)}</span>
         </div>
         {!cart.canCheckout && (
           <div className="mt-3">
@@ -306,7 +307,7 @@ function CartView() {
             <FormAlert message={coErr} />
           </div>
         )}
-        <button onClick={submit} disabled={!cart.canCheckout || placing || !session} className="hsv-btn-gold mt-3.5 h-[52px] w-full text-[15px]">
+        <button onClick={submit} disabled={!cart.canCheckout || placing || !session} className="hsv-btn-primary mt-3.5 h-[52px] w-full rounded-md text-[14.5px] uppercase tracking-[0.05em]">
           {placing ? "Đang đặt hàng…" : "Đặt hàng"}
         </button>
       </div>
@@ -314,13 +315,58 @@ function CartView() {
   );
 }
 
-export default function CartPage() {
+/** Hình minh họa giỏ trống: giá trưng bày trang sức (tượng bán thân) và vài hạt ngọc. */
+function EmptyCartArt() {
   return (
-    <div className="hsv-container animate-hin pb-[72px] pt-9">
-      <h1 className="hsv-page-title mb-6">Giỏ hàng &amp; thanh toán</h1>
-      <RequireCustomer>
-        <CartView />
-      </RequireCustomer>
+    <svg viewBox="0 0 200 170" className="h-[150px] w-[180px]" aria-hidden>
+      <defs>
+        <linearGradient id="bust" x1="0" x2="1">
+          <stop offset="0" stopColor="#e9ecf1" />
+          <stop offset=".5" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#dde2e9" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="100" cy="150" rx="70" ry="10" fill="#eef1f5" />
+      <path d="M70 40c0-14 13-22 30-22s30 8 30 22c0 10-6 14-6 22 0 14 14 22 14 44 0 18-16 30-38 30s-38-12-38-30c0-22 14-30 14-44 0-8-6-12-6-22z" fill="url(#bust)" stroke="#d5dbe3" />
+      <ellipse cx="100" cy="30" rx="18" ry="6" fill="#f4f6f9" stroke="#d5dbe3" />
+      <rect x="96" y="136" width="8" height="10" rx="2" fill="#d5dbe3" />
+      <ellipse cx="100" cy="148" rx="20" ry="4" fill="#d5dbe3" />
+      {[
+        [52, 128, 5],
+        [150, 132, 4.5],
+        [64, 146, 4],
+        [140, 150, 5],
+      ].map(([x, y, r]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill="#c9ced6" />
+      ))}
+      <path d="M150 52l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M48 72l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#c9ced6" />
+    </svg>
+  );
+}
+
+export default function CartPage() {
+  const router = useRouter();
+  const back = () => (window.history.length > 1 ? router.back() : router.push("/products"));
+
+  return (
+    <div className="animate-hin bg-surface-2 px-3 pb-16 pt-6 sm:px-6 sm:pt-8">
+      <div className="mx-auto max-w-[1120px] rounded-2xl bg-white px-4 pb-8 pt-5 sm:px-8">
+        <div className="relative flex items-center justify-center">
+          <button onClick={back} className="absolute left-0 flex items-center gap-1 text-[13.5px] text-ink-2 hover:text-navy">
+            <ChevronLeft className="h-4 w-4" />
+            Quay lại
+          </button>
+          <h1 className="text-[17px] font-medium text-navy sm:text-[18px]">Giỏ hàng</h1>
+        </div>
+        <div className="mt-4 flex justify-center border-b border-line-2 pb-5">
+          <CheckoutSteps current={1} />
+        </div>
+        <div className="mt-6">
+          <RequireCustomer>
+            <CartView />
+          </RequireCustomer>
+        </div>
+      </div>
     </div>
   );
 }
