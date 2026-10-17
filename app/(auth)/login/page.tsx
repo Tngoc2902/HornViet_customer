@@ -101,14 +101,9 @@ export default function LoginPage() {
               <FieldError message={errors.email} />
             </div>
             <div>
-              <div className="flex items-baseline justify-between gap-3">
-                <label htmlFor="lg-pass" className="hsv-label">
-                  Mật khẩu
-                </label>
-                <Link href="/forgot-password" className="text-[13px] font-semibold text-gold">
-                  Quên mật khẩu?
-                </Link>
-              </div>
+              <label htmlFor="lg-pass" className="hsv-label">
+                Mật khẩu
+              </label>
               <input
                 id="lg-pass"
                 type="password"
@@ -123,6 +118,11 @@ export default function LoginPage() {
             <button type="submit" disabled={busy} className="hsv-btn-primary mt-1 h-[50px] text-[15px]">
               {busy ? "Đang đăng nhập…" : "Đăng nhập"}
             </button>
+            <p className="text-right text-[12.5px]">
+              <Link href="/forgot-password" className="font-semibold text-gold">
+                Quên mật khẩu?
+              </Link>
+            </p>
             <p className="text-center text-[13.5px] text-muted2">
               Chưa có tài khoản?{" "}
               <Link href="/register" className="font-semibold text-gold">
