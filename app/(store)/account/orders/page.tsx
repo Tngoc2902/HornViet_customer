@@ -9,6 +9,7 @@ import { RequireCustomer } from "@/components/hsv/guards";
 import { AccountShell } from "@/components/hsv/page-shells";
 import { Chip, ErrorBox, LoadingRows, notify, OrderProgress, Pager, StatusBadge } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
+import { useRealtimeRefresh } from "@/hooks/use-realtime";
 import { toApiError } from "@/lib/api/http";
 import { orderApi } from "@/lib/api/services";
 import { OrderStatus, type OrderListItem } from "@/lib/api/types";
@@ -130,6 +131,7 @@ function OrdersView() {
     void list.reload();
     void counts.reload();
   };
+  useRealtimeRefresh(["OrderStatusChanged"], refreshAll);
 
   const items = list.data?.items ?? [];
 

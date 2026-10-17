@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/hsv/confirm-provider";
@@ -10,6 +11,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
 import { profileApi } from "@/lib/api/services";
+import { SESSION_TOAST_ID } from "@/lib/realtime";
 import type { Address } from "@/lib/api/types";
 import { isStrongPassword, isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
 import { cn } from "@/lib/utils";
@@ -248,6 +250,7 @@ function AddressTab() {
 function PasswordTab() {
   const { logout } = useAuth();
   const router = useRouter();
+  const profile = useApi(() => profileApi.get(), []);
   const [pw, setPw] = useState({ cur: "", nw: "", cf: "" });
   const [errors, setErrors] = useState<FieldErrors<"cur" | "nw" | "cf">>({});
   const [busy, setBusy] = useState(false);
@@ -264,7 +267,7 @@ function PasswordTab() {
       await profileApi.changePassword(pw.cur, pw.nw);
       // Backend thu hồi mọi phiên đăng nhập (kể cả phiên này) khi đổi mật khẩu → đăng nhập lại.
       logout();
-      notify("Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.");
+      notify("Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.", SESSION_TOAST_ID);
       router.replace("/login?returnUrl=%2Faccount%2Fprofile");
       return;
     } catch (err) {
@@ -285,6 +288,22 @@ function PasswordTab() {
     ["nw", "Mật khẩu mới", "new-password"],
     ["cf", "Nhập lại mật khẩu mới", "new-password"],
   ] as const;
+
+  // Tài khoản tạo bằng Google chưa có mật khẩu: tạo qua Quên mật khẩu (link gửi về email) thay vì đổi ở đây.
+  if (profile.data && !profile.data.hasPassword) {
+    return (
+      <div className="max-w-[420px] rounded-card border border-line bg-surface-2 px-4 py-3.5 text-[13.5px] leading-relaxed text-ink-2">
+        <p>
+          Tài khoản của bạn đăng nhập bằng Google nên chưa có mật khẩu. Nếu muốn đăng nhập bằng email và mật khẩu,
+          hãy tạo mật khẩu qua mục Quên mật khẩu — liên kết tạo mật khẩu sẽ được gửi tới{" "}
+          <span className="font-semibold">{profile.data.emailAddress}</span>.
+        </p>
+        <Link href="/forgot-password" className="mt-2 inline-block font-semibold text-gold">
+          Tạo mật khẩu →
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex max-w-[420px] flex-col gap-4">

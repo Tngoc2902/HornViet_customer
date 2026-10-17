@@ -9,11 +9,13 @@ import { Breadcrumbs, ServicePerks, STORE_INFO, ZALO_URL } from "@/components/hs
 import { ErrorBox, notify, ProductImage, QtyStepper, Skeleton } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
+import { useWatchProducts } from "@/contexts/realtime-context";
 import { useApi } from "@/hooks/use-api";
+import { useRealtime } from "@/hooks/use-realtime";
 import { toApiError } from "@/lib/api/http";
 import { productApi } from "@/lib/api/services";
 import type { ProductVariant } from "@/lib/api/types";
-import { formatVND } from "@/lib/hsv/format";
+import { formatVND, LOW_STOCK_THRESHOLD } from "@/lib/hsv/format";
 import { cn } from "@/lib/utils";
 
 function OptionButton({ label, on, empty, onClick }: { label: string; on: boolean; empty: boolean; onClick: () => void }) {
@@ -51,7 +53,25 @@ export default function ProductDetailPage() {
   const { session } = useAuth();
   const { cart, add } = useCart();
 
-  const { data: product, error, reload } = useApi(() => productApi.get(productId), [productId]);
+  const { data: product, error, reload, setData } = useApi(() => productApi.get(productId), [productId]);
+
+  // Thời gian thực: có người mua / hủy đơn / nhập kho → số lượng còn lại và nhãn Hết hàng đổi ngay trên trang.
+  useWatchProducts(product ? [productId] : []);
+  useRealtime("StockChanged", (e) => {
+    if (e.productId !== productId) return;
+    setData((p) => {
+      if (!p) return p as never;
+      const variants = p.variants.map((v) => {
+        const s = e.variants.find((x) => x.variantId === v.id);
+        return s ? { ...v, stockQuantity: s.stockQuantity, inStock: s.stockQuantity > 0, isLowStock: s.stockQuantity <= LOW_STOCK_THRESHOLD } : v;
+      });
+      return { ...p, variants, totalStock: variants.reduce((sum, v) => sum + v.stockQuantity, 0) };
+    });
+  });
+  // Giá, biến thể sửa đổi hoặc sản phẩm bị ẩn / xóa → tải lại (ẩn / xóa sẽ hiện "không còn tồn tại").
+  useRealtime("ProductChanged", (e) => {
+    if (e.productId === productId) void reload();
+  });
   const related = useApi(
     () => productApi.getAll({ categoryIds: [product!.categoryId], maxResultCount: 11 }),
     [product?.categoryId],
@@ -79,7 +99,7 @@ export default function ProductDetailPage() {
     setTab("desc");
   }, [productId]);
 
-  if (error && !product) {
+  if (error && (!product || error.status === 404)) {
     return (
       <div className="hsv-container py-28 text-center">
         {error.status === 404 ? (

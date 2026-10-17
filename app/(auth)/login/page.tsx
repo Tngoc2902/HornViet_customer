@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { GoogleLoginButton } from "@/components/hsv/google-login-button";
 import { AuthShell } from "@/components/hsv/page-shells";
 import { FieldError, FormAlert, notify } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
@@ -21,7 +22,7 @@ function safeReturnUrl(v: string | null) {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [wrongArea, setWrongArea] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
@@ -64,6 +65,23 @@ export default function LoginPage() {
     }
   };
 
+  // Google đã xác nhận tài khoản → backend kiểm tra token với Google, chưa có tài khoản thì tạo mới rồi cấp phiên đăng nhập.
+  const submitGoogle = async (accessToken: string) => {
+    setBusy(true);
+    setWrongArea(false);
+    setErrors({});
+    try {
+      await loginWithGoogle(accessToken);
+      notify("Đăng nhập thành công");
+      router.push(returnUrl ?? "/");
+    } catch (err) {
+      const api = toApiError(err);
+      setWrongArea(api.status === 403);
+      setErrors({ form: api.message });
+      setBusy(false);
+    }
+  };
+
   return (
     <AuthShell title="Chào mừng trở lại" sub="Vui lòng đăng nhập để tiếp tục" perks={MEMBER_PERKS}>
         <form onSubmit={submit} noValidate>
@@ -101,14 +119,9 @@ export default function LoginPage() {
               <FieldError message={errors.email} />
             </div>
             <div>
-              <div className="flex items-baseline justify-between gap-3">
-                <label htmlFor="lg-pass" className="hsv-label">
-                  Mật khẩu
-                </label>
-                <Link href="/forgot-password" className="text-[13px] font-semibold text-gold">
-                  Quên mật khẩu?
-                </Link>
-              </div>
+              <label htmlFor="lg-pass" className="hsv-label">
+                Mật khẩu
+              </label>
               <input
                 id="lg-pass"
                 type="password"
@@ -123,6 +136,12 @@ export default function LoginPage() {
             <button type="submit" disabled={busy} className="hsv-btn-primary mt-1 h-[50px] text-[15px]">
               {busy ? "Đang đăng nhập…" : "Đăng nhập"}
             </button>
+            <p className="text-right text-[12.5px]">
+              <Link href="/forgot-password" className="font-semibold text-gold">
+                Quên mật khẩu?
+              </Link>
+            </p>
+            <GoogleLoginButton disabled={busy} onToken={submitGoogle} onError={(message) => setErrors({ form: message })} />
             <p className="text-center text-[13.5px] text-muted2">
               Chưa có tài khoản?{" "}
               <Link href="/register" className="font-semibold text-gold">

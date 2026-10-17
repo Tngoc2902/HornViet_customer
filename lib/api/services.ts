@@ -44,6 +44,9 @@ const app = (path: string) => `/api/services/app/${path}`;
 export const authApi = {
   authenticate: (userNameOrEmailAddress: string, password: string) =>
     http.post<AuthenticateResult>("/api/TokenAuth/Authenticate", { userNameOrEmailAddress, password }),
+  /** Đăng nhập bằng Google: gửi access token Google cấp; backend tự hỏi Google để kiểm tra, chưa có tài khoản thì tạo mới. */
+  authenticateGoogle: (accessToken: string) =>
+    http.post<AuthenticateResult>("/api/TokenAuth/AuthenticateGoogle", { accessToken }),
   register: (input: RegisterInput) => http.post<{ userId: number; userName: string }>(app("Account/Register"), input),
   /** Gửi email chứa link đặt lại mật khẩu; luôn thành công dù email có tồn tại hay không. */
   forgotPassword: (emailAddress: string) => http.post<null>(app("Account/ForgotPassword"), { emailAddress }),

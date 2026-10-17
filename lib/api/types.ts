@@ -37,6 +37,10 @@ export type Profile = {
   emailAddress: string;
   phoneNumber: string | null;
   roleNames: RoleName[];
+  /** false = tài khoản tạo bằng Google, chưa đặt mật khẩu. */
+  hasPassword: boolean;
+  /** Đã liên kết tài khoản Google. */
+  hasGoogleLogin: boolean;
 };
 
 export type Address = { id: number; receiverName: string; phoneNumber: string; address: string; isDefault: boolean };
