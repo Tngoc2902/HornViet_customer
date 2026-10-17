@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleLoginButton } from "@/components/hsv/google-login-button";
 import { AuthShell } from "@/components/hsv/page-shells";
 import { FieldError, FormAlert, notify } from "@/components/hsv/ui";
+import { useAuth } from "@/contexts/auth-context";
 import { toApiError } from "@/lib/api/http";
 import { authApi } from "@/lib/api/services";
 import { isStrongPassword, isValidEmail, isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
@@ -34,6 +36,7 @@ function validate(f: Record<Key, string>): FieldErrors<Key> {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { loginWithGoogle } = useAuth();
   const [form, setForm] = useState<Record<Key, string>>({ name: "", phoneNumber: "", emailAddress: "", password: "" });
   const [errors, setErrors] = useState<FieldErrors<Key>>({});
   const [formError, setFormError] = useState("");
@@ -62,6 +65,21 @@ export default function RegisterPage() {
       if (!Object.keys(f).length && /sử dụng/i.test(api.message)) f.emailAddress = api.message;
       setErrors(f);
       if (!Object.keys(f).length) setFormError(api.message);
+      setBusy(false);
+    }
+  };
+
+  // Đăng ký bằng Google: backend tạo tài khoản từ thông tin Google (đã có thì đăng nhập luôn), không cần nhập form.
+  const submitGoogle = async (accessToken: string) => {
+    setBusy(true);
+    setErrors({});
+    setFormError("");
+    try {
+      await loginWithGoogle(accessToken);
+      notify("Đăng nhập thành công");
+      router.push("/");
+    } catch (err) {
+      setFormError(toApiError(err).message);
       setBusy(false);
     }
   };
@@ -99,6 +117,7 @@ export default function RegisterPage() {
           <button type="submit" disabled={busy} className="hsv-btn-primary mt-1 h-[50px] text-[15px]">
             {busy ? "Đang tạo tài khoản…" : "Đăng ký"}
           </button>
+          <GoogleLoginButton text="signup_with" disabled={busy} onToken={submitGoogle} onError={setFormError} />
           <p className="text-center text-[13.5px] text-muted2">
             Đã có tài khoản?{" "}
             <Link href="/login" className="font-semibold text-gold">

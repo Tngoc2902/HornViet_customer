@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { GoogleLoginButton } from "@/components/hsv/google-login-button";
 import { AuthShell } from "@/components/hsv/page-shells";
 import { FieldError, FormAlert, notify } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
@@ -21,7 +22,7 @@ function safeReturnUrl(v: string | null) {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [wrongArea, setWrongArea] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
@@ -60,6 +61,23 @@ export default function LoginPage() {
       setWrongArea(api.status === 403);
       const f = api.fieldErrors();
       setErrors({ email: f.userNameOrEmailAddress, pass: f.password, form: f.userNameOrEmailAddress || f.password ? undefined : api.message });
+      setBusy(false);
+    }
+  };
+
+  // Google đã xác nhận tài khoản → backend kiểm tra token với Google, chưa có tài khoản thì tạo mới rồi cấp phiên đăng nhập.
+  const submitGoogle = async (accessToken: string) => {
+    setBusy(true);
+    setWrongArea(false);
+    setErrors({});
+    try {
+      await loginWithGoogle(accessToken);
+      notify("Đăng nhập thành công");
+      router.push(returnUrl ?? "/");
+    } catch (err) {
+      const api = toApiError(err);
+      setWrongArea(api.status === 403);
+      setErrors({ form: api.message });
       setBusy(false);
     }
   };
@@ -123,6 +141,7 @@ export default function LoginPage() {
                 Quên mật khẩu?
               </Link>
             </p>
+            <GoogleLoginButton disabled={busy} onToken={submitGoogle} onError={(message) => setErrors({ form: message })} />
             <p className="text-center text-[13.5px] text-muted2">
               Chưa có tài khoản?{" "}
               <Link href="/register" className="font-semibold text-gold">

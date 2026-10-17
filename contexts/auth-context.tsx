@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ApiError, setUnauthorizedHandler, tokenStore } from "@/lib/api/http";
 import { authApi } from "@/lib/api/services";
-import type { RoleName } from "@/lib/api/types";
+import type { AuthenticateResult, RoleName } from "@/lib/api/types";
 import { loadLocalStorage, removeLocalStorage, saveLocalStorage } from "@/lib/storage";
 
 const SESSION_KEY = "hsv-session";
@@ -22,6 +22,8 @@ type AuthValue = {
   session: Session | null;
   /** Đăng nhập; tài khoản Nhân viên / Quản trị viên → ném ApiError 403 và không lưu phiên. */
   login: (identifier: string, password: string) => Promise<Session>;
+  /** Đăng nhập bằng access token Google (chưa có tài khoản thì backend tạo mới). */
+  loginWithGoogle: (accessToken: string) => Promise<Session>;
   logout: () => void;
   setName: (name: string) => void;
 };
@@ -73,9 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [session, logout]);
 
-  const login = useCallback(
-    async (identifier: string, password: string) => {
-      const r = await authApi.authenticate(identifier.trim(), password);
+  // Lưu phiên từ kết quả đăng nhập (mật khẩu hoặc Google).
+  const startSession = useCallback(
+    (r: AuthenticateResult) => {
       if (isStaffRoles(r.roles ?? [])) throw new ApiError(403, STAFF_ACCOUNT_MESSAGE);
       tokenStore.set(r.accessToken);
       const s: Session = {
@@ -91,14 +93,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persist]
   );
 
+  const login = useCallback(
+    async (identifier: string, password: string) => startSession(await authApi.authenticate(identifier.trim(), password)),
+    [startSession]
+  );
+
+  const loginWithGoogle = useCallback(
+    async (accessToken: string) => startSession(await authApi.authenticateGoogle(accessToken)),
+    [startSession]
+  );
+
   const value = useMemo<AuthValue>(
     () => ({
       session,
       login,
+      loginWithGoogle,
       logout,
       setName: (name: string) => session && persist({ ...session, name }),
     }),
-    [session, login, logout, persist]
+    [session, login, loginWithGoogle, logout, persist]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
