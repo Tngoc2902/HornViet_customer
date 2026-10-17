@@ -10,8 +10,9 @@ import { gradient, ORDER_FLOW, ORDER_STATUS } from "@/lib/hsv/format";
 import { tonesFor } from "@/lib/hsv/tones";
 
 /** Toast đen ở đáy giữa màn hình, tự ẩn sau 2.6s. */
-export function notify(message: string) {
-  toast(message);
+export function notify(message: string, id?: string) {
+  // Cùng id thì toast sau thay toast trước (không hiện trùng).
+  toast(message, id ? { id } : undefined);
 }
 
 /**

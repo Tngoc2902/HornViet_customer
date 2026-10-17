@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
 import { profileApi } from "@/lib/api/services";
+import { SESSION_TOAST_ID } from "@/lib/realtime";
 import type { Address } from "@/lib/api/types";
 import { isStrongPassword, isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
 import { cn } from "@/lib/utils";
@@ -264,7 +265,7 @@ function PasswordTab() {
       await profileApi.changePassword(pw.cur, pw.nw);
       // Backend thu hồi mọi phiên đăng nhập (kể cả phiên này) khi đổi mật khẩu → đăng nhập lại.
       logout();
-      notify("Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.");
+      notify("Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.", SESSION_TOAST_ID);
       router.replace("/login?returnUrl=%2Faccount%2Fprofile");
       return;
     } catch (err) {
