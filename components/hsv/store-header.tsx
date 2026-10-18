@@ -16,7 +16,6 @@ import {
   Mail,
   Menu,
   Phone,
-  Search,
   ShoppingBag,
   Store,
   UserRound,
@@ -28,6 +27,7 @@ import { useCatalog } from "@/contexts/catalog-context";
 import { initialOf, lastName, roleLabel } from "@/lib/hsv/format";
 import { cn } from "@/lib/utils";
 import { STORE_INFO, ZALO_URL } from "./store-ui";
+import { SearchBox } from "./search-box";
 import { Drawer, notify } from "./ui";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
@@ -64,39 +64,6 @@ function HeaderIcon({ label, children, badge }: { label: string; children: React
       </span>
       <span className="hidden lg:inline">{label}</span>
     </span>
-  );
-}
-
-function SearchBox({ className, autoFocus }: { className?: string; autoFocus?: boolean }) {
-  const router = useRouter();
-  const params = useSearchParams();
-  const [q, setQ] = useState(params.get("q") ?? "");
-
-  useEffect(() => {
-    setQ(params.get("q") ?? "");
-  }, [params]);
-
-  return (
-    <form
-      role="search"
-      onSubmit={(e) => {
-        e.preventDefault();
-        router.push(q.trim() ? `/products?q=${encodeURIComponent(q.trim())}` : "/products");
-      }}
-      className={cn("flex h-10 items-center rounded-full border border-line bg-surface pl-4 pr-1 focus-within:border-navy/40", className)}
-    >
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Tìm lược sừng, vòng tay, trâm cài…"
-        aria-label="Tìm kiếm sản phẩm"
-        autoFocus={autoFocus}
-        className="min-w-0 flex-1 bg-transparent text-[13.5px] font-light outline-none placeholder:italic placeholder:text-faint"
-      />
-      <button type="submit" aria-label="Tìm kiếm" className="flex h-8 w-8 items-center justify-center rounded-full text-navy hover:bg-white">
-        <Search className="h-[18px] w-[18px]" />
-      </button>
-    </form>
   );
 }
 
