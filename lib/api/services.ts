@@ -19,7 +19,6 @@ import type {
   PagedResult,
   PageInput,
   Shipment,
-  ShippingDistrict,
   ShippingFeeResult,
   ShippingProvince,
   ShippingWard,
@@ -126,10 +125,9 @@ export const orderApi = {
 export const shippingApi = {
   getStatus: () => http.get<{ isEnabled: boolean }>(app("Shipping/GetStatus")),
   getProvinces: () => http.get<ShippingProvince[]>(app("Shipping/GetProvinces")),
-  getDistricts: (provinceId: number) => http.get<ShippingDistrict[]>(app("Shipping/GetDistricts"), { provinceId }),
-  getWards: (districtId: number) => http.get<ShippingWard[]>(app("Shipping/GetWards"), { districtId }),
-  calculateFee: (toDistrictId: number, toWardCode: string) =>
-    http.post<ShippingFeeResult>(app("Shipping/CalculateFee"), { toDistrictId, toWardCode }),
+  getWards: (provinceId: number) => http.get<ShippingWard[]>(app("Shipping/GetWards"), { provinceId }),
+  calculateFee: (toProvinceId: number, toWardCode: string) =>
+    http.post<ShippingFeeResult>(app("Shipping/CalculateFee"), { toProvinceId, toWardCode }),
 };
 
 export const shipmentApi = {

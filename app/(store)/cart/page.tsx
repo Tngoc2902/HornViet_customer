@@ -103,7 +103,7 @@ function CartView() {
   const router = useRouter();
   const addresses = useApi(() => profileApi.getAddresses(), []);
   const profile = useApi(() => profileApi.get(), []);
-  // Bật giao hàng nhanh: bắt buộc chọn Tỉnh / Quận / Phường (để tính phí và tạo vận đơn) nên dùng form nhập địa chỉ,
+  // Bật giao hàng nhanh: bắt buộc chọn Tỉnh / Phường (để tính phí và tạo vận đơn) nên dùng form nhập địa chỉ,
   // chưa dùng sổ địa chỉ (địa chỉ đã lưu chưa có mã khu vực).
   const shipping = useApi(() => shippingApi.getStatus(), []);
   const shippingOn = shipping.data?.isEnabled === true;
@@ -132,7 +132,7 @@ function CartView() {
   // Tính phí ship mỗi khi đổi khu vực hoặc giỏ hàng (số lượng đổi → cân nặng đổi).
   const cartKey = cart ? `${cart.totalQuantity}-${cart.subTotal}` : "";
   useEffect(() => {
-    if (!shippingOn || !area.districtId || !area.wardCode) {
+    if (!shippingOn || !area.provinceId || !area.wardCode) {
       setFee(null);
       setFeeErr("");
       return;
@@ -141,13 +141,13 @@ function CartView() {
     setFee(null);
     setFeeErr("");
     shippingApi
-      .calculateFee(area.districtId, area.wardCode)
+      .calculateFee(area.provinceId, area.wardCode)
       .then((r) => !cancelled && setFee(r.fee))
       .catch((e) => !cancelled && setFeeErr(toApiError(e).message));
     return () => {
       cancelled = true;
     };
-  }, [shippingOn, area.districtId, area.wardCode, cartKey]);
+  }, [shippingOn, area.provinceId, area.wardCode, cartKey]);
 
   if (placing && cart?.items.length === 0) return null;
 
@@ -182,8 +182,8 @@ function CartView() {
     if (!info.shippingAddress.trim()) e.shippingAddress = "Vui lòng nhập địa chỉ giao hàng";
     setErrors(e);
     let missingArea = false;
-    if (shippingOn && !(area.provinceId && area.districtId && area.wardCode)) {
-      setAreaErr("Vui lòng chọn Tỉnh / Quận / Phường");
+    if (shippingOn && !(area.provinceId && area.wardCode)) {
+      setAreaErr("Vui lòng chọn Tỉnh / Thành phố và Phường / Xã");
       missingArea = true;
     } else setAreaErr("");
     if (shippingOn && !missingArea && fee === null) {
@@ -201,7 +201,7 @@ function CartView() {
         shippingAddress: info.shippingAddress.trim(),
         paymentMethod: pay,
         note: note.trim() || undefined,
-        ...(shippingOn ? { toProvinceId: area.provinceId!, toDistrictId: area.districtId!, toWardCode: area.wardCode } : {}),
+        ...(shippingOn ? { toProvinceId: area.provinceId!, toWardCode: area.wardCode } : {}),
       });
       clearLocal();
       router.push(`/order-success/${order.id}`);
