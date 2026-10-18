@@ -1,10 +1,10 @@
-// Tài khoản nhận chuyển khoản của cửa hàng. Mặc định là tài khoản đang dùng (Techcombank · 0451 000 123 456 · CTY TNHH
+// Tài khoản nhận chuyển khoản của cửa hàng. Mặc định là tài khoản đang dùng (Techcombank · 19070061122019 · CTY TNHH
 // HỒN SỪNG VIỆT); đổi tài khoản thì đặt biến môi trường (Vercel → Settings → Environment Variables) rồi deploy lại, không cần
 // sửa code. Mã ngân hàng (BIN) tra ở https://api.vietqr.io/v2/banks, VD Techcombank 970407, Vietcombank 970436, MB 970422.
 const DEFAULT_BANK = {
   bin: "970407",
   bankName: "Techcombank",
-  accountNo: "0451 000 123 456",
+  accountNo: "19070061122019",
   accountName: "CTY TNHH HỒN SỪNG VIỆT",
 };
 
