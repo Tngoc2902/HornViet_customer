@@ -43,7 +43,7 @@ function SuccessView() {
         </div>
         <div>
           <p className="text-xs text-subtle">Tổng thanh toán</p>
-          <p className="mt-1 text-lg font-semibold text-price">{formatVND(order.totalAmount)}</p>
+          <p className="mt-1 text-lg font-semibold text-price">{formatVND(order.payableAmount ?? order.totalAmount)}</p>
         </div>
         <div className="col-span-2">
           <p className="text-xs text-subtle">Phương thức</p>

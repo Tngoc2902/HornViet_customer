@@ -11,7 +11,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
-import { orderApi, profileApi } from "@/lib/api/services";
+import { orderApi, profileApi, shippingApi } from "@/lib/api/services";
+import { AddressPicker, EMPTY_AREA, type Area } from "@/components/hsv/address-picker";
 import { PaymentMethod, type CartItem } from "@/lib/api/types";
 import { BANK_INFO, formatVND } from "@/lib/hsv/format";
 import { isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
@@ -102,7 +103,15 @@ function CartView() {
   const router = useRouter();
   const addresses = useApi(() => profileApi.getAddresses(), []);
   const profile = useApi(() => profileApi.get(), []);
-  const list = addresses.data?.items ?? [];
+  // Bật giao hàng nhanh: bắt buộc chọn Tỉnh / Quận / Phường (để tính phí và tạo vận đơn) nên dùng form nhập địa chỉ,
+  // chưa dùng sổ địa chỉ (địa chỉ đã lưu chưa có mã khu vực).
+  const shipping = useApi(() => shippingApi.getStatus(), []);
+  const shippingOn = shipping.data?.isEnabled === true;
+  const list = shippingOn ? [] : (addresses.data?.items ?? []);
+  const [area, setArea] = useState<Area>(EMPTY_AREA);
+  const [areaErr, setAreaErr] = useState("");
+  const [fee, setFee] = useState<number | null>(null);
+  const [feeErr, setFeeErr] = useState("");
 
   const [addrId, setAddrId] = useState<number | null | undefined>(undefined);
   const [ship, setShip] = useState({ receiverName: "", phoneNumber: "", shippingAddress: "" });
@@ -119,6 +128,26 @@ function CartView() {
   useEffect(() => {
     if (profile.data) setShip((s) => ({ ...s, receiverName: s.receiverName || profile.data!.name, phoneNumber: s.phoneNumber || (profile.data!.phoneNumber ?? "") }));
   }, [profile.data]);
+
+  // Tính phí ship mỗi khi đổi khu vực hoặc giỏ hàng (số lượng đổi → cân nặng đổi).
+  const cartKey = cart ? `${cart.totalQuantity}-${cart.subTotal}` : "";
+  useEffect(() => {
+    if (!shippingOn || !area.districtId || !area.wardCode) {
+      setFee(null);
+      setFeeErr("");
+      return;
+    }
+    let cancelled = false;
+    setFee(null);
+    setFeeErr("");
+    shippingApi
+      .calculateFee(area.districtId, area.wardCode)
+      .then((r) => !cancelled && setFee(r.fee))
+      .catch((e) => !cancelled && setFeeErr(toApiError(e).message));
+    return () => {
+      cancelled = true;
+    };
+  }, [shippingOn, area.districtId, area.wardCode, cartKey]);
 
   if (placing && cart?.items.length === 0) return null;
 
@@ -152,8 +181,17 @@ function CartView() {
     else if (!isValidPhone(info.phoneNumber)) e.phoneNumber = "Số điện thoại không hợp lệ";
     if (!info.shippingAddress.trim()) e.shippingAddress = "Vui lòng nhập địa chỉ giao hàng";
     setErrors(e);
+    let missingArea = false;
+    if (shippingOn && !(area.provinceId && area.districtId && area.wardCode)) {
+      setAreaErr("Vui lòng chọn Tỉnh / Quận / Phường");
+      missingArea = true;
+    } else setAreaErr("");
+    if (shippingOn && !missingArea && fee === null) {
+      setCoErr(feeErr || "Đang tính phí giao hàng, vui lòng đợi giây lát.");
+      return;
+    }
     setCoErr(picked && Object.keys(e).length ? "Địa chỉ đã chọn thiếu thông tin, vui lòng chọn địa chỉ khác." : "");
-    if (Object.keys(e).length) return;
+    if (Object.keys(e).length || missingArea) return;
 
     setPlacing(true);
     try {
@@ -163,6 +201,7 @@ function CartView() {
         shippingAddress: info.shippingAddress.trim(),
         paymentMethod: pay,
         note: note.trim() || undefined,
+        ...(shippingOn ? { toProvinceId: area.provinceId!, toDistrictId: area.districtId!, toWardCode: area.wardCode } : {}),
       });
       clearLocal();
       router.push(`/order-success/${order.id}`);
@@ -238,7 +277,7 @@ function CartView() {
               [
                 ["receiverName", "Tên người nhận", ""],
                 ["phoneNumber", "Số điện thoại", ""],
-                ["shippingAddress", "Địa chỉ nhận hàng chi tiết", "col-span-2"],
+                ["shippingAddress", shippingOn ? "Số nhà, tên đường" : "Địa chỉ nhận hàng chi tiết", "col-span-2"],
               ] as const
             ).map(([k, label, span]) => (
               <div key={k} className={span}>
@@ -252,9 +291,15 @@ function CartView() {
                 <FieldError message={errors[k]} />
               </div>
             ))}
-            <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
-              Quản lý sổ địa chỉ →
-            </Link>
+            {shippingOn ? (
+              <div className="col-span-2">
+                <AddressPicker value={area} onChange={setArea} error={areaErr} />
+              </div>
+            ) : (
+              <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
+                Quản lý sổ địa chỉ →
+              </Link>
+            )}
           </div>
         )}
         <textarea
@@ -293,9 +338,16 @@ function CartView() {
           </div>
         )}
 
-        <div className="mt-5 flex items-baseline justify-between border-t border-line pt-4">
+        {shippingOn && (
+          <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm">
+            <span className="text-muted2">Phí giao hàng (Giao Hàng Nhanh)</span>
+            <span className="font-semibold">{fee !== null ? formatVND(fee) : feeErr ? "—" : "Chọn khu vực để tính"}</span>
+          </div>
+        )}
+        {shippingOn && feeErr && <p className="mt-1 text-[12.5px] text-danger">{feeErr}</p>}
+        <div className={cn("flex items-baseline justify-between pt-4", shippingOn ? "" : "mt-5 border-t border-line")}>
           <span className="text-[15px] font-medium text-navy">Tổng thanh toán</span>
-          <span className="text-[22px] font-semibold text-price">{formatVND(cart.subTotal)}</span>
+          <span className="text-[22px] font-semibold text-price">{formatVND(cart.subTotal + (fee ?? 0))}</span>
         </div>
         {!cart.canCheckout && (
           <div className="mt-3">

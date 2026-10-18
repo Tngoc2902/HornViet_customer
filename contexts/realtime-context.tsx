@@ -6,6 +6,7 @@ import { notify } from "@/components/hsv/ui";
 import { useRealtime } from "@/hooks/use-realtime";
 import { tokenStore } from "@/lib/api/http";
 import { ORDER_STATUS } from "@/lib/hsv/format";
+import { shipmentLabel } from "@/lib/hsv/shipping";
 import {
   createHubConnection,
   emitRealtime,
@@ -95,6 +96,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     notify(SESSION_REVOKED_MESSAGES[reason], SESSION_TOAST_ID);
   });
   useRealtime("OrderStatusChanged", (o) => notify(`Đơn hàng ${o.code}: ${ORDER_STATUS[o.status].label}`));
+  useRealtime("ShipmentChanged", (o) => o.ghnStatus && notify(`Đơn hàng ${o.code}: ${shipmentLabel(o.ghnStatus)}`));
 
   const value = useMemo(() => ({ watchProduct }), [watchProduct]);
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
