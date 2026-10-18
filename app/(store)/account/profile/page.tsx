@@ -10,7 +10,8 @@ import { ErrorBox, FieldError, FormAlert, LoadingRows, notify } from "@/componen
 import { useAuth } from "@/contexts/auth-context";
 import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
-import { profileApi } from "@/lib/api/services";
+import { profileApi, shippingApi } from "@/lib/api/services";
+import { AddressPicker, EMPTY_AREA, type Area } from "@/components/hsv/address-picker";
 import { SESSION_TOAST_ID } from "@/lib/realtime";
 import type { Address } from "@/lib/api/types";
 import { isStrongPassword, isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
@@ -88,12 +89,20 @@ function InfoTab() {
   );
 }
 
-type AddrForm = { id?: number; receiverName: string; phoneNumber: string; address: string; isDefault: boolean };
+type AddrForm = { id?: number; receiverName: string; phoneNumber: string; address: string; isDefault: boolean; area: Area };
+
+/** Dữ liệu gửi lưu: khi bật giao hàng nhanh, address là số nhà và kèm tỉnh / phường. */
+function toInput(a: { id?: number; receiverName: string; phoneNumber: string; address: string; isDefault: boolean }, area: Area | null) {
+  return { ...a, provinceId: area?.provinceId ?? null, wardCode: area?.wardCode || null };
+}
 
 function AddressTab() {
   const confirm = useConfirm();
   const { data, error, reload } = useApi(() => profileApi.getAddresses(), []);
   const profile = useApi(() => profileApi.get(), []);
+  const shipping = useApi(() => shippingApi.getStatus(), []);
+  const shippingOn = shipping.data?.isEnabled === true;
+  const [areaErr, setAreaErr] = useState("");
   const [form, setForm] = useState<AddrForm | null>(null);
   const [errors, setErrors] = useState<FieldErrors<"receiverName" | "phoneNumber" | "address">>({});
   const [busy, setBusy] = useState(false);
@@ -123,21 +132,53 @@ function AddressTab() {
     if (!isValidPhone(form.phoneNumber)) e.phoneNumber = "Số điện thoại không hợp lệ";
     if (!form.address.trim()) e.address = "Bắt buộc";
     setErrors(e);
-    if (Object.keys(e).length) return;
+    const missingArea = shippingOn && !(form.area.provinceId && form.area.wardCode);
+    setAreaErr(missingArea ? "Vui lòng chọn Tỉnh / Thành phố và Phường / Xã" : "");
+    if (Object.keys(e).length || missingArea) return;
     const ok = await run(
       () =>
-        profileApi.saveAddress({
-          ...form,
-          receiverName: form.receiverName.trim(),
-          phoneNumber: normalizePhone(form.phoneNumber),
-          address: form.address.trim(),
-        }),
+        profileApi.saveAddress(
+          toInput(
+            {
+              id: form.id,
+              isDefault: form.isDefault,
+              receiverName: form.receiverName.trim(),
+              phoneNumber: normalizePhone(form.phoneNumber),
+              address: form.address.trim(),
+            },
+            shippingOn ? form.area : null
+          )
+        ),
       form.id ? "Đã cập nhật địa chỉ" : "Đã thêm địa chỉ"
     );
     if (ok) setForm(null);
   };
 
-  const setDefault = (a: Address) => run(() => profileApi.saveAddress({ ...a, isDefault: true }), "Đã đặt làm địa chỉ mặc định");
+  const setDefault = (a: Address) =>
+    run(
+      () =>
+        profileApi.saveAddress(
+          toInput(
+            { id: a.id, receiverName: a.receiverName, phoneNumber: a.phoneNumber, address: a.street ?? a.address, isDefault: true },
+            a.provinceId && a.wardCode ? { provinceId: a.provinceId, wardCode: a.wardCode } : null
+          )
+        ),
+      "Đã đặt làm địa chỉ mặc định"
+    );
+
+  const edit = (a: Address) => {
+    setErrors({});
+    setAreaErr("");
+    setForm({
+      id: a.id,
+      receiverName: a.receiverName,
+      phoneNumber: a.phoneNumber,
+      isDefault: a.isDefault,
+      // Địa chỉ cũ chưa có tỉnh / phường: giữ nguyên chữ để khách sửa lại thành số nhà + chọn tỉnh / phường.
+      address: a.street ?? a.address,
+      area: { provinceId: a.provinceId ?? null, wardCode: a.wardCode ?? "" },
+    });
+  };
 
   const remove = async (a: Address) => {
     if (await confirm({ title: "Xóa địa chỉ này?", body: a.address, okLabel: "Xóa", danger: true })) {
@@ -155,11 +196,13 @@ function AddressTab() {
           <button
             onClick={() => {
               setErrors({});
+              setAreaErr("");
               setForm({
                 receiverName: profile.data?.name ?? "",
                 phoneNumber: profile.data?.phoneNumber ?? "",
                 address: "",
                 isDefault: addresses.length === 0,
+                area: EMPTY_AREA,
               });
             }}
             className="text-[13.5px] font-semibold text-gold"
@@ -184,13 +227,13 @@ function AddressTab() {
                   {a.isDefault && <span className="rounded-lg bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-gold">Mặc định</span>}
                 </div>
                 <p className="mt-1 text-[13.5px] text-ink-2">{a.address}</p>
+                {a.needsUpdate && (
+                  <p className="mt-1 text-[12.5px] font-semibold text-warn">Cần cập nhật Tỉnh / Phường để dùng khi đặt hàng — bấm Sửa.</p>
+                )}
               </div>
               <div className="flex gap-3.5">
                 <button
-                  onClick={() => {
-                    setErrors({});
-                    setForm({ ...a });
-                  }}
+                  onClick={() => edit(a)}
                   className="text-[13px] font-semibold"
                 >
                   Sửa
@@ -215,7 +258,7 @@ function AddressTab() {
             [
               ["receiverName", "Tên người nhận", ""],
               ["phoneNumber", "Số điện thoại", ""],
-              ["address", "Địa chỉ chi tiết", "col-span-2"],
+              ["address", shippingOn ? "Số nhà, tên đường" : "Địa chỉ chi tiết", "col-span-2"],
             ] as const
           ).map(([k, label, span]) => (
             <div key={k} className={span}>
@@ -229,6 +272,11 @@ function AddressTab() {
               <FieldError message={errors[k]} />
             </div>
           ))}
+          {shippingOn && (
+            <div className="col-span-2">
+              <AddressPicker value={form.area} onChange={(area) => setForm((f) => (f ? { ...f, area } : f))} error={areaErr} />
+            </div>
+          )}
           <label className="col-span-2 flex items-center gap-2 text-[13.5px]">
             <input type="checkbox" checked={form.isDefault} onChange={(e) => setForm({ ...form, isDefault: e.target.checked })} />
             Đặt làm địa chỉ mặc định

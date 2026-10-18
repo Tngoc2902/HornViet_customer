@@ -12,7 +12,7 @@ import { useApi } from "@/hooks/use-api";
 import { useRealtime, useRealtimeRefresh } from "@/hooks/use-realtime";
 import { toApiError } from "@/lib/api/http";
 import { orderApi, shipmentApi } from "@/lib/api/services";
-import { SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/lib/hsv/shipping";
+import { isShipmentStale, SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/lib/hsv/shipping";
 import { OrderStatus, type OrderListItem } from "@/lib/api/types";
 import { formatDateTime, formatVND, ORDER_TABS, parseOrderTab, PAYMENT_LABEL } from "@/lib/hsv/format";
 
@@ -103,7 +103,7 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-subtle">Vận chuyển Giao Hàng Nhanh · Mã vận đơn</span>
             <b>{data.ghnOrderCode}</b>
-            {data.ghnStatus && (
+            {data.ghnStatus && !isShipmentStale(data.status, data.ghnStatus) && (
               <span
                 className="rounded-full border px-2.5 py-0.5 text-xs font-semibold"
                 style={{
@@ -116,7 +116,11 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
               </span>
             )}
           </div>
-          {data.ghnStatusTime && <p className="mt-1.5 text-muted2">Cập nhật lúc {formatDateTime(data.ghnStatusTime)}</p>}
+          {isShipmentStale(data.status, data.ghnStatus) ? (
+            <p className="mt-1.5 text-muted2">Đơn đã được cửa hàng cập nhật trạng thái trực tiếp.</p>
+          ) : (
+            data.ghnStatusTime && <p className="mt-1.5 text-muted2">Cập nhật lúc {formatDateTime(data.ghnStatusTime)}</p>
+          )}
           {data.ghnExpectedDeliveryTime && data.status !== OrderStatus.Completed && (
             <p className="mt-0.5 text-muted2">Dự kiến giao: {formatDateTime(data.ghnExpectedDeliveryTime)}</p>
           )}

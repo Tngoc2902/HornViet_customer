@@ -103,11 +103,12 @@ function CartView() {
   const router = useRouter();
   const addresses = useApi(() => profileApi.getAddresses(), []);
   const profile = useApi(() => profileApi.get(), []);
-  // Bật giao hàng nhanh: bắt buộc chọn Tỉnh / Phường (để tính phí và tạo vận đơn) nên dùng form nhập địa chỉ,
-  // chưa dùng sổ địa chỉ (địa chỉ đã lưu chưa có mã khu vực).
+  // Bật giao hàng nhanh: cần Tỉnh / Phường để tính phí và tạo vận đơn. Địa chỉ trong sổ đã có tỉnh / phường dùng được ngay;
+  // địa chỉ cũ (needsUpdate) phải sửa trong sổ địa chỉ trước.
   const shipping = useApi(() => shippingApi.getStatus(), []);
   const shippingOn = shipping.data?.isEnabled === true;
-  const list = shippingOn ? [] : (addresses.data?.items ?? []);
+  const list = addresses.data?.items ?? [];
+  const usable = (a: (typeof list)[number]) => !(shippingOn && a.needsUpdate);
   const [area, setArea] = useState<Area>(EMPTY_AREA);
   const [areaErr, setAreaErr] = useState("");
   const [fee, setFee] = useState<number | null>(null);
@@ -121,10 +122,15 @@ function CartView() {
   const [coErr, setCoErr] = useState("");
   const [placing, setPlacing] = useState(false);
 
-  // Mặc định chọn địa chỉ mặc định (đứng đầu danh sách); chưa có địa chỉ thì nhập tay.
+  // Mặc định chọn địa chỉ mặc định (đứng đầu danh sách) nếu dùng được; không có thì nhập tay.
   useEffect(() => {
-    if (addresses.data && addrId === undefined) setAddrId(list[0]?.id ?? null);
-  }, [addresses.data, addrId, list]);
+    if (addresses.data && shipping.data && addrId === undefined) setAddrId(list.find(usable)?.id ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addresses.data, shipping.data, addrId, list]);
+
+  // Khu vực dùng để tính phí: của địa chỉ đã chọn trong sổ, hoặc khách chọn ở form.
+  const picked = list.find((a) => a.id === addrId);
+  const effArea: Area = picked ? { provinceId: picked.provinceId ?? null, wardCode: picked.wardCode ?? "" } : area;
   useEffect(() => {
     if (profile.data) setShip((s) => ({ ...s, receiverName: s.receiverName || profile.data!.name, phoneNumber: s.phoneNumber || (profile.data!.phoneNumber ?? "") }));
   }, [profile.data]);
@@ -132,7 +138,7 @@ function CartView() {
   // Tính phí ship mỗi khi đổi khu vực hoặc giỏ hàng (số lượng đổi → cân nặng đổi).
   const cartKey = cart ? `${cart.totalQuantity}-${cart.subTotal}` : "";
   useEffect(() => {
-    if (!shippingOn || !area.provinceId || !area.wardCode) {
+    if (!shippingOn || !effArea.provinceId || !effArea.wardCode) {
       setFee(null);
       setFeeErr("");
       return;
@@ -141,13 +147,13 @@ function CartView() {
     setFee(null);
     setFeeErr("");
     shippingApi
-      .calculateFee(area.provinceId, area.wardCode)
+      .calculateFee(effArea.provinceId, effArea.wardCode)
       .then((r) => !cancelled && setFee(r.fee))
       .catch((e) => !cancelled && setFeeErr(toApiError(e).message));
     return () => {
       cancelled = true;
     };
-  }, [shippingOn, area.provinceId, area.wardCode, cartKey]);
+  }, [shippingOn, effArea.provinceId, effArea.wardCode, cartKey]);
 
   if (placing && cart?.items.length === 0) return null;
 
@@ -173,8 +179,9 @@ function CartView() {
   }
 
   const submit = async () => {
-    const picked = list.find((a) => a.id === addrId);
-    const info = picked ? { receiverName: picked.receiverName, phoneNumber: picked.phoneNumber, shippingAddress: picked.address } : ship;
+    const info = picked
+      ? { receiverName: picked.receiverName, phoneNumber: picked.phoneNumber, shippingAddress: (shippingOn && picked.street) || picked.address }
+      : ship;
     const e: FieldErrors<ShipKey> = {};
     if (!info.receiverName.trim()) e.receiverName = "Vui lòng nhập tên người nhận";
     if (!info.phoneNumber.trim()) e.phoneNumber = "Vui lòng nhập số điện thoại";
@@ -182,7 +189,7 @@ function CartView() {
     if (!info.shippingAddress.trim()) e.shippingAddress = "Vui lòng nhập địa chỉ giao hàng";
     setErrors(e);
     let missingArea = false;
-    if (shippingOn && !(area.provinceId && area.wardCode)) {
+    if (shippingOn && !(effArea.provinceId && effArea.wardCode)) {
       setAreaErr("Vui lòng chọn Tỉnh / Thành phố và Phường / Xã");
       missingArea = true;
     } else setAreaErr("");
@@ -201,7 +208,7 @@ function CartView() {
         shippingAddress: info.shippingAddress.trim(),
         paymentMethod: pay,
         note: note.trim() || undefined,
-        ...(shippingOn ? { toProvinceId: area.provinceId!, toWardCode: area.wardCode } : {}),
+        ...(shippingOn ? { toProvinceId: effArea.provinceId!, toWardCode: effArea.wardCode } : {}),
       });
       clearLocal();
       router.push(`/order-success/${order.id}`);
@@ -243,12 +250,13 @@ function CartView() {
             <button
               key={a.id}
               type="button"
+              disabled={!usable(a)}
               onClick={() => {
                 setAddrId(a.id);
                 setErrors({});
                 setCoErr("");
               }}
-              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left", addrId === a.id ? "border-navy" : "border-line")}
+              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left disabled:opacity-60", addrId === a.id ? "border-navy" : "border-line")}
             >
               <span className="mt-0.5">
                 <Radio checked={addrId === a.id} />
@@ -259,6 +267,11 @@ function CartView() {
                   {a.isDefault && <span className="ml-2 text-[11px] font-bold text-gold">Mặc định</span>}
                 </span>
                 <span className="mt-0.5 block text-[13px] leading-snug text-muted2">{a.address}</span>
+                {!usable(a) && (
+                  <Link href="/account/profile?tab=addr" className="mt-1 block text-[12.5px] font-semibold text-gold">
+                    Cần cập nhật Tỉnh / Phường trong sổ địa chỉ →
+                  </Link>
+                )}
               </span>
             </button>
           ))}
@@ -291,15 +304,14 @@ function CartView() {
                 <FieldError message={errors[k]} />
               </div>
             ))}
-            {shippingOn ? (
+            {shippingOn && (
               <div className="col-span-2">
                 <AddressPicker value={area} onChange={setArea} error={areaErr} />
               </div>
-            ) : (
-              <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
-                Quản lý sổ địa chỉ →
-              </Link>
             )}
+            <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
+              Quản lý sổ địa chỉ →
+            </Link>
           </div>
         )}
         <textarea
