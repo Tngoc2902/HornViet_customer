@@ -14,7 +14,8 @@ import { toApiError } from "@/lib/api/http";
 import { orderApi, shipmentApi } from "@/lib/api/services";
 import { isShipmentStale, SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/lib/hsv/shipping";
 import { ShipmentProgress } from "@/components/hsv/shipment-progress";
-import { OrderStatus, type OrderListItem } from "@/lib/api/types";
+import { OrderStatus, PaymentMethod, type OrderListItem } from "@/lib/api/types";
+import { BankTransferQr } from "@/components/hsv/bank-transfer-qr";
 import { formatDateTime, formatVND, ORDER_TABS, parseOrderTab, PAYMENT_LABEL } from "@/lib/hsv/format";
 
 const PAGE_SIZE = 8;
@@ -99,6 +100,9 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
           {data.lastStatusChangeTime && <p className="mt-0.5 text-muted2">Cập nhật lúc {formatDateTime(data.lastStatusChangeTime)}</p>}
         </div>
       </div>
+      {data.paymentMethod === PaymentMethod.BankTransfer && data.status === OrderStatus.Pending && (
+        <BankTransferQr amount={data.payableAmount ?? data.totalAmount} content={data.code} className="mt-4" />
+      )}
       {data.ghnOrderCode && (
         <div className="mt-4 rounded-card border border-line-2 p-4 text-[13.5px]">
           <div className="flex flex-wrap items-center gap-2">
