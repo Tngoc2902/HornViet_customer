@@ -158,15 +158,13 @@ export type CreateOrderInput = {
   shippingAddress: string;
   paymentMethod: PaymentMethod;
   note?: string;
-  /** Khu vực nhận hàng theo danh mục GHN; bắt buộc khi cửa hàng bật giao hàng nhanh. Phí ship do server tính. */
+  /** Tỉnh / Phường nhận hàng (địa chỉ mới 2 cấp) theo danh mục GHN; bắt buộc khi cửa hàng bật giao hàng nhanh. Phí ship do server tính. */
   toProvinceId?: number;
-  toDistrictId?: number;
   toWardCode?: string;
 };
 
 export type ShippingProvince = { id: number; name: string };
-export type ShippingDistrict = { id: number; provinceId: number; name: string };
-export type ShippingWard = { code: string; districtId: number; name: string };
+export type ShippingWard = { code: string; provinceId: number; name: string };
 export type ShippingFeeResult = { isEnabled: boolean; fee: number };
 
 /** Tiến trình giao hàng của một đơn (GET Shipment/Get). */
