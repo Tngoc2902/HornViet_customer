@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Literata } from "next/font/google";
 import { Toaster } from "sonner";
@@ -55,6 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </RealtimeProvider>
           </AuthProvider>
         </ClientOnly>
+        {/* Vercel Web Analytics (lượt truy cập, không cookie) và Speed Insights (tốc độ tải trang thực tế của khách); chỉ gửi số liệu khi chạy trên Vercel. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
