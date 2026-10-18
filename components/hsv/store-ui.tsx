@@ -10,6 +10,8 @@ export const STORE_INFO = {
   hours: "8h00 – 21h00, T2 – CN",
   email: "lienhe@honsungviet.vn",
   address: "Thụy Ứng, Thường Tín, Hà Nội",
+  /** Địa điểm hiện trên Google Maps (địa chỉ hoặc tên địa điểm như khi tìm trên Google Maps). */
+  mapQuery: "Làng nghề sừng Thụy Ứng, Thường Tín, Hà Nội",
   freeShipFrom: "500.000₫",
   /** Mạng xã hội ở footer — điền link thật; để trống thì chỉ hiện biểu tượng, không bấm được. */
   socials: { 
