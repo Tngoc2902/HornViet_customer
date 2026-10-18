@@ -31,6 +31,8 @@ export default function LoginPage() {
   const [pass, setPass] = useState("");
   const [errors, setErrors] = useState<FieldErrors<"email" | "pass" | "form">>({});
   const [busy, setBusy] = useState(false);
+  // Mặc định không ghi nhớ: đóng tab / trình duyệt là đăng xuất (an toàn khi dùng máy chung).
+  const [remember, setRemember] = useState(false);
 
   const retNote =
     returnUrl === "/cart"
@@ -52,7 +54,7 @@ export default function LoginPage() {
     setBusy(true);
     setWrongArea(false);
     try {
-      await login(email, pass);
+      await login(email, pass, remember);
       notify("Đăng nhập thành công");
       router.push(returnUrl ?? "/");
     } catch (err) {
@@ -71,7 +73,7 @@ export default function LoginPage() {
     setWrongArea(false);
     setErrors({});
     try {
-      await loginWithGoogle(accessToken);
+      await loginWithGoogle(accessToken, remember);
       notify("Đăng nhập thành công");
       router.push(returnUrl ?? "/");
     } catch (err) {
@@ -133,6 +135,10 @@ export default function LoginPage() {
               />
               <FieldError message={errors.pass} />
             </div>
+            <label className="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink-2">
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-navy" />
+              Ghi nhớ đăng nhập trên thiết bị này
+            </label>
             <button type="submit" disabled={busy} className="hsv-btn-primary mt-1 h-[50px] text-[15px]">
               {busy ? "Đang đăng nhập…" : "Đăng nhập"}
             </button>

@@ -4,7 +4,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, 
 import { ApiError, setUnauthorizedHandler, tokenStore } from "@/lib/api/http";
 import { authApi } from "@/lib/api/services";
 import type { AuthenticateResult, RoleName } from "@/lib/api/types";
-import { loadLocalStorage, removeLocalStorage, saveLocalStorage } from "@/lib/storage";
+import { loadAuthItem, removeAuthItem, saveAuthItem } from "@/lib/storage";
 
 const SESSION_KEY = "hsv-session";
 
@@ -21,9 +21,10 @@ type AuthValue = {
   /** Phiên của Khách hàng; Nhân viên / Quản trị viên dùng repo quản trị riêng. */
   session: Session | null;
   /** Đăng nhập; tài khoản Nhân viên / Quản trị viên → ném ApiError 403 và không lưu phiên. */
-  login: (identifier: string, password: string) => Promise<Session>;
+  /** remember = true: giữ đăng nhập sau khi đóng trình duyệt; mặc định đóng tab là đăng xuất. */
+  login: (identifier: string, password: string, remember?: boolean) => Promise<Session>;
   /** Đăng nhập bằng access token Google (chưa có tài khoản thì backend tạo mới). */
-  loginWithGoogle: (accessToken: string) => Promise<Session>;
+  loginWithGoogle: (accessToken: string, remember?: boolean) => Promise<Session>;
   logout: () => void;
   setName: (name: string) => void;
 };
@@ -36,12 +37,22 @@ function isStaffRoles(roles: RoleName[]) {
   return roles.includes("Admin") || roles.includes("Staff");
 }
 
+function readSession(): Session | null {
+  try {
+    const raw = loadAuthItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as Session) : null;
+  } catch {
+    return null;
+  }
+}
+
 function loadSession(): Session | null {
-  const s = loadLocalStorage<Session | null>(SESSION_KEY, null);
+  if (typeof window === "undefined") return null;
+  const s = readSession();
   // Phiên quản trị lưu từ trước khi tách repo cũng bị bỏ.
   if (!s || !tokenStore.get() || s.expiresAt <= Date.now() || isStaffRoles(s.roles)) {
     tokenStore.clear();
-    removeLocalStorage(SESSION_KEY);
+    removeAuthItem(SESSION_KEY);
     return null;
   }
   return s;
@@ -52,8 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((s: Session | null) => {
     setSession(s);
-    if (s) saveLocalStorage(SESSION_KEY, s);
-    else removeLocalStorage(SESSION_KEY);
+    // Phiên lưu cùng chỗ với token: ghi nhớ (localStorage) hoặc chỉ trong tab (sessionStorage).
+    if (s) saveAuthItem(SESSION_KEY, JSON.stringify(s), tokenStore.isPersistent());
+    else removeAuthItem(SESSION_KEY);
   }, []);
 
   const logout = useCallback(() => {
@@ -77,9 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Lưu phiên từ kết quả đăng nhập (mật khẩu hoặc Google).
   const startSession = useCallback(
-    (r: AuthenticateResult) => {
+    (r: AuthenticateResult, remember: boolean) => {
       if (isStaffRoles(r.roles ?? [])) throw new ApiError(403, STAFF_ACCOUNT_MESSAGE);
-      tokenStore.set(r.accessToken);
+      tokenStore.set(r.accessToken, remember);
       const s: Session = {
         userId: r.userId,
         userName: r.userName,
@@ -94,12 +106,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const login = useCallback(
-    async (identifier: string, password: string) => startSession(await authApi.authenticate(identifier.trim(), password)),
+    async (identifier: string, password: string, remember = false) =>
+      startSession(await authApi.authenticate(identifier.trim(), password), remember),
     [startSession]
   );
 
   const loginWithGoogle = useCallback(
-    async (accessToken: string) => startSession(await authApi.authenticateGoogle(accessToken)),
+    async (accessToken: string, remember = false) => startSession(await authApi.authenticateGoogle(accessToken), remember),
     [startSession]
   );
 
