@@ -13,6 +13,7 @@ import { useRealtime, useRealtimeRefresh } from "@/hooks/use-realtime";
 import { toApiError } from "@/lib/api/http";
 import { orderApi, shipmentApi } from "@/lib/api/services";
 import { isShipmentStale, SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/lib/hsv/shipping";
+import { ShipmentProgress } from "@/components/hsv/shipment-progress";
 import { OrderStatus, type OrderListItem } from "@/lib/api/types";
 import { formatDateTime, formatVND, ORDER_TABS, parseOrderTab, PAYMENT_LABEL } from "@/lib/hsv/format";
 
@@ -116,6 +117,7 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
               </span>
             )}
           </div>
+          {!isShipmentStale(data.status, data.ghnStatus) && <ShipmentProgress status={data.ghnStatus} />}
           {isShipmentStale(data.status, data.ghnStatus) ? (
             <p className="mt-1.5 text-muted2">Đơn đã được cửa hàng cập nhật trạng thái trực tiếp.</p>
           ) : (

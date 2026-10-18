@@ -45,3 +45,43 @@ export const TONE_STYLE: Record<ShipmentTone, { fg: string; bg: string; bd: stri
 export function isShipmentStale(orderStatus: number, ghnStatus: string | null | undefined) {
   return (orderStatus === 2 || orderStatus === 3) && !!ghnStatus && !["delivered", "returned", "cancel"].includes(ghnStatus);
 }
+
+/** Các bước chính của vận đơn, theo đúng thứ tự (giống tiến trình trên cổng GHN). */
+export const SHIPMENT_FLOW = [
+  { key: "ready_to_pick", label: "Chờ lấy hàng" },
+  { key: "picking", label: "Đang lấy hàng" },
+  { key: "picked", label: "Đã lấy hàng" },
+  { key: "transporting", label: "Đang luân chuyển" },
+  { key: "delivering", label: "Đang giao hàng" },
+  { key: "delivered", label: "Giao thành công" },
+] as const;
+
+/** Vị trí của trạng thái GHN trên các bước chính (trạng thái phụ gộp vào bước gần nhất). */
+export function shipmentStepIndex(status: string | null | undefined): number {
+  switch (status) {
+    case "ready_to_pick":
+      return 0;
+    case "picking":
+    case "money_collect_picking":
+      return 1;
+    case "picked":
+      return 2;
+    case "storing":
+    case "sorting":
+    case "transporting":
+      return 3;
+    case "delivering":
+    case "money_collect_delivering":
+    case "delivery_fail":
+      return 4;
+    case "delivered":
+      return 5;
+    default:
+      return -1;
+  }
+}
+
+/** Nhánh hoàn hàng (sau khi giao thất bại). */
+export function isReturnFlow(status: string | null | undefined) {
+  return !!status && ["waiting_to_return", "return", "return_transporting", "return_sorting", "returning", "return_fail", "returned"].includes(status);
+}
