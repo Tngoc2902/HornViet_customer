@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
       <div className="hsv-container grid grid-cols-[minmax(0,1fr)] items-start gap-8 pb-12 pt-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12">
         {/* Ảnh */}
         <div className={cn("grid gap-3", shots.length > 1 && "sm:grid-cols-[76px_minmax(0,1fr)]")}>
-          <ProductImage src={main} seed={product.id} alt={product.name} className="aspect-square rounded-2xl border border-line sm:order-2" />
+          <ProductImage src={main} seed={product.id} alt={product.name} width={1100} className="aspect-square rounded-2xl border border-line sm:order-2" />
           {shots.length > 1 && (
             <div className="scrollbar-none flex gap-2.5 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
               {shots.map((src, i) => (
@@ -221,7 +221,7 @@ export default function ProductDetailPage() {
                   aria-label={`Ảnh ${i + 1}`}
                   className={cn("w-[68px] shrink-0 rounded-xl border-2 p-0.5 sm:w-full", gal === i ? "border-navy" : "border-transparent hover:border-line-3")}
                 >
-                  <ProductImage src={src} seed={product.id + i} className="aspect-square w-full rounded-lg" />
+                  <ProductImage src={src} seed={product.id + i} width={180} className="aspect-square w-full rounded-lg" />
                 </button>
               ))}
             </div>

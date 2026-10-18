@@ -150,3 +150,15 @@ export function assetUrl(path?: string | null) {
   if (/^(https?:|data:|blob:)/.test(path)) return path;
   return API_BASE_URL + (path.startsWith("/") ? path : `/${path}`);
 }
+
+const CLOUDINARY_UPLOAD = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?!.*\b[fqw]_)/;
+
+/**
+ * Ảnh hiển thị: ảnh trên Cloudinary được yêu cầu bản đã tối ưu — tự chọn định dạng nhẹ nhất trình duyệt hỗ trợ (WebP / AVIF),
+ * tự nén và thu nhỏ còn tối đa `width` px (không phóng to ảnh nhỏ). Ảnh gốc 2 MB còn vài chục KB. Ảnh khác giữ nguyên.
+ */
+export function imageUrl(path?: string | null, width = 640) {
+  const url = assetUrl(path);
+  if (!url) return url;
+  return url.replace(CLOUDINARY_UPLOAD, `$1f_auto,q_auto,c_limit,w_${Math.round(width)}/`);
+}
