@@ -37,3 +37,11 @@ export const TONE_STYLE: Record<ShipmentTone, { fg: string; bg: string; bd: stri
   warn: { fg: "#8a5a12", bg: "#fbf1dc", bd: "#ecd29a" },
   bad: { fg: "#9b3a2e", bg: "#f8e6e2", bd: "#e8c4bd" },
 };
+
+/**
+ * Đơn đã Hoàn thành / Đã hủy mà vận đơn chưa ở trạng thái cuối: đơn được cập nhật tay trước khi hệ thống chặn việc này,
+ * trạng thái vận đơn không còn được theo dõi — không hiện để tránh mâu thuẫn với trạng thái đơn.
+ */
+export function isShipmentStale(orderStatus: number, ghnStatus: string | null | undefined) {
+  return (orderStatus === 2 || orderStatus === 3) && !!ghnStatus && !["delivered", "returned", "cancel"].includes(ghnStatus);
+}

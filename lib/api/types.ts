@@ -43,8 +43,30 @@ export type Profile = {
   hasGoogleLogin: boolean;
 };
 
-export type Address = { id: number; receiverName: string; phoneNumber: string; address: string; isDefault: boolean };
-export type AddressInput = Omit<Address, "id"> & { id?: number };
+export type Address = {
+  id: number;
+  receiverName: string;
+  phoneNumber: string;
+  /** Địa chỉ đầy đủ để hiển thị. */
+  address: string;
+  isDefault: boolean;
+  /** Tỉnh / phường (địa chỉ mới 2 cấp) và số nhà; null ở địa chỉ lưu trước khi bật giao hàng nhanh. */
+  provinceId?: number | null;
+  wardCode?: string | null;
+  street?: string | null;
+  /** Đã bật giao hàng nhanh mà địa chỉ chưa có tỉnh / phường → cần sửa lại trước khi dùng. */
+  needsUpdate?: boolean;
+};
+/** Khi bật giao hàng nhanh: address là số nhà, tên đường (server ghép phường / tỉnh). */
+export type AddressInput = {
+  id?: number;
+  receiverName: string;
+  phoneNumber: string;
+  address: string;
+  isDefault: boolean;
+  provinceId?: number | null;
+  wardCode?: string | null;
+};
 
 // ---------- Catalog
 export type Category = { id: number; name: string; description: string | null; productCount: number; creationTime: string };
