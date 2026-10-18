@@ -1,27 +1,40 @@
-// Tài khoản nhận chuyển khoản của cửa hàng — đặt bằng biến môi trường (Vercel → Settings → Environment Variables), không ghi cứng
-// trong code. Mã ngân hàng (BIN) tra ở https://api.vietqr.io/v2/banks, VD Vietcombank 970436, Techcombank 970407, MB 970422.
-const BIN = process.env.NEXT_PUBLIC_BANK_BIN?.trim() ?? "";
-const ACCOUNT_NO = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NO?.replace(/\s+/g, "") ?? "";
-const ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME?.trim() ?? "";
-const BANK_NAME = process.env.NEXT_PUBLIC_BANK_NAME?.trim() ?? "";
+// Tài khoản nhận chuyển khoản của cửa hàng. Mặc định là tài khoản đang dùng (Techcombank · 0451 000 123 456 · CTY TNHH
+// HỒN SỪNG VIỆT); đổi tài khoản thì đặt biến môi trường (Vercel → Settings → Environment Variables) rồi deploy lại, không cần
+// sửa code. Mã ngân hàng (BIN) tra ở https://api.vietqr.io/v2/banks, VD Techcombank 970407, Vietcombank 970436, MB 970422.
+const DEFAULT_BANK = {
+  bin: "970407",
+  bankName: "Techcombank",
+  accountNo: "0451 000 123 456",
+  accountName: "CTY TNHH HỒN SỪNG VIỆT",
+};
 
-export type BankAccount = { bin: string; accountNo: string; accountName: string; bankName: string };
+const env = (v: string | undefined) => v?.trim() || undefined;
 
-/** null = chưa cấu hình tài khoản nhận tiền: không hiện mã QR, chỉ báo cửa hàng sẽ liên hệ. */
-export const STORE_BANK: BankAccount | null =
-  BIN && ACCOUNT_NO ? { bin: BIN, accountNo: ACCOUNT_NO, accountName: ACCOUNT_NAME, bankName: BANK_NAME } : null;
+/** accountNo: số tài khoản để hiển thị (giữ khoảng trắng); qrAccountNo: chỉ chữ số, dùng cho mã QR. */
+export type BankAccount = { bin: string; accountNo: string; qrAccountNo: string; accountName: string; bankName: string };
+
+const accountNo = env(process.env.NEXT_PUBLIC_BANK_ACCOUNT_NO) ?? DEFAULT_BANK.accountNo;
+
+export const STORE_BANK: BankAccount = {
+  bin: env(process.env.NEXT_PUBLIC_BANK_BIN) ?? DEFAULT_BANK.bin,
+  bankName: env(process.env.NEXT_PUBLIC_BANK_NAME) ?? DEFAULT_BANK.bankName,
+  accountNo,
+  qrAccountNo: accountNo.replace(/\s+/g, ""),
+  accountName: env(process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME) ?? DEFAULT_BANK.accountName,
+};
 
 /** Một dòng thông tin tài khoản để hiện dạng chữ. */
-export const BANK_INFO = STORE_BANK
-  ? [STORE_BANK.bankName, STORE_BANK.accountNo, STORE_BANK.accountName].filter(Boolean).join(" · ")
-  : "Cửa hàng sẽ liên hệ gửi thông tin tài khoản chuyển khoản";
+export const BANK_INFO = [STORE_BANK.bankName.toUpperCase(), STORE_BANK.accountNo, STORE_BANK.accountName].join(" · ");
+
+/** Tên chủ tài khoản trên mã QR: viết hoa không dấu như app ngân hàng hiển thị. */
+const qrName = (name: string) =>
+  name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toUpperCase();
 
 /**
  * Ảnh mã VietQR (chuẩn NAPAS, app ngân hàng nào cũng quét được): điền sẵn tài khoản, số tiền và nội dung chuyển khoản.
  * Ảnh do img.vietqr.io tạo, không cần khóa API.
  */
 export function vietQrUrl(bank: BankAccount, amount: number, content: string) {
-  const q = new URLSearchParams({ amount: String(Math.round(amount)), addInfo: content });
-  if (bank.accountName) q.set("accountName", bank.accountName);
-  return `https://img.vietqr.io/image/${encodeURIComponent(bank.bin)}-${encodeURIComponent(bank.accountNo)}-compact2.png?${q}`;
+  const q = new URLSearchParams({ amount: String(Math.round(amount)), addInfo: content, accountName: qrName(bank.accountName) });
+  return `https://img.vietqr.io/image/${encodeURIComponent(bank.bin)}-${encodeURIComponent(bank.qrAccountNo)}-compact2.png?${q}`;
 }

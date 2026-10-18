@@ -8,18 +8,10 @@ import { notify } from "./ui";
 
 /** Mã QR chuyển khoản cho một đơn: số tiền và nội dung (mã đơn) điền sẵn khi khách quét bằng app ngân hàng. */
 export function BankTransferQr({ amount, content, className }: { amount: number; content: string; className?: string }) {
-  if (!STORE_BANK) {
-    return (
-      <p className={cn("rounded-card bg-surface px-3.5 py-3 text-[13px] text-ink-2", className)}>
-        Cửa hàng sẽ liên hệ gửi thông tin tài khoản. Khi chuyển khoản, ghi nội dung <b>{content}</b>.
-      </p>
-    );
-  }
-
   const rows: [string, string, string?][] = [
-    ["Ngân hàng", STORE_BANK.bankName || STORE_BANK.bin],
-    ["Số tài khoản", STORE_BANK.accountNo, STORE_BANK.accountNo],
-    ...(STORE_BANK.accountName ? ([["Chủ tài khoản", STORE_BANK.accountName]] as [string, string][]) : []),
+    ["Ngân hàng", STORE_BANK.bankName],
+    ["Số tài khoản", STORE_BANK.accountNo, STORE_BANK.qrAccountNo],
+    ["Chủ tài khoản", STORE_BANK.accountName],
     ["Số tiền", formatVND(amount), String(Math.round(amount))],
     ["Nội dung", content, content],
   ];
