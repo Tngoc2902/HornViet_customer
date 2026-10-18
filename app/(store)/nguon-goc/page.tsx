@@ -89,7 +89,7 @@ export default function OriginPage() {
             return (
               <article key={m.id} id={`nguyen-lieu-${m.id}`} className="scroll-mt-[140px] overflow-hidden rounded-2xl border border-line bg-white">
                 <div className="relative aspect-[16/9]">
-                  <ProductImage src={cover?.src} seed={cover?.seed ?? m.id} alt={m.name} className="absolute inset-0" />
+                  <ProductImage src={cover?.src} seed={cover?.seed ?? m.id} alt={m.name} width={1200} className="absolute inset-0" />
                   <span className="absolute inset-0 bg-gradient-to-t from-[#1a1410]/80 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 p-6 text-white">
                     <p className="font-serif text-[30px] leading-tight">{m.name}</p>

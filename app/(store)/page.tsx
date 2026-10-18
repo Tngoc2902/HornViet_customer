@@ -8,7 +8,7 @@ import { SectionHeader, ServicePerks, STORE_INFO } from "@/components/hsv/store-
 import { ProductImage } from "@/components/hsv/ui";
 import { useCatalog } from "@/contexts/catalog-context";
 import { useApi } from "@/hooks/use-api";
-import { assetUrl } from "@/lib/api/http";
+import { imageUrl } from "@/lib/api/http";
 import { productApi } from "@/lib/api/services";
 import { ProductSorting, type ProductListItem } from "@/lib/api/types";
 import { gradient } from "@/lib/hsv/format";
@@ -212,7 +212,7 @@ function MaterialShowcase() {
   const tones = tonesFor(mat.id + 3);
   const firstImg = products.data?.items.find((p) => p.mainImage)?.mainImage;
   // Ưu tiên ảnh của nguyên liệu (quản trị tải lên); chưa có thì dùng ảnh sản phẩm đầu tiên làm từ nguyên liệu đó.
-  const cover = mat.image ? assetUrl(mat.image) : firstImg ? assetUrl(firstImg) : null;
+  const cover = imageUrl(mat.image || firstImg, 1400) ?? null;
   const traits = traitsOf(mat.name);
 
   return (

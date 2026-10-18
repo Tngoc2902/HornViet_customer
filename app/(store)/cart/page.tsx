@@ -63,7 +63,7 @@ function CartLine({ item }: { item: CartItem }) {
   return (
     <div className={cn("flex gap-[18px] border-b border-line-2 py-5", busy && "opacity-60")}>
       <Link href={`/products/${item.productId}`} className="shrink-0">
-        <ProductImage src={item.mainImage} seed={item.productId} alt={item.productName} className="h-28 w-[92px] rounded-card" />
+        <ProductImage src={item.mainImage} seed={item.productId} alt={item.productName} width={200} className="h-28 w-[92px] rounded-card" />
       </Link>
       <div className="min-w-0 flex-1">
         <div className="flex justify-between gap-3">

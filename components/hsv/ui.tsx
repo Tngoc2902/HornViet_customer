@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { assetUrl, type ApiError } from "@/lib/api/http";
+import { imageUrl, type ApiError } from "@/lib/api/http";
 import type { OrderStatus } from "@/lib/api/types";
 import { gradient, ORDER_FLOW, ORDER_STATUS } from "@/lib/hsv/format";
 import { tonesFor } from "@/lib/hsv/tones";
@@ -23,16 +23,19 @@ export function ProductImage({
   src,
   seed = 0,
   alt = "",
+  width = 640,
   className,
   children,
 }: {
   src?: string | null;
   seed?: number;
   alt?: string;
+  /** Bề rộng ảnh cần tải (px, đã tính màn hình nét gấp đôi) — ảnh Cloudinary được thu nhỏ theo số này. */
+  width?: number;
   className?: string;
   children?: ReactNode;
 }) {
-  const url = assetUrl(src);
+  const url = imageUrl(src, width);
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [url]);
   return (
