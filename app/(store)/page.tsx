@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock, MapPin, Phone, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock, MapPin, Navigation, Phone, Sparkles } from "lucide-react";
 import { ProductCarousel } from "@/components/hsv/product-card";
-import { StoreMap } from "@/components/hsv/store-map";
+import { MAP_DIRECTIONS_URL, MAP_EMBED_URL } from "@/components/hsv/store-map";
 import { SectionHeader, ServicePerks, STORE_INFO } from "@/components/hsv/store-ui";
 import { ProductImage } from "@/components/hsv/ui";
 import { useCatalog } from "@/contexts/catalog-context";
@@ -466,34 +466,52 @@ export default function HomePage() {
       </section>
 
       <section id="cua-hang" className="hsv-container scroll-mt-[140px] pb-14 sm:pb-16">
-        <div className="relative overflow-hidden rounded-2xl bg-navy px-7 py-9 text-white sm:px-12 sm:py-11">
+        <div className="relative overflow-hidden rounded-2xl bg-navy p-5 text-white sm:p-7 lg:p-8">
           <span className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-champagne/20" />
-          <span className="absolute -bottom-24 right-40 h-56 w-56 rounded-full bg-champagne/10 max-md:hidden" />
-          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
+          <span className="absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-champagne/10 max-md:hidden" />
+          <div className="relative grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:items-stretch lg:gap-8">
+            <div className="flex flex-col justify-center px-2 py-2 sm:px-4">
               <p className="text-xs font-bold tracking-[0.24em] text-champagne">GHÉ THĂM XƯỞNG</p>
               <p className="mt-2 font-serif text-[26px] leading-tight sm:text-[32px]">Cửa hàng & xưởng chế tác Hồn Sừng Việt</p>
-              <div className="mt-4 flex flex-col gap-2 text-[14px] text-[#d6dee8] sm:flex-row sm:gap-6">
+              <div className="mt-4 flex flex-col gap-2.5 text-[14px] text-[#d6dee8]">
                 <span className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-champagne" />
+                  <MapPin className="h-4 w-4 shrink-0 text-champagne" />
                   {STORE_INFO.address}
                 </span>
                 <span className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-champagne" />
+                  <Clock className="h-4 w-4 shrink-0 text-champagne" />
                   {STORE_INFO.hours}
                 </span>
               </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href={`tel:${STORE_INFO.hotlineTel}`}
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-champagne px-6 text-sm font-bold text-navy transition hover:bg-white"
+                >
+                  <Phone className="h-4 w-4" />
+                  Gọi {STORE_INFO.hotline}
+                </a>
+                <a
+                  href={MAP_DIRECTIONS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-12 items-center gap-2 rounded-full border border-champagne/60 px-6 text-sm font-bold text-champagne transition hover:bg-champagne hover:text-navy"
+                >
+                  <Navigation className="h-4 w-4" />
+                  Chỉ đường
+                </a>
+              </div>
             </div>
-            <a
-              href={`tel:${STORE_INFO.hotlineTel}`}
-              className="inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full bg-champagne px-7 text-sm font-bold text-navy transition hover:bg-white md:self-auto"
-            >
-              <Phone className="h-4 w-4" />
-              Gọi {STORE_INFO.hotline}
-            </a>
+            <iframe
+              src={MAP_EMBED_URL}
+              title={`Bản đồ: ${STORE_INFO.address}`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              className="block h-[260px] w-full rounded-xl border-0 bg-[#e5e3df] sm:h-[300px] md:h-full md:min-h-[300px]"
+            />
           </div>
         </div>
-        <StoreMap className="mt-5" />
       </section>
     </div>
   );
