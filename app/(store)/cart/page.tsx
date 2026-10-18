@@ -346,7 +346,7 @@ function CartView() {
           <div className="mt-2.5 rounded-card bg-surface px-3.5 py-3 text-[13px] leading-relaxed text-ink-2">
             {BANK_INFO}
             <br />
-            Nội dung: mã đơn hàng (hiển thị sau khi đặt)
+            Sau khi đặt hàng sẽ hiện mã QR chuyển khoản, đã điền sẵn số tiền và nội dung là mã đơn.
           </div>
         )}
 

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Check } from "lucide-react";
 import { RequireCustomer } from "@/components/hsv/guards";
 import { CheckoutSteps } from "@/components/hsv/page-shells";
+import { BankTransferQr } from "@/components/hsv/bank-transfer-qr";
 import { ErrorBox, Skeleton } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
 import { orderApi } from "@/lib/api/services";
@@ -50,9 +51,7 @@ function SuccessView() {
           <p className="mt-1 text-sm font-semibold">{PAYMENT_LABEL[order.paymentMethod]}</p>
         </div>
         {order.paymentMethod === PaymentMethod.BankTransfer && (
-          <p className="col-span-2 rounded-card bg-surface px-3 py-2.5 text-[13px] text-ink-2">
-            Chuyển khoản tới Vietcombank 0451 000 123 456 với nội dung <b>{order.code}</b>.
-          </p>
+          <BankTransferQr amount={order.payableAmount ?? order.totalAmount} content={order.code} className="col-span-2" />
         )}
       </div>
       <div className="flex flex-wrap justify-center gap-2.5">

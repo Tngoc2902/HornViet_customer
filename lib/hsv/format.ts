@@ -4,7 +4,8 @@ import type { Tones } from "./tones";
 /** Trùng AppConsts.LowStockThreshold của backend. */
 export const LOW_STOCK_THRESHOLD = 5;
 
-export const BANK_INFO = "TECHCOMBANK · 0451 000 123 456 · CTY TNHH HỒN SỪNG VIỆT";
+/** Tài khoản nhận chuyển khoản: cấu hình bằng biến môi trường, xem lib/hsv/bank.ts. */
+export { BANK_INFO } from "./bank";
 
 export function formatVND(value: number | null | undefined) {
   return (value ?? 0).toLocaleString("vi-VN") + "₫";
