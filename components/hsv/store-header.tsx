@@ -26,6 +26,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useCatalog } from "@/contexts/catalog-context";
 import { initialOf, lastName, roleLabel } from "@/lib/hsv/format";
 import { cn } from "@/lib/utils";
+import { StoreMap } from "./store-map";
 import { STORE_INFO, ZALO_URL } from "./store-ui";
 import { SearchBox } from "./search-box";
 import { Drawer, notify } from "./ui";
@@ -423,6 +424,7 @@ export function StoreFooter() {
                 {STORE_INFO.hotline}
               </a>
             </p>
+            <StoreMap compact className="mt-4 max-w-[360px] rounded-xl" />
           </div>
 
           <FooterSection title="Về Hồn Sừng Việt">

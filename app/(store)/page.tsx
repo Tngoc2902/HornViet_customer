@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock, MapPin, Phone, Sparkles } from "lucide-react";
 import { ProductCarousel } from "@/components/hsv/product-card";
+import { StoreMap } from "@/components/hsv/store-map";
 import { SectionHeader, ServicePerks, STORE_INFO } from "@/components/hsv/store-ui";
 import { ProductImage } from "@/components/hsv/ui";
 import { useCatalog } from "@/contexts/catalog-context";
@@ -492,6 +493,7 @@ export default function HomePage() {
             </a>
           </div>
         </div>
+        <StoreMap className="mt-5" />
       </section>
     </div>
   );
