@@ -158,6 +158,26 @@ export type CreateOrderInput = {
   shippingAddress: string;
   paymentMethod: PaymentMethod;
   note?: string;
+  /** Khu vực nhận hàng theo danh mục GHN; bắt buộc khi cửa hàng bật giao hàng nhanh. Phí ship do server tính. */
+  toProvinceId?: number;
+  toDistrictId?: number;
+  toWardCode?: string;
+};
+
+export type ShippingProvince = { id: number; name: string };
+export type ShippingDistrict = { id: number; provinceId: number; name: string };
+export type ShippingWard = { code: string; districtId: number; name: string };
+export type ShippingFeeResult = { isEnabled: boolean; fee: number };
+
+/** Tiến trình giao hàng của một đơn (GET Shipment/Get). */
+export type Shipment = {
+  orderId: number;
+  orderCode: string;
+  trackingCode: string | null;
+  status: string | null;
+  expectedDeliveryTime: string | null;
+  statusTime: string | null;
+  shippingFee: number;
 };
 
 export type OrderListItem = {
@@ -170,6 +190,8 @@ export type OrderListItem = {
   itemCount: number;
   receiverName: string;
   canCancel: boolean;
+  shippingFee?: number;
+  payableAmount?: number;
   /** Sản phẩm trong đơn. Backend cũ chưa trả trường này. */
   items?: OrderLineSummary[];
 };
@@ -194,6 +216,13 @@ export type Order = Omit<OrderListItem, "items"> & {
   note: string | null;
   lastStatusChangeTime: string | null;
   items: OrderItem[];
+  /** totalAmount là tiền hàng; payableAmount = totalAmount + shippingFee. Backend cũ chưa trả. */
+  shippingFee?: number;
+  payableAmount?: number;
+  ghnOrderCode?: string | null;
+  ghnStatus?: string | null;
+  ghnExpectedDeliveryTime?: string | null;
+  ghnStatusTime?: string | null;
 };
 
 export type OrderQuery = PageInput & { status?: OrderStatus; keyword?: string; fromDate?: string; toDate?: string };

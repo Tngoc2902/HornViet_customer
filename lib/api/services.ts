@@ -18,6 +18,11 @@ import type {
   OrderStatus,
   PagedResult,
   PageInput,
+  Shipment,
+  ShippingDistrict,
+  ShippingFeeResult,
+  ShippingProvince,
+  ShippingWard,
   ProductAdminListItem,
   ProductAdminQuery,
   ProductDetail,
@@ -116,6 +121,19 @@ export const orderApi = {
   cancel: (id: number) => http.post<Order>(app("Order/Cancel"), { id }),
   getAll: (q: OrderQuery = {}) => http.get<PagedResult<OrderListItem>>(app("Order/GetAll"), q),
   updateStatus: (id: number, status: OrderStatus) => http.put<Order>(app("Order/UpdateStatus"), { id, status }),
+};
+
+export const shippingApi = {
+  getStatus: () => http.get<{ isEnabled: boolean }>(app("Shipping/GetStatus")),
+  getProvinces: () => http.get<ShippingProvince[]>(app("Shipping/GetProvinces")),
+  getDistricts: (provinceId: number) => http.get<ShippingDistrict[]>(app("Shipping/GetDistricts"), { provinceId }),
+  getWards: (districtId: number) => http.get<ShippingWard[]>(app("Shipping/GetWards"), { districtId }),
+  calculateFee: (toDistrictId: number, toWardCode: string) =>
+    http.post<ShippingFeeResult>(app("Shipping/CalculateFee"), { toDistrictId, toWardCode }),
+};
+
+export const shipmentApi = {
+  get: (orderId: number, refresh = false) => http.get<Shipment>(app("Shipment/Get"), { orderId, refresh }),
 };
 
 export const userApi = {

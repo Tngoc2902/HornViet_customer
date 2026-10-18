@@ -9,9 +9,10 @@ import { RequireCustomer } from "@/components/hsv/guards";
 import { AccountShell } from "@/components/hsv/page-shells";
 import { Chip, ErrorBox, LoadingRows, notify, OrderProgress, Pager, StatusBadge } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
-import { useRealtimeRefresh } from "@/hooks/use-realtime";
+import { useRealtime, useRealtimeRefresh } from "@/hooks/use-realtime";
 import { toApiError } from "@/lib/api/http";
-import { orderApi } from "@/lib/api/services";
+import { orderApi, shipmentApi } from "@/lib/api/services";
+import { SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/lib/hsv/shipping";
 import { OrderStatus, type OrderListItem } from "@/lib/api/types";
 import { formatDateTime, formatVND, ORDER_TABS, parseOrderTab, PAYMENT_LABEL } from "@/lib/hsv/format";
 
@@ -21,6 +22,22 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
   const confirm = useConfirm();
   const { data, error, reload } = useApi(() => orderApi.get(order.id), [order.id, order.status]);
   const [busy, setBusy] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  // Webhook của GHN đổi trạng thái → tải lại để khách thấy ngay.
+  useRealtime("ShipmentChanged", (e) => {
+    if (e.orderId === order.id) void reload();
+  });
+  const refreshShipment = async () => {
+    setRefreshing(true);
+    try {
+      await shipmentApi.get(order.id, true);
+      await reload();
+    } catch (e) {
+      notify(toApiError(e).message);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const onCancel = async () => {
     const ok = await confirm({
@@ -76,10 +93,44 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
         <div>
           <p className="text-xs text-subtle">Thanh toán</p>
           <p className="mt-[3px] font-semibold">{PAYMENT_LABEL[data.paymentMethod]}</p>
-          <p className="mt-0.5 text-ink-2">Tổng {formatVND(data.totalAmount)}</p>
+          {!!data.shippingFee && <p className="mt-0.5 text-ink-2">Tiền hàng {formatVND(data.totalAmount)} · Phí giao {formatVND(data.shippingFee)}</p>}
+          <p className="mt-0.5 text-ink-2">Tổng {formatVND(data.payableAmount ?? data.totalAmount)}</p>
           {data.lastStatusChangeTime && <p className="mt-0.5 text-muted2">Cập nhật lúc {formatDateTime(data.lastStatusChangeTime)}</p>}
         </div>
       </div>
+      {data.ghnOrderCode && (
+        <div className="mt-4 rounded-card border border-line-2 p-4 text-[13.5px]">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-subtle">Vận chuyển Giao Hàng Nhanh · Mã vận đơn</span>
+            <b>{data.ghnOrderCode}</b>
+            {data.ghnStatus && (
+              <span
+                className="rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                style={{
+                  color: TONE_STYLE[SHIPMENT_STATUS[data.ghnStatus]?.tone ?? "info"].fg,
+                  background: TONE_STYLE[SHIPMENT_STATUS[data.ghnStatus]?.tone ?? "info"].bg,
+                  borderColor: TONE_STYLE[SHIPMENT_STATUS[data.ghnStatus]?.tone ?? "info"].bd,
+                }}
+              >
+                {shipmentLabel(data.ghnStatus)}
+              </span>
+            )}
+          </div>
+          {data.ghnStatusTime && <p className="mt-1.5 text-muted2">Cập nhật lúc {formatDateTime(data.ghnStatusTime)}</p>}
+          {data.ghnExpectedDeliveryTime && data.status !== OrderStatus.Completed && (
+            <p className="mt-0.5 text-muted2">Dự kiến giao: {formatDateTime(data.ghnExpectedDeliveryTime)}</p>
+          )}
+          {data.status === OrderStatus.Shipping && (
+            <button
+              onClick={refreshShipment}
+              disabled={refreshing}
+              className="mt-2.5 rounded-lg border border-line px-3.5 py-2 text-[13px] font-semibold disabled:opacity-60"
+            >
+              {refreshing ? "Đang cập nhật…" : "Cập nhật tình trạng giao hàng"}
+            </button>
+          )}
+        </div>
+      )}
       {data.status !== OrderStatus.Canceled && data.status !== OrderStatus.Completed && (
         <div className="mt-4 flex items-center justify-end gap-3">
           {!data.canCancel && <span className="text-[12.5px] text-faint">Đơn đang giao, không thể hủy</span>}
@@ -185,7 +236,7 @@ function OrdersView() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-bold">{formatVND(o.totalAmount)}</p>
+                    <p className="text-base font-bold">{formatVND(o.payableAmount ?? o.totalAmount)}</p>
                     <button onClick={() => setOpen(isOpen ? null : o.id)} aria-expanded={isOpen} className="mt-1.5 text-[13px] font-semibold text-gold">
                       {isOpen ? "Thu gọn" : "Xem chi tiết"}
                     </button>
