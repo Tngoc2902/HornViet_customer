@@ -180,7 +180,7 @@ export function FormAlert({ message, tone = "danger" }: { message?: string | nul
 
 export function EmptyState({ title, desc, action }: { title: string; desc?: string; action?: ReactNode }) {
   return (
-    <div className="rounded-card border border-dashed border-[#d6d6d6] bg-white px-6 py-20 text-center">
+    <div className="rounded-card border border-dashed border-[#ddd4c8] bg-white px-6 py-20 text-center">
       <p className="font-serif text-[22px]">{title}</p>
       {desc && <p className="mt-2 text-sm text-subtle">{desc}</p>}
       {action && <div className="mt-5">{action}</div>}
