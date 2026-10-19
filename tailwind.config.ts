@@ -23,26 +23,29 @@ const config = {
       },
     },
     extend: {
+      // Một họ chữ không chân (Inter, gần Helvetica Neue) cho toàn trang; "serif" giữ tên cũ nhưng cũng là Inter để các tiêu đề
+      // lớn đang dùng font-serif tự đồng bộ.
       fontFamily: {
-        sans: ["var(--font-be-vietnam)", "system-ui", "sans-serif"],
-        serif: ["var(--font-literata)", "Georgia", "serif"],
+        sans: ["var(--font-inter)", "Helvetica Neue", "Arial", "sans-serif"],
+        serif: ["var(--font-inter)", "Helvetica Neue", "Arial", "sans-serif"],
       },
       colors: {
-        // Design tokens Hồn Sừng Việt (xem README handoff)
-        navy: { DEFAULT: "#0f2a4a", deep: "#0b2140" },
+        // Design tokens Hồn Sừng Việt — phong cách tối giản đen trắng, vàng sừng làm điểm nhấn.
+        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: đen.
+        navy: { DEFAULT: "#111111", deep: "#000000" },
         gold: { DEFAULT: "#b08d57", dark: "#8f6f3f", soft: "#f6efe2" },
         champagne: "#e7d3a8",
-        ink: { DEFAULT: "#1d2939", 2: "#344054" },
-        muted2: "#5b6676",
-        subtle: "#6b7686",
-        faint: "#8a94a3",
-        line: { DEFAULT: "#e6e9ee", 2: "#eef1f5", 3: "#c3cbd6" },
-        surface: { DEFAULT: "#f3f5f8", 2: "#f7f9fb", active: "#eef2f7" },
-        // Dải nền xanh nhạt sau các băng sản phẩm (kiểu trang trang sức lớn).
-        band: "#edf2f8",
-        // Giá sản phẩm (vàng nâu) và nền thẻ sản phẩm (xám nhạt).
-        price: "#b47a32",
-        tile: "#f6f6f6",
+        ink: { DEFAULT: "#111111", 2: "#333333" },
+        muted2: "#555555",
+        subtle: "#6b6b6b",
+        faint: "#8f8f8f",
+        line: { DEFAULT: "#e5e5e5", 2: "#efefef", 3: "#c8c8c8" },
+        surface: { DEFAULT: "#f5f5f5", 2: "#fafafa", active: "#efefef" },
+        // Dải nền xám rất nhạt sau các băng sản phẩm.
+        band: "#f5f5f5",
+        // Giá sản phẩm (vàng sừng — điểm nhấn màu duy nhất) và nền ảnh thẻ sản phẩm.
+        price: "#9a6a2e",
+        tile: "#ffffff",
         danger: { DEFAULT: "#b42318", soft: "#fbe9e6", line: "#efc5bd" },
         warn: { DEFAULT: "#8a5a12", soft: "#fbf1dc", line: "#ecd29a" },
         ok: { DEFAULT: "#2f5d3c", soft: "#e7f0e8", line: "#bcd3c0", solid: "#3f7a50" },
@@ -81,17 +84,22 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      // Góc vuông như các shop thời trang tối giản; chỉ rounded-full (icon tròn, nhãn số, chấm) giữ nguyên.
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        card: "14px",
-        hero: "20px",
+        DEFAULT: "0px",
+        sm: "0px",
+        md: "0px",
+        lg: "0px",
+        xl: "0px",
+        "2xl": "0px",
+        "3xl": "0px",
+        card: "0px",
+        hero: "0px",
       },
       boxShadow: {
-        card: "0 14px 34px rgba(15,42,74,.12)",
-        dropdown: "0 18px 44px rgba(15,42,74,.16)",
-        drawer: "-16px 0 48px rgba(31,26,21,.18)",
+        card: "0 14px 34px rgba(0,0,0,.08)",
+        dropdown: "0 18px 44px rgba(0,0,0,.12)",
+        drawer: "-16px 0 48px rgba(0,0,0,.14)",
       },
       keyframes: {
         "accordion-down": {

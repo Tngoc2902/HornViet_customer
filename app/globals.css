@@ -5,25 +5,25 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 212 66% 17%;
+    --foreground: 0 0% 7%;
     --card: 0 0% 100%;
-    --card-foreground: 212 66% 17%;
+    --card-foreground: 0 0% 7%;
     --popover: 0 0% 100%;
-    --popover-foreground: 212 66% 17%;
-    --primary: 212 66% 17%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 7%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 216 23% 96%;
-    --secondary-foreground: 212 66% 17%;
-    --muted: 216 23% 96%;
-    --muted-foreground: 215 11% 39%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
     --accent: 37 34% 52%;
     --accent-foreground: 0 0% 100%;
     --destructive: 4 76% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 216 17% 92%;
-    --input: 216 17% 92%;
-    --ring: 212 66% 17%;
-    --radius: 0.5rem;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 7%;
+    --radius: 0rem;
   }
 
   html {
@@ -36,6 +36,13 @@
 
   button {
     cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-weight: 600;
+    letter-spacing: -0.015em;
   }
 }
 
@@ -54,7 +61,7 @@
   }
 
   .hsv-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .hsv-btn-primary {
@@ -62,7 +69,7 @@
   }
 
   .hsv-btn-outline {
-    @apply hsv-btn h-12 border border-navy text-navy hover:bg-surface;
+    @apply hsv-btn h-12 border border-navy text-navy hover:bg-navy hover:text-white;
   }
 
   .hsv-btn-gold {
@@ -82,7 +89,7 @@
   }
 
   .hsv-page-title {
-    @apply text-[22px] font-semibold text-navy sm:text-[24px];
+    @apply text-[20px] font-semibold uppercase tracking-[0.05em] text-navy sm:text-[22px];
   }
 
   /* Tiêu đề khu vực căn giữa ở trang chủ / danh sách. */

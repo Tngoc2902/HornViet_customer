@@ -319,8 +319,8 @@ function NavLink({ href, active, children, className }: { href: string; active: 
     <Link
       href={href}
       className={cn(
-        "relative flex h-full shrink-0 items-center whitespace-nowrap text-[14.5px] font-normal transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full",
-        active ? "text-gold-dark after:bg-gold" : "text-ink-2 hover:text-gold-dark",
+        "relative flex h-full shrink-0 items-center whitespace-nowrap text-[12.5px] font-medium uppercase tracking-[0.14em] transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px",
+        active ? "text-navy after:bg-navy" : "text-ink-2 hover:text-navy hover:after:bg-navy/40",
         className
       )}
     >
@@ -409,20 +409,20 @@ export function StoreFooter() {
             <p className="mt-1.5">Xưởng chế tác: {STORE_INFO.address}</p>
             <p>
               Email:{" "}
-              <a href={`mailto:${STORE_INFO.email}`} className="text-[#2f6fb5] hover:underline">
+              <a href={`mailto:${STORE_INFO.email}`} className="text-ink hover:underline">
                 {STORE_INFO.email}
               </a>
             </p>
             <p className="mt-4">Tổng đài hỗ trợ ({STORE_INFO.hours})</p>
             <p>
               Gọi mua:{" "}
-              <a href={`tel:${STORE_INFO.hotlineTel}`} className="text-[#2f6fb5] hover:underline">
+              <a href={`tel:${STORE_INFO.hotlineTel}`} className="text-ink hover:underline">
                 {STORE_INFO.hotline}
               </a>
             </p>
             <p>
               Góp ý / khiếu nại:{" "}
-              <a href={`tel:${STORE_INFO.hotlineTel}`} className="text-[#2f6fb5] hover:underline">
+              <a href={`tel:${STORE_INFO.hotlineTel}`} className="text-ink hover:underline">
                 {STORE_INFO.hotline}
               </a>
             </p>
@@ -507,10 +507,10 @@ export function StoreFooter() {
                 notify("Cảm ơn bạn đã đăng ký nhận tin");
                 (e.currentTarget as HTMLFormElement).reset();
               }}
-              className="flex rounded-full border border-line bg-surface p-1"
+              className="flex border border-line bg-white p-1"
             >
               <input type="email" required placeholder="Email của bạn" aria-label="Email nhận tin" className="min-w-0 flex-1 bg-transparent px-3.5 text-[13px] font-light text-navy outline-none" />
-              <button className="h-9 rounded-full bg-navy px-4 text-[13px] font-semibold text-white hover:bg-navy-deep">Đăng ký</button>
+              <button className="h-9 bg-navy px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white hover:bg-navy-deep">Đăng ký</button>
             </form>
           </div>
         </div>
