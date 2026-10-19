@@ -49,6 +49,20 @@ function CheckRow({ on, label, count, onClick }: { on: boolean; label: string; c
   );
 }
 
+/** Một nhóm lọc có thể thu gọn (như thanh bên của các shop thời trang). */
+function FilterGroup({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-line-2 py-4 first:pt-0 last:border-0">
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="flex w-full items-center justify-between text-left">
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-navy">{title}</span>
+        <ChevronDown className={cn("h-4 w-4 text-subtle transition-transform", open && "rotate-180")} />
+      </button>
+      {open && <div className="mt-3 flex flex-col gap-2.5">{children}</div>}
+    </div>
+  );
+}
+
 function FilterTag({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <button
@@ -73,6 +87,7 @@ export default function ProductListPage() {
   const price = PRICE_RANGES.find((r) => r.key === params.get("price")) ?? PRICE_RANGES[0];
   const sort = SORTS.find((s) => s.key === params.get("sort")) ?? SORTS[0];
   const page = Math.max(1, Number(params.get("page")) || 1);
+  const stockOnly = params.get("stock") === "1";
 
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -98,6 +113,7 @@ export default function ProductListPage() {
         minPrice: price.min,
         maxPrice: price.max,
         sorting: sort.value,
+        inStockOnly: stockOnly || undefined,
         skipCount: (page - 1) * PAGE_SIZE,
         maxResultCount: PAGE_SIZE,
       }),
@@ -120,8 +136,40 @@ export default function ProductListPage() {
     ...cats.map((id) => ({ key: `c${id}`, label: categories.find((c) => c.id === id)?.name ?? `Danh mục ${id}`, remove: () => toggle("cat", cats, id) })),
     ...mats.map((id) => ({ key: `m${id}`, label: materials.find((m) => m.id === id)?.name ?? `Chất liệu ${id}`, remove: () => toggle("mat", mats, id) })),
     ...(price.key !== "all" ? [{ key: "price", label: price.label, remove: () => setParams({ price: null }) }] : []),
+    ...(stockOnly ? [{ key: "stock", label: "Còn hàng", remove: () => setParams({ stock: null }) }] : []),
   ];
-  const filterCount = cats.length + mats.length + (price.key !== "all" ? 1 : 0);
+  const filterCount = cats.length + mats.length + (price.key !== "all" ? 1 : 0) + (stockOnly ? 1 : 0);
+
+  const filterGroups = (
+    <>
+      <FilterGroup title="Danh mục">
+        {categories.map((c) => (
+          <CheckRow key={c.id} on={cats.includes(c.id)} label={c.name} count={c.productCount} onClick={() => toggle("cat", cats, c.id)} />
+        ))}
+      </FilterGroup>
+      <FilterGroup title="Chất liệu">
+        {materials.map((m) => (
+          <CheckRow key={m.id} on={mats.includes(m.id)} label={m.name} onClick={() => toggle("mat", mats, m.id)} />
+        ))}
+      </FilterGroup>
+      <FilterGroup title="Khoảng giá">
+        {PRICE_RANGES.map((r) => (
+          <button
+            key={r.key}
+            type="button"
+            onClick={() => setParams({ price: r.key === "all" ? null : r.key })}
+            className={cn("flex items-center gap-2.5 text-left text-sm", price.key === r.key ? "font-semibold" : "")}
+          >
+            <Radio checked={price.key === r.key} />
+            {r.label}
+          </button>
+        ))}
+      </FilterGroup>
+      <FilterGroup title="Tình trạng">
+        <CheckRow on={stockOnly} label="Chỉ hiện sản phẩm còn hàng" onClick={() => setParams({ stock: stockOnly ? null : "1" })} />
+      </FilterGroup>
+    </>
+  );
 
   return (
     <div className="animate-hin pb-[72px]">
@@ -141,87 +189,75 @@ export default function ProductListPage() {
           </div>
         </div>
 
-        <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setFiltersOpen((v) => !v)}
-              aria-expanded={filtersOpen}
-              className={cn(
-                "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-[13.5px] font-semibold transition-colors",
-                filtersOpen || filterCount ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy/50"
+        <div className="mt-7 lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+          {/* Thanh lọc bên trái (máy tính) */}
+          <aside className="hidden self-start lg:sticky lg:top-[140px] lg:block">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="flex items-center gap-2 text-[15px] font-semibold text-navy">
+                <SlidersHorizontal className="h-4 w-4" /> Bộ lọc
+              </p>
+              {filterCount > 0 && (
+                <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-gold-dark hover:underline">
+                  Xóa ({filterCount})
+                </button>
               )}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Bộ lọc
-              {filterCount > 0 && <span className="rounded-full bg-white px-1.5 text-[11px] text-navy">{filterCount}</span>}
-            </button>
-            {categories.slice(0, 5).map((c) => (
+            </div>
+            {filterGroups}
+          </aside>
+
+          <div className="min-w-0">
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-3 lg:mt-0">
+            <span className="hidden text-[13px] text-subtle lg:inline">{data ? `${total} sản phẩm` : "Đang tải…"}</span>
+            <div className="flex flex-wrap items-center gap-2 lg:hidden">
               <button
-                key={c.id}
-                onClick={() => toggle("cat", cats, c.id)}
-                aria-pressed={cats.includes(c.id)}
+                onClick={() => setFiltersOpen((v) => !v)}
+                aria-expanded={filtersOpen}
                 className={cn(
-                  "hidden h-10 rounded-lg border px-3.5 text-[13px] font-medium transition-colors md:inline-flex md:items-center",
-                  cats.includes(c.id) ? "border-gold bg-gold-soft text-gold-dark" : "border-line bg-white text-ink-2 hover:border-navy/40"
+                  "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-[13.5px] font-semibold transition-colors",
+                  filtersOpen || filterCount ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy/50"
                 )}
               >
-                {c.name}
+                <SlidersHorizontal className="h-4 w-4" />
+                Bộ lọc
+                {filterCount > 0 && <span className="rounded-full bg-white px-1.5 text-[11px] text-navy">{filterCount}</span>}
               </button>
-            ))}
+              {categories.slice(0, 5).map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => toggle("cat", cats, c.id)}
+                  aria-pressed={cats.includes(c.id)}
+                  className={cn(
+                    "hidden h-10 rounded-lg border px-3.5 text-[13px] font-medium transition-colors md:inline-flex md:items-center",
+                    cats.includes(c.id) ? "border-gold bg-gold-soft text-gold-dark" : "border-line bg-white text-ink-2 hover:border-navy/40"
+                  )}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-[13px] text-subtle">
+              <span className="max-sm:hidden">Sắp xếp theo</span>
+              <span className="relative">
+                <select
+                  value={sort.key}
+                  onChange={(e) => setParams({ sort: e.target.value === "new" ? null : e.target.value })}
+                  className="h-10 appearance-none rounded-lg border border-line bg-white pl-3.5 pr-9 text-[13.5px] font-semibold text-navy outline-none focus:border-navy"
+                >
+                  {SORTS.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy" />
+              </span>
+            </label>
           </div>
-          <label className="flex items-center gap-2 text-[13px] text-subtle">
-            <span className="max-sm:hidden">Sắp xếp theo</span>
-            <span className="relative">
-              <select
-                value={sort.key}
-                onChange={(e) => setParams({ sort: e.target.value === "new" ? null : e.target.value })}
-                className="h-10 appearance-none rounded-lg border border-line bg-white pl-3.5 pr-9 text-[13.5px] font-semibold text-navy outline-none focus:border-navy"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.key} value={s.key}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy" />
-            </span>
-          </label>
-        </div>
 
-        {filtersOpen && (
-          <div className="mt-3 grid gap-6 rounded-xl border border-line bg-white p-5 shadow-[0_8px_24px_rgba(15,42,74,.06)] sm:grid-cols-2 lg:grid-cols-3 lg:p-6">
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.1em] text-subtle">Danh mục</p>
-              <div className="flex flex-col gap-2.5">
-                {categories.map((c) => (
-                  <CheckRow key={c.id} on={cats.includes(c.id)} label={c.name} count={c.productCount} onClick={() => toggle("cat", cats, c.id)} />
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.1em] text-subtle">Chất liệu</p>
-              <div className="flex flex-col gap-2.5">
-                {materials.map((m) => (
-                  <CheckRow key={m.id} on={mats.includes(m.id)} label={m.name} onClick={() => toggle("mat", mats, m.id)} />
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.1em] text-subtle">Khoảng giá</p>
-              <div className="flex flex-col gap-2.5">
-                {PRICE_RANGES.map((r) => (
-                  <button
-                    key={r.key}
-                    type="button"
-                    onClick={() => setParams({ price: r.key === "all" ? null : r.key })}
-                    className={cn("flex items-center gap-2.5 text-left text-sm", price.key === r.key ? "font-semibold" : "")}
-                  >
-                    <Radio checked={price.key === r.key} />
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-5 flex gap-2">
+          {filtersOpen && (
+            <div className="mt-3 rounded-xl border border-line bg-white p-5 shadow-[0_8px_24px_rgba(15,42,74,.06)] lg:hidden">
+              {filterGroups}
+              <div className="mt-4 flex gap-2">
                 <button onClick={() => router.push(pathname)} className="flex-1 rounded-lg border border-line p-2.5 text-[13px] font-semibold text-gold-dark hover:border-gold">
                   Xóa bộ lọc
                 </button>
@@ -230,38 +266,39 @@ export default function ProductListPage() {
                 </button>
               </div>
             </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[13px] text-subtle lg:hidden">{data ? `${total} sản phẩm` : "Đang tải…"}</span>
+            {q && <FilterTag label={`“${q}”`} onRemove={() => setParams({ q: null })} />}
+            {tags.map((t) => (
+              <FilterTag key={t.key} label={t.label} onRemove={t.remove} />
+            ))}
+            {(tags.length > 0 || q) && (
+              <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-gold-dark hover:underline">
+                Xóa tất cả
+              </button>
+            )}
           </div>
-        )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-[13px] text-subtle">{data ? `${total} sản phẩm` : "Đang tải…"}</span>
-          {q && <FilterTag label={`“${q}”`} onRemove={() => setParams({ q: null })} />}
-          {tags.map((t) => (
-            <FilterTag key={t.key} label={t.label} onRemove={t.remove} />
-          ))}
-          {(tags.length > 0 || q) && (
-            <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-gold-dark hover:underline">
-              Xóa tất cả
-            </button>
-          )}
-        </div>
-
-        <div className={cn("mt-5", loading && data && "opacity-60 transition-opacity")}>
-          {data && total === 0 ? (
-            <EmptyState
-              title="Rất tiếc, không tìm thấy sản phẩm phù hợp với tiêu chí của bạn"
-              desc="Thử bỏ bớt bộ lọc hoặc dùng từ khóa khác."
-              action={
-                <button onClick={() => router.push(pathname)} className="hsv-btn-primary h-11">
-                  Xóa bộ lọc
-                </button>
-              }
-            />
-          ) : (
-            <ProductGrid items={data?.items} error={error} onRetry={reload} skeletons={8} />
-          )}
-          <Pager page={page} total={total} pageSize={PAGE_SIZE} onChange={(n) => setParams({ page: n === 1 ? null : String(n) }, false)} />
-          <p className="mt-6 text-center text-[11.5px] text-faint">Sản phẩm còn hàng luôn được xếp trước.</p>
+          <div className={cn("mt-5", loading && data && "opacity-60 transition-opacity")}>
+            {data && total === 0 ? (
+              <EmptyState
+                title="Rất tiếc, không tìm thấy sản phẩm phù hợp với tiêu chí của bạn"
+                desc="Thử bỏ bớt bộ lọc hoặc dùng từ khóa khác."
+                action={
+                  <button onClick={() => router.push(pathname)} className="hsv-btn-primary h-11">
+                    Xóa bộ lọc
+                  </button>
+                }
+              />
+            ) : (
+              <ProductGrid items={data?.items} error={error} onRetry={reload} skeletons={9} withSidebar />
+            )}
+            <Pager page={page} total={total} pageSize={PAGE_SIZE} onChange={(n) => setParams({ page: n === 1 ? null : String(n) }, false)} />
+            <p className="mt-6 text-center text-[11.5px] text-faint">Sản phẩm còn hàng luôn được xếp trước.</p>
+          </div>
+          </div>
         </div>
       </div>
     </div>

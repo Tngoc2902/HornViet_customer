@@ -80,6 +80,8 @@ export type ProductListItem = {
   name: string;
   price: number;
   mainImage: string | null;
+  /** Ảnh thứ hai (khác ảnh đại diện) để đổi ảnh khi rê chuột; null nếu chỉ có một ảnh. Backend cũ chưa trả. */
+  hoverImage?: string | null;
   categoryId: number;
   categoryName: string;
   materialId: number;

@@ -2,48 +2,65 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import type { ApiError } from "@/lib/api/http";
 import { formatVND } from "@/lib/hsv/format";
 import type { ProductListItem } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
+import { QuickView } from "./quick-view";
 import { ErrorBox, ProductImage, Skeleton } from "./ui";
 
 function isNew(p: ProductListItem) {
   return Date.now() - new Date(p.creationTime).getTime() <= 45 * 24 * 3600 * 1000;
 }
 
-/** Thẻ sản phẩm kiểu PNJ: nền xám nhạt không viền, ảnh vuông, tên 2 dòng căn giữa, giá vàng nâu. */
+/**
+ * Thẻ sản phẩm: nền xám nhạt, ảnh vuông, tên 2 dòng căn giữa, giá vàng nâu. Rê chuột (máy tính): đổi sang ảnh thứ hai và hiện
+ * nút "Xem nhanh" để chọn biến thể, thêm vào giỏ ngay tại chỗ.
+ */
 export function ProductCard({ product, className }: { product: ProductListItem; className?: string }) {
+  const [quick, setQuick] = useState(false);
   return (
-    <Link
-      href={`/products/${product.id}`}
-      className={cn("group flex h-full flex-col overflow-hidden rounded-lg bg-tile transition duration-200 hover:shadow-[0_8px_24px_rgba(15,42,74,.10)]", className)}
-    >
-      <div className="p-2.5 pb-0 sm:p-3 sm:pb-0">
-        <ProductImage
-          src={product.mainImage}
-          seed={product.id}
-          alt={product.name}
-          className="aspect-square w-full rounded-md [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
+    <div className={cn("group relative flex h-full flex-col overflow-hidden rounded-lg bg-tile transition duration-200 hover:shadow-[0_8px_24px_rgba(15,42,74,.10)]", className)}>
+      <Link href={`/products/${product.id}`} className="flex flex-1 flex-col">
+        <div className="p-2.5 pb-0 sm:p-3 sm:pb-0">
+          <ProductImage
+            src={product.mainImage}
+            hoverSrc={product.hoverImage}
+            seed={product.id}
+            alt={product.name}
+            className="aspect-square w-full rounded-md [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
+          >
+            {isNew(product) && product.inStock && (
+              <span className="absolute right-2 top-1.5 font-serif text-[12px] italic tracking-wide text-gold-dark [text-shadow:0_0_6px_rgba(255,255,255,.9)]">NEW</span>
+            )}
+            {!product.inStock && (
+              <>
+                <div className="absolute inset-0 bg-white/45" />
+                <span className="absolute left-2 top-2 rounded bg-white px-2 py-[3px] text-[11px] font-medium text-danger shadow-sm">Hết hàng</span>
+              </>
+            )}
+          </ProductImage>
+        </div>
+        <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-4">
+          <p className="line-clamp-2 min-h-[38px] text-[13px] font-light leading-[1.45] text-ink group-hover:text-navy sm:text-[13.5px]">{product.name}</p>
+          <p className="mt-1.5 text-[14.5px] font-semibold text-price sm:text-[15px]">{formatVND(product.price)}</p>
+          <p className="mt-0.5 text-[11px] font-light text-faint">{product.materialName}</p>
+        </div>
+      </Link>
+      {/* Nút Xem nhanh nằm trên lớp phủ trùng khung ảnh vuông; chỉ hiện khi rê chuột trên máy tính (điện thoại bấm thẳng vào thẻ). */}
+      <div className="pointer-events-none absolute inset-x-2.5 top-2.5 hidden aspect-square sm:inset-x-3 sm:top-3 md:block">
+        <button
+          type="button"
+          onClick={() => setQuick(true)}
+          className="pointer-events-auto absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-center gap-1.5 rounded-md bg-white/95 py-2 text-[12.5px] font-semibold text-navy opacity-0 shadow-[0_6px_18px_rgba(15,42,74,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
         >
-          {isNew(product) && product.inStock && (
-            <span className="absolute right-2 top-1.5 font-serif text-[12px] italic tracking-wide text-gold-dark [text-shadow:0_0_6px_rgba(255,255,255,.9)]">NEW</span>
-          )}
-          {!product.inStock && (
-            <>
-              <div className="absolute inset-0 bg-white/45" />
-              <span className="absolute left-2 top-2 rounded bg-white px-2 py-[3px] text-[11px] font-medium text-danger shadow-sm">Hết hàng</span>
-            </>
-          )}
-        </ProductImage>
+          <Eye className="h-4 w-4" />
+          Xem nhanh
+        </button>
       </div>
-      <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-4">
-        <p className="line-clamp-2 min-h-[38px] text-[13px] font-light leading-[1.45] text-ink group-hover:text-navy sm:text-[13.5px]">{product.name}</p>
-        <p className="mt-1.5 text-[14.5px] font-semibold text-price sm:text-[15px]">{formatVND(product.price)}</p>
-        <p className="mt-0.5 text-[11px] font-light text-faint">{product.materialName}</p>
-      </div>
-    </Link>
+      {quick && <QuickView productId={product.id} onClose={() => setQuick(false)} />}
+    </div>
   );
 }
 
@@ -65,15 +82,23 @@ export function ProductGrid({
   error,
   onRetry,
   skeletons = 8,
+  withSidebar,
 }: {
   items?: ProductListItem[];
   error?: ApiError | null;
   onRetry?: () => void;
   skeletons?: number;
+  /** true: lưới nằm cạnh thanh lọc bên trái nên ít cột hơn (3 → 4 cột). */
+  withSidebar?: boolean;
 }) {
   if (error && !items) return <ErrorBox error={error} onRetry={onRetry} />;
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 min-[1800px]:grid-cols-6">
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3",
+        withSidebar ? "2xl:grid-cols-4" : "lg:grid-cols-4 min-[1800px]:grid-cols-6"
+      )}
+    >
       {items
         ? items.map((p) => <ProductCard key={p.id} product={p} />)
         : Array.from({ length: skeletons }, (_, i) => <ProductCardSkeleton key={i} />)}

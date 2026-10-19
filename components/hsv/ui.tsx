@@ -24,6 +24,7 @@ export function ProductImage({
   seed = 0,
   alt = "",
   width = 640,
+  hoverSrc,
   className,
   children,
 }: {
@@ -32,10 +33,13 @@ export function ProductImage({
   alt?: string;
   /** Bề rộng ảnh cần tải (px, đã tính màn hình nét gấp đôi) — ảnh Cloudinary được thu nhỏ theo số này. */
   width?: number;
+  /** Ảnh thứ hai hiện lên khi rê chuột vào thẻ cha có class "group" (như các shop thời trang). */
+  hoverSrc?: string | null;
   className?: string;
   children?: ReactNode;
 }) {
   const url = imageUrl(src, width);
+  const hoverUrl = imageUrl(hoverSrc, width);
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [url]);
   return (
@@ -43,6 +47,16 @@ export function ProductImage({
       {url && !failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={alt} loading="lazy" onError={() => setFailed(true)} className="absolute inset-0 h-full w-full object-cover" />
+      )}
+      {hoverUrl && !failed && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={hoverUrl}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        />
       )}
       {children}
     </div>
