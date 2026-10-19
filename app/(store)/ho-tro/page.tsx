@@ -73,7 +73,7 @@ const SECTIONS: Section[] = [
             {STORE_INFO.hotline}
           </a>{" "}
           hoặc nhắn{" "}
-          <a href={ZALO_URL} target="_blank" rel="noreferrer" className="font-normal text-[#0068ff] underline">
+          <a href={ZALO_URL} target="_blank" rel="noreferrer" className="font-normal text-ink underline underline-offset-4">
             Zalo
           </a>{" "}
           để được hướng dẫn đo.
