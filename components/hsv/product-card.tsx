@@ -21,15 +21,15 @@ function isNew(p: ProductListItem) {
 export function ProductCard({ product, className }: { product: ProductListItem; className?: string }) {
   const [quick, setQuick] = useState(false);
   return (
-    <div className={cn("group relative flex h-full flex-col overflow-hidden rounded-lg bg-tile transition duration-200 hover:shadow-[0_8px_24px_rgba(15,42,74,.10)]", className)}>
+    <div className={cn("group relative flex h-full flex-col overflow-hidden bg-tile", className)}>
       <Link href={`/products/${product.id}`} className="flex flex-1 flex-col">
-        <div className="p-2.5 pb-0 sm:p-3 sm:pb-0">
+        <div>
           <ProductImage
             src={product.mainImage}
             hoverSrc={product.hoverImage}
             seed={product.id}
             alt={product.name}
-            className="aspect-square w-full rounded-md [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
+            className="aspect-square w-full bg-surface [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
           >
             {isNew(product) && product.inStock && (
               <span className="absolute right-2 top-1.5 font-serif text-[12px] italic tracking-wide text-gold-dark [text-shadow:0_0_6px_rgba(255,255,255,.9)]">NEW</span>
@@ -42,18 +42,18 @@ export function ProductCard({ product, className }: { product: ProductListItem; 
             )}
           </ProductImage>
         </div>
-        <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-4">
-          <p className="line-clamp-2 min-h-[38px] text-[13px] font-light leading-[1.45] text-ink group-hover:text-navy sm:text-[13.5px]">{product.name}</p>
-          <p className="mt-1.5 text-[14.5px] font-semibold text-price sm:text-[15px]">{formatVND(product.price)}</p>
+        <div className="flex flex-1 flex-col px-2 pb-4 pt-3 text-center">
+          <p className="line-clamp-2 min-h-[36px] text-[12px] font-semibold uppercase leading-[1.5] tracking-[0.03em] text-ink sm:text-[12.5px]">{product.name}</p>
+          <p className="mt-1.5 text-[14px] font-medium text-price sm:text-[14.5px]">{formatVND(product.price)}</p>
           <p className="mt-0.5 text-[11px] font-light text-faint">{product.materialName}</p>
         </div>
       </Link>
       {/* Nút Xem nhanh nằm trên lớp phủ trùng khung ảnh vuông; chỉ hiện khi rê chuột trên máy tính (điện thoại bấm thẳng vào thẻ). */}
-      <div className="pointer-events-none absolute inset-x-2.5 top-2.5 hidden aspect-square sm:inset-x-3 sm:top-3 md:block">
+      <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square md:block">
         <button
           type="button"
           onClick={() => setQuick(true)}
-          className="pointer-events-auto absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-center gap-1.5 rounded-md bg-white/95 py-2 text-[12.5px] font-semibold text-navy opacity-0 shadow-[0_6px_18px_rgba(15,42,74,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          className="pointer-events-auto absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-navy opacity-0 shadow-[0_6px_18px_rgba(0,0,0,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
         >
           <Eye className="h-4 w-4" />
           Xem nhanh
@@ -66,7 +66,7 @@ export function ProductCard({ product, className }: { product: ProductListItem; 
 
 export function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg bg-tile p-3">
+    <div className="flex flex-col overflow-hidden bg-tile">
       <Skeleton className="aspect-square w-full bg-line-2" />
       <div className="flex flex-col items-center gap-2 pt-3">
         <Skeleton className="h-4 w-4/5 bg-line-2" />

@@ -94,7 +94,7 @@ export function SearchBox({ className, autoFocus }: { className?: string; autoFo
       }}
       className={cn("relative", className)}
     >
-      <div className="flex h-10 items-center rounded-full border border-line bg-surface pl-4 pr-1 focus-within:border-navy/40">
+      <div className="flex h-10 items-center border border-line bg-white pl-4 pr-1 focus-within:border-navy">
         <input
           value={q}
           onChange={(e) => {
@@ -123,13 +123,13 @@ export function SearchBox({ className, autoFocus }: { className?: string; autoFo
           autoFocus={autoFocus}
           className="min-w-0 flex-1 bg-transparent text-[13.5px] font-light outline-none placeholder:italic placeholder:text-faint"
         />
-        <button type="submit" aria-label="Tìm kiếm" className="flex h-8 w-8 items-center justify-center rounded-full text-navy hover:bg-white">
+        <button type="submit" aria-label="Tìm kiếm" className="flex h-8 w-8 items-center justify-center text-navy hover:bg-surface">
           {loading ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Search className="h-[18px] w-[18px]" />}
         </button>
       </div>
 
       {showPanel && (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-line bg-white shadow-[0_12px_32px_rgba(15,42,74,.14)] lg:left-auto lg:w-[420px]">
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-line bg-white shadow-[0_12px_32px_rgba(0,0,0,.14)] lg:left-auto lg:w-[420px]">
           {loading && items.length === 0 ? (
             <p className="px-4 py-3 text-[13px] text-muted2">Đang tìm…</p>
           ) : items.length === 0 ? (

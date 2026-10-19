@@ -391,19 +391,19 @@ function EmptyCartArt() {
         </linearGradient>
       </defs>
       <ellipse cx="100" cy="150" rx="70" ry="10" fill="#eef1f5" />
-      <path d="M70 40c0-14 13-22 30-22s30 8 30 22c0 10-6 14-6 22 0 14 14 22 14 44 0 18-16 30-38 30s-38-12-38-30c0-22 14-30 14-44 0-8-6-12-6-22z" fill="url(#bust)" stroke="#d5dbe3" />
-      <ellipse cx="100" cy="30" rx="18" ry="6" fill="#f4f6f9" stroke="#d5dbe3" />
-      <rect x="96" y="136" width="8" height="10" rx="2" fill="#d5dbe3" />
-      <ellipse cx="100" cy="148" rx="20" ry="4" fill="#d5dbe3" />
+      <path d="M70 40c0-14 13-22 30-22s30 8 30 22c0 10-6 14-6 22 0 14 14 22 14 44 0 18-16 30-38 30s-38-12-38-30c0-22 14-30 14-44 0-8-6-12-6-22z" fill="url(#bust)" stroke="#dcdcdc" />
+      <ellipse cx="100" cy="30" rx="18" ry="6" fill="#f4f6f9" stroke="#dcdcdc" />
+      <rect x="96" y="136" width="8" height="10" rx="2" fill="#dcdcdc" />
+      <ellipse cx="100" cy="148" rx="20" ry="4" fill="#dcdcdc" />
       {[
         [52, 128, 5],
         [150, 132, 4.5],
         [64, 146, 4],
         [140, 150, 5],
       ].map(([x, y, r]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill="#c9ced6" />
+        <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill="#d0d0d0" />
       ))}
-      <path d="M150 52l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M48 72l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#c9ced6" />
+      <path d="M150 52l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M48 72l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z" fill="#d0d0d0" />
     </svg>
   );
 }

@@ -68,7 +68,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
   // Gắn thẳng vào <body>: phần tử cha có hiệu ứng (transform) sẽ "nhốt" position: fixed và lớp phủ không che được header.
   return createPortal(
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-      <div onClick={onClose} className="absolute inset-0 bg-[rgba(15,23,35,.45)]" />
+      <div onClick={onClose} className="absolute inset-0 bg-[rgba(0,0,0,.45)]" />
       <div role="dialog" aria-modal="true" aria-label="Xem nhanh sản phẩm" className="relative grid max-h-[92vh] w-full max-w-[880px] animate-hin overflow-y-auto rounded-2xl bg-white shadow-drawer md:grid-cols-2">
         <button onClick={onClose} aria-label="Đóng" className="absolute right-3 top-3 z-10 rounded-full bg-white/90 p-1.5 text-subtle shadow-sm hover:text-navy">
           <X className="h-5 w-5" />

@@ -178,7 +178,7 @@ export default function ProductListPage() {
 
         <div
           className="relative mt-4 overflow-hidden rounded-2xl px-6 py-9 text-white sm:px-12 sm:py-12"
-          style={{ background: oneCat || oneMat ? gradient(tonesFor((oneCat?.id ?? oneMat!.id) + 1)) : "linear-gradient(110deg,#0f2a4a 0%,#2c4363 55%,#a39886 100%)" }}
+          style={{ background: oneCat || oneMat ? gradient(tonesFor((oneCat?.id ?? oneMat!.id) + 1)) : "linear-gradient(110deg,#111111 0%,#2e2e2e 55%,#8c8278 100%)" }}
         >
           <span className="absolute -right-16 -top-20 h-72 w-72 rounded-full border border-white/20" />
           <span className="absolute -bottom-20 right-32 h-48 w-48 rounded-full bg-white/10 max-sm:hidden" />
@@ -255,7 +255,7 @@ export default function ProductListPage() {
           </div>
 
           {filtersOpen && (
-            <div className="mt-3 rounded-xl border border-line bg-white p-5 shadow-[0_8px_24px_rgba(15,42,74,.06)] lg:hidden">
+            <div className="mt-3 rounded-xl border border-line bg-white p-5 shadow-[0_8px_24px_rgba(0,0,0,.06)] lg:hidden">
               {filterGroups}
               <div className="mt-4 flex gap-2">
                 <button onClick={() => router.push(pathname)} className="flex-1 rounded-lg border border-line p-2.5 text-[13px] font-semibold text-gold-dark hover:border-gold">
