@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         unstyled: true,
                         classNames: {
                           toast:
-                            "flex items-center whitespace-pre-line rounded-lg bg-[#111] px-[22px] py-[13px] text-sm font-medium text-white shadow-[0_10px_30px_rgba(43,40,37,.25)] font-sans",
+                            "flex items-center whitespace-pre-line rounded-lg bg-[#111] px-[22px] py-[13px] text-sm font-medium text-white shadow-[0_10px_30px_rgba(91,55,36,.25)] font-sans",
                         },
                       }}
                     />
