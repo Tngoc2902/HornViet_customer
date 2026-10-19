@@ -96,7 +96,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
                       key={s}
                       onClick={() => setImg(i)}
                       aria-label={`Ảnh ${i + 1}`}
-                      className={cn("w-16 shrink-0 rounded-lg border-2 p-0.5", i === img ? "border-navy" : "border-transparent")}
+                      className={cn("w-16 shrink-0 rounded-lg border-2 p-0.5", i === img ? "border-brand" : "border-transparent")}
                     >
                       <ProductImage src={s} seed={product.id + i} width={140} className="aspect-square rounded-md" />
                     </button>
@@ -106,7 +106,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
             </div>
 
             <div className="flex flex-col p-6 sm:p-7">
-              <p className="text-[11px] font-semibold tracking-[0.2em] text-gold-dark">{product.categoryName.toUpperCase()}</p>
+              <p className="text-[11px] font-semibold tracking-[0.2em] text-ink">{product.categoryName.toUpperCase()}</p>
               <h2 className="mt-1.5 text-[20px] font-medium leading-snug text-navy">{product.name}</h2>
               <p className="mt-1 text-[12.5px] text-subtle">{product.material?.name}</p>
               <p className="mt-3 text-[24px] font-semibold text-price">{formatVND(product.price)}</p>
@@ -126,7 +126,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
                         aria-pressed={cur?.id === v.id}
                         className={cn(
                           "min-h-[38px] rounded-lg border px-3.5 text-[13px] transition-colors",
-                          cur?.id === v.id ? "border-navy bg-navy text-white" : "border-line bg-white hover:border-navy/50",
+                          cur?.id === v.id ? "border-brand bg-brand text-white" : "border-line bg-white hover:border-brand/50",
                           !v.inStock && "line-through opacity-55"
                         )}
                       >
@@ -153,7 +153,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
                   disabled={!canAdd}
                   className={cn(
                     "h-11 flex-1 rounded-md text-[13.5px] font-semibold uppercase tracking-[0.04em] transition-colors",
-                    canAdd ? "bg-navy text-white hover:bg-navy-deep" : "cursor-not-allowed bg-line-2 text-faint"
+                    canAdd ? "bg-brand text-white hover:bg-brand-deep" : "cursor-not-allowed bg-line-2 text-faint"
                   )}
                 >
                   {!cur?.inStock ? "Hết hàng" : adding ? "Đang thêm…" : session ? "Thêm vào giỏ" : "Đăng nhập để mua"}
@@ -163,7 +163,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
               <Link
                 href={`/products/${product.id}`}
                 onClick={onClose}
-                className="mt-3 flex h-11 items-center justify-center rounded-md border border-navy text-[13.5px] font-semibold text-navy hover:bg-navy hover:text-white"
+                className="mt-3 flex h-11 items-center justify-center rounded-md border border-brand text-[13.5px] font-semibold text-navy hover:bg-brand hover:text-white"
               >
                 Xem chi tiết sản phẩm
               </Link>

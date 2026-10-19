@@ -33,20 +33,22 @@ const config = {
         // Design tokens Hồn Sừng Việt — tông "trắng kem & nâu" (bảng màu trang sức):
         //   #5B3724 nâu đậm · #755543 nâu · #C09B81 nâu sữa · #ADA399 xám be · #DBD5CB be nhạt · #FFF7ED trắng kem.
         // Nền trang, header, thẻ giữ trắng tinh; trắng kem #FFF7ED dùng cho các dải nền phụ (băng sản phẩm, dải thông báo…).
-        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: nâu đậm.
-        navy: { DEFAULT: "#5B3724", deep: "#4a2c1c" },
+        // Chữ chỉ đen / trắng tùy nền. "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ chính: đen.
+        navy: { DEFAULT: "#1a1a1a", deep: "#000000" },
+        // Nâu thương hiệu: chỉ cho nền nút chính, chip đang chọn, viền nhấn, huy hiệu, khối nền đậm (chữ trên đó màu trắng).
+        brand: { DEFAULT: "#5B3724", deep: "#4a2c1c", 2: "#755543" },
         gold: { DEFAULT: "#C09B81", dark: "#755543", soft: "#f3e8db" },
         champagne: "#eadbc8",
-        ink: { DEFAULT: "#4a3226", 2: "#5f4637" },
-        muted2: "#6e5a4d",
-        subtle: "#857266",
-        faint: "#a3958a",
+        ink: { DEFAULT: "#1a1a1a", 2: "#3d3d3d" },
+        muted2: "#555555",
+        subtle: "#6b6b6b",
+        faint: "#8f8f8f",
         line: { DEFAULT: "#DBD5CB", 2: "#e9e3da", 3: "#ADA399" },
         surface: { DEFAULT: "#FFF7ED", 2: "#fffbf6", active: "#f6ebdd" },
         // Dải nền trắng kem sau các băng sản phẩm.
         band: "#FFF7ED",
-        // Giá sản phẩm (nâu) và nền thẻ sản phẩm (trắng).
-        price: "#755543",
+        // Giá sản phẩm (đen như chữ) và nền thẻ sản phẩm (trắng).
+        price: "#1a1a1a",
         tile: "#ffffff",
         danger: { DEFAULT: "#b42318", soft: "#fbe9e6", line: "#efc5bd" },
         warn: { DEFAULT: "#8a5a12", soft: "#fbf1dc", line: "#ecd29a" },

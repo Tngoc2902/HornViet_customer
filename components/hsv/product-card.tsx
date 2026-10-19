@@ -32,7 +32,7 @@ export function ProductCard({ product, className }: { product: ProductListItem; 
             className="aspect-square w-full bg-surface [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
           >
             {isNew(product) && product.inStock && (
-              <span className="absolute right-2 top-1.5 font-serif text-[12px] italic tracking-wide text-gold-dark [text-shadow:0_0_6px_rgba(255,255,255,.9)]">NEW</span>
+              <span className="absolute right-2 top-1.5 font-serif text-[12px] italic tracking-wide text-ink [text-shadow:0_0_6px_rgba(255,255,255,.9)]">NEW</span>
             )}
             {!product.inStock && (
               <>
@@ -53,7 +53,7 @@ export function ProductCard({ product, className }: { product: ProductListItem; 
         <button
           type="button"
           onClick={() => setQuick(true)}
-          className="pointer-events-auto absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-navy opacity-0 shadow-[0_6px_18px_rgba(91,55,36,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          className="pointer-events-auto absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-navy opacity-0 shadow-[0_6px_18px_rgba(91,55,36,.15)] transition duration-300 hover:bg-brand hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
         >
           <Eye className="h-4 w-4" />
           Xem nhanh

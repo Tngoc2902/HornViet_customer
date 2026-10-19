@@ -116,7 +116,7 @@ export default function OriginPage() {
                   )}
                   <Link
                     href={`/products?mat=${m.id}`}
-                    className="mt-5 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-gold-dark hover:gap-2.5 hover:underline"
+                    className="mt-5 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-ink hover:gap-2.5 hover:underline"
                   >
                     Xem {countOf(m.id) || ""} sản phẩm {m.name.toLowerCase()} <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -147,7 +147,7 @@ export default function OriginPage() {
           </ol>
           <p className="mt-6 text-center text-[13.5px] font-light text-subtle">
             Sừng về đến xưởng sẽ đi tiếp qua 7 công đoạn chế tác thủ công —{" "}
-            <Link href="/cau-chuyen#quy-trinh" className="font-normal text-gold-dark hover:underline">
+            <Link href="/cau-chuyen#quy-trinh" className="font-normal text-ink underline underline-offset-4 hover:underline">
               xem quy trình chế tác
             </Link>
             .
@@ -163,7 +163,7 @@ export default function OriginPage() {
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {REAL_HORN_TIPS.map((t, i) => (
                 <div key={t.title} className="flex gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy text-[12px] font-semibold text-white">{i + 1}</span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-[12px] font-semibold text-white">{i + 1}</span>
                   <div>
                     <p className="text-[14.5px] font-medium text-navy">{t.title}</p>
                     <p className="mt-1 text-[13.5px] font-light leading-relaxed text-ink-2">{t.desc}</p>

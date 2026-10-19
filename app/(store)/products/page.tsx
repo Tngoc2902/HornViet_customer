@@ -38,7 +38,7 @@ function CheckRow({ on, label, count, onClick }: { on: boolean; label: string; c
       <span
         className={cn(
           "flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[11px] text-white",
-          on ? "border-navy bg-navy" : "border-line-3 bg-white"
+          on ? "border-brand bg-brand" : "border-line-3 bg-white"
         )}
       >
         {on ? "✓" : ""}
@@ -67,7 +67,7 @@ function FilterTag({ label, onRemove }: { label: string; onRemove: () => void })
   return (
     <button
       onClick={onRemove}
-      className="inline-flex items-center gap-1.5 rounded-full border border-navy/20 bg-surface-active px-3 py-1.5 text-[12.5px] font-semibold text-navy hover:border-navy/50"
+      className="inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-surface-active px-3 py-1.5 text-[12.5px] font-semibold text-navy hover:border-brand/50"
     >
       {label}
       <X className="h-3.5 w-3.5" />
@@ -183,7 +183,7 @@ export default function ProductListPage() {
           <span className="absolute -right-16 -top-20 h-72 w-72 rounded-full border border-white/20" />
           <span className="absolute -bottom-20 right-32 h-48 w-48 rounded-full bg-white/10 max-sm:hidden" />
           <div className="relative max-w-[640px]">
-            <p className="text-[11px] font-bold tracking-[0.24em] text-champagne">HỒN SỪNG VIỆT</p>
+            <p className="text-[11px] font-bold tracking-[0.24em] text-white/80">HỒN SỪNG VIỆT</p>
             <h1 className="mt-2 font-serif text-[30px] leading-tight sm:text-[42px]">{title}</h1>
             <p className="mt-2 line-clamp-2 text-[14px] text-white/85">{desc}</p>
           </div>
@@ -197,7 +197,7 @@ export default function ProductListPage() {
                 <SlidersHorizontal className="h-4 w-4" /> Bộ lọc
               </p>
               {filterCount > 0 && (
-                <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-gold-dark hover:underline">
+                <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-ink underline underline-offset-4 hover:underline">
                   Xóa ({filterCount})
                 </button>
               )}
@@ -214,7 +214,7 @@ export default function ProductListPage() {
                 aria-expanded={filtersOpen}
                 className={cn(
                   "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-[13.5px] font-semibold transition-colors",
-                  filtersOpen || filterCount ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy/50"
+                  filtersOpen || filterCount ? "border-brand bg-brand text-white" : "border-line bg-white text-navy hover:border-brand/50"
                 )}
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default function ProductListPage() {
                   aria-pressed={cats.includes(c.id)}
                   className={cn(
                     "hidden h-10 rounded-lg border px-3.5 text-[13px] font-medium transition-colors md:inline-flex md:items-center",
-                    cats.includes(c.id) ? "border-gold bg-gold-soft text-gold-dark" : "border-line bg-white text-ink-2 hover:border-navy/40"
+                    cats.includes(c.id) ? "border-gold bg-gold-soft text-ink" : "border-line bg-white text-ink-2 hover:border-brand/40"
                   )}
                 >
                   {c.name}
@@ -241,7 +241,7 @@ export default function ProductListPage() {
                 <select
                   value={sort.key}
                   onChange={(e) => setParams({ sort: e.target.value === "new" ? null : e.target.value })}
-                  className="h-10 appearance-none rounded-lg border border-line bg-white pl-3.5 pr-9 text-[13.5px] font-semibold text-navy outline-none focus:border-navy"
+                  className="h-10 appearance-none rounded-lg border border-line bg-white pl-3.5 pr-9 text-[13.5px] font-semibold text-navy outline-none focus:border-brand"
                 >
                   {SORTS.map((s) => (
                     <option key={s.key} value={s.key}>
@@ -258,10 +258,10 @@ export default function ProductListPage() {
             <div className="mt-3 rounded-xl border border-line bg-white p-5 shadow-[0_8px_24px_rgba(91,55,36,.06)] lg:hidden">
               {filterGroups}
               <div className="mt-4 flex gap-2">
-                <button onClick={() => router.push(pathname)} className="flex-1 rounded-lg border border-line p-2.5 text-[13px] font-semibold text-gold-dark hover:border-gold">
+                <button onClick={() => router.push(pathname)} className="flex-1 rounded-lg border border-line p-2.5 text-[13px] font-semibold text-ink hover:border-gold">
                   Xóa bộ lọc
                 </button>
-                <button onClick={() => setFiltersOpen(false)} className="flex-1 rounded-lg bg-navy p-2.5 text-[13px] font-semibold text-white">
+                <button onClick={() => setFiltersOpen(false)} className="flex-1 rounded-lg bg-brand p-2.5 text-[13px] font-semibold text-white">
                   Xong
                 </button>
               </div>
@@ -275,7 +275,7 @@ export default function ProductListPage() {
               <FilterTag key={t.key} label={t.label} onRemove={t.remove} />
             ))}
             {(tags.length > 0 || q) && (
-              <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-gold-dark hover:underline">
+              <button onClick={() => router.push(pathname)} className="text-[12.5px] font-semibold text-ink underline underline-offset-4 hover:underline">
                 Xóa tất cả
               </button>
             )}

@@ -221,7 +221,7 @@ function OrdersView() {
       ) : items.length === 0 ? (
         <div className="rounded-card border border-dashed border-[#ddd4c8] bg-white px-6 py-[72px] text-center">
           <p className="text-[15px] text-muted2">{tab === "all" ? "Bạn chưa có đơn hàng nào." : "Không có đơn hàng ở trạng thái này."}</p>
-          <Link href="/products" className="mt-4 inline-block text-sm font-semibold text-gold">
+          <Link href="/products" className="mt-4 inline-block text-sm font-semibold text-ink underline underline-offset-4">
             Mua sắm ngay →
           </Link>
         </div>
@@ -232,7 +232,7 @@ function OrdersView() {
             return (
               <div key={o.id} className="hsv-card px-6 py-[22px]">
                 <div className="flex items-center gap-[18px]">
-                  <div className="flex h-[60px] w-[52px] shrink-0 items-center justify-center rounded-card bg-surface text-gold">
+                  <div className="flex h-[60px] w-[52px] shrink-0 items-center justify-center rounded-card bg-surface text-ink">
                     <Package className="h-6 w-6" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -247,7 +247,7 @@ function OrdersView() {
                   </div>
                   <div className="text-right">
                     <p className="text-base font-bold">{formatVND(o.payableAmount ?? o.totalAmount)}</p>
-                    <button onClick={() => setOpen(isOpen ? null : o.id)} aria-expanded={isOpen} className="mt-1.5 text-[13px] font-semibold text-gold">
+                    <button onClick={() => setOpen(isOpen ? null : o.id)} aria-expanded={isOpen} className="mt-1.5 text-[13px] font-semibold text-ink underline underline-offset-4">
                       {isOpen ? "Thu gọn" : "Xem chi tiết"}
                     </button>
                   </div>

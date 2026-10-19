@@ -60,7 +60,7 @@ function HeaderIcon({ label, children, badge }: { label: string; children: React
     <span className="relative flex h-10 w-10 items-center justify-center text-navy transition-opacity hover:opacity-70">
       {children}
       {badge !== undefined && badge > 0 && (
-        <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-navy px-1 text-[10px] font-semibold text-white">
+        <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
           {badge}
         </span>
       )}
@@ -205,7 +205,7 @@ export function StoreHeader() {
             <div className="relative max-sm:hidden" ref={menuRef}>
               <button onClick={() => setMenuOpen((v) => !v)} aria-haspopup="menu" aria-expanded={menuOpen}>
                 <HeaderIcon label={`Tài khoản ${lastName(user.name)}`}>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-navy text-[11px] font-semibold text-white">{initialOf(user.name)}</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{initialOf(user.name)}</span>
                 </HeaderIcon>
               </button>
               {menuOpen && (
@@ -213,7 +213,7 @@ export function StoreHeader() {
                   <div className="mb-1.5 border-b border-line-2 px-3 pb-3 pt-2.5">
                     <p className="text-sm font-semibold">{user.name}</p>
                     <p className="mt-0.5 text-xs text-subtle">{user.userName}</p>
-                    <p className="mt-1.5 text-[11.5px] font-semibold text-gold-dark">{roleLabel(user.roles)}</p>
+                    <p className="mt-1.5 text-[11.5px] font-semibold text-ink">{roleLabel(user.roles)}</p>
                   </div>
                   <MenuLink href="/account/profile">Hồ sơ cá nhân</MenuLink>
                   <MenuLink href="/account/orders">Đơn hàng của tôi</MenuLink>
@@ -261,7 +261,7 @@ export function StoreHeader() {
                     {m.name}
                   </MegaLink>
                 ))}
-                <Link href="/nguon-goc" className="mt-3 inline-block text-[12.5px] text-gold-dark underline-offset-4 hover:underline">
+                <Link href="/nguon-goc" className="mt-3 inline-block text-[12.5px] text-ink underline-offset-4 hover:underline">
                   Tìm hiểu nguồn gốc nguyên liệu →
                 </Link>
               </div>
@@ -278,7 +278,7 @@ export function StoreHeader() {
                 <img src="/banners/banner-bracelet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/75 to-transparent" />
                 <span className="absolute inset-x-0 bottom-0 p-5 text-white">
-                  <span className="block text-[10.5px] font-semibold tracking-[0.22em] text-champagne">BỘ SƯU TẬP</span>
+                  <span className="block text-[10.5px] font-semibold tracking-[0.22em] text-white/80">BỘ SƯU TẬP</span>
                   <span className="mt-1 block text-[18px] font-semibold">Trang sức sừng thủ công</span>
                 </span>
               </Link>
@@ -304,7 +304,7 @@ export function StoreHeader() {
           {user ? (
             <div className="mb-3 rounded-xl bg-surface px-4 py-3.5">
               <p className="text-sm font-bold">{user.name}</p>
-              <div className="mt-2 flex gap-4 text-[13px] font-semibold text-gold-dark">
+              <div className="mt-2 flex gap-4 text-[13px] font-semibold text-ink">
                 <Link href="/account/profile">Hồ sơ</Link>
                 <Link href="/account/orders">Đơn hàng</Link>
                 <button
@@ -365,8 +365,8 @@ export function StoreHeader() {
 // Một kiểu chữ cho mọi mục menu: in hoa, cỡ 12.5px, giãn chữ vừa; mục đang xem gạch chân mảnh.
 const navCls =
   "relative flex h-full shrink-0 items-center whitespace-nowrap text-[12.5px] font-medium uppercase tracking-[0.1em] transition-colors after:absolute after:inset-x-0 after:bottom-[22px] after:h-px";
-const navActive = "text-navy after:bg-navy";
-const navIdle = "text-ink-2 hover:text-navy hover:after:bg-navy/30";
+const navActive = "text-navy after:bg-brand";
+const navIdle = "text-ink-2 hover:text-navy hover:after:bg-brand/30";
 const megaHead = "mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint";
 
 function NavLink({ href, active, children, onEnter }: { href: string; active: boolean; children: React.ReactNode; onEnter?: () => void }) {
@@ -410,7 +410,7 @@ function FooterItem({ href, children }: { href?: string; children: React.ReactNo
   return (
     <li>
       {href ? (
-        <Link href={href} className="transition-colors hover:text-gold-dark">
+        <Link href={href} className="transition-colors hover:underline">
           {children}
         </Link>
       ) : (
@@ -566,7 +566,7 @@ export function StoreFooter() {
               className="flex border border-line bg-white p-1"
             >
               <input type="email" required placeholder="Email của bạn" aria-label="Email nhận tin" className="min-w-0 flex-1 bg-transparent px-3.5 text-[13px] font-light text-navy outline-none" />
-              <button className="h-9 bg-navy px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white hover:bg-navy-deep">Đăng ký</button>
+              <button className="h-9 bg-brand px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-deep">Đăng ký</button>
             </form>
           </div>
         </div>

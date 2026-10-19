@@ -95,7 +95,7 @@ const SECTIONS: Section[] = [
             ["Đặt hàng", "Chọn phương thức thanh toán và bấm “Đặt hàng”. Đơn mới ở trạng thái “Chờ xử lý”."],
           ].map(([t, d], i) => (
             <li key={t} className="rounded-xl bg-surface-2 px-4 py-3.5">
-              <p className="text-[12px] font-medium uppercase tracking-[0.1em] text-gold">Bước {i + 1}</p>
+              <p className="text-[12px] font-medium uppercase tracking-[0.1em] text-ink">Bước {i + 1}</p>
               <p className="mt-1 text-[15px] font-medium text-navy">{t}</p>
               <p className="mt-1 text-[13.5px] font-light leading-relaxed text-ink-2">{d}</p>
             </li>
@@ -208,7 +208,7 @@ export default function SupportPage() {
             ))}
             <a
               href={`tel:${STORE_INFO.hotlineTel}`}
-              className="mt-1 flex items-center gap-2 rounded-xl bg-navy px-3.5 py-3 text-[13.5px] font-medium text-white hover:bg-navy-deep"
+              className="mt-1 flex items-center gap-2 rounded-xl bg-brand px-3.5 py-3 text-[13.5px] font-medium text-white hover:bg-brand-deep"
             >
               <Phone className="h-4 w-4" /> Hotline {STORE_INFO.hotline}
             </a>

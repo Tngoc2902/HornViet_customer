@@ -120,7 +120,7 @@ export default function RegisterPage() {
           <GoogleLoginButton text="signup_with" disabled={busy} onToken={submitGoogle} onError={setFormError} />
           <p className="text-center text-[13.5px] text-muted2">
             Đã có tài khoản?{" "}
-            <Link href="/login" className="font-semibold text-gold">
+            <Link href="/login" className="font-semibold text-ink underline underline-offset-4">
               Đăng nhập
             </Link>
           </p>

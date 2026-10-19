@@ -15,7 +15,7 @@ export function ShipmentProgress({ status }: { status: string | null | undefined
           const done = !returning && i <= current;
           return (
             <li key={step.key} className="flex flex-col gap-1.5">
-              <span className={cn("h-1 rounded-full", done ? (failed && i === current ? "bg-[#c0841a]" : "bg-navy") : "bg-line")} />
+              <span className={cn("h-1 rounded-full", done ? (failed && i === current ? "bg-[#c0841a]" : "bg-brand") : "bg-line")} />
               <span className={cn("text-[11px] leading-tight", i === current && !returning ? "font-semibold text-ink" : "text-muted2")}>
                 {step.label}
               </span>

@@ -19,7 +19,7 @@ const CODE_LENGTH = 6;
 function BackToLogin() {
   return (
     <p className="text-center text-[13.5px] text-muted2">
-      <Link href="/login" className="font-semibold text-gold">
+      <Link href="/login" className="font-semibold text-ink underline underline-offset-4">
         ← Quay lại đăng nhập
       </Link>
     </p>

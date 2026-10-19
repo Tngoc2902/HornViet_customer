@@ -72,7 +72,7 @@ export default function StoryPage() {
             </span>
           </div>
           <div>
-            <p className="text-xs font-medium tracking-[0.24em] text-gold">LÀNG NGHỀ THỤY ỨNG</p>
+            <p className="text-xs font-medium tracking-[0.24em] text-ink">LÀNG NGHỀ THỤY ỨNG</p>
             <h2 className="mt-3 font-serif text-[28px] leading-tight text-navy sm:text-[36px]">Nơi nghề sừng được giữ bằng đôi tay</h2>
             <div className="mt-4 space-y-3 text-[14.5px] font-light leading-[1.85] text-ink-2">
               <p>
@@ -105,7 +105,7 @@ export default function StoryPage() {
         <div className="hsv-container grid gap-4 sm:grid-cols-3">
           {VALUES.map((v, i) => (
             <div key={v.title} className="rounded-2xl bg-white px-6 py-6">
-              <p className="font-serif text-[34px] leading-none text-gold/70">0{i + 1}</p>
+              <p className="font-serif text-[34px] leading-none text-ink/70">0{i + 1}</p>
               <p className="mt-3 text-[17px] font-medium text-navy">{v.title}</p>
               <p className="mt-1.5 text-[14px] font-light leading-relaxed text-ink-2">{v.desc}</p>
             </div>
@@ -117,7 +117,7 @@ export default function StoryPage() {
       <section id="quy-trinh" className="hsv-container scroll-mt-[140px] py-12 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
           <div className="lg:sticky lg:top-[150px] lg:self-start">
-            <p className="text-xs font-medium tracking-[0.24em] text-gold">QUY TRÌNH CHẾ TÁC</p>
+            <p className="text-xs font-medium tracking-[0.24em] text-ink">QUY TRÌNH CHẾ TÁC</p>
             <h2 className="mt-3 font-serif text-[28px] leading-tight text-navy sm:text-[36px]">Hành trình làm ra một món đồ sừng</h2>
             <p className="mt-4 text-[14.5px] font-light leading-[1.85] text-ink-2">
               Một chiếc lược sừng đi qua bảy công đoạn và nhiều ngày làm việc của người thợ. Không có khuôn đúc hàng loạt — mỗi món là một lần cưa, uốn, chạm
@@ -136,7 +136,7 @@ export default function StoryPage() {
                   <Icon className="h-6 w-6" strokeWidth={1.5} />
                 </span>
                 <div className="flex-1 rounded-2xl border border-line bg-white px-5 py-4">
-                  <p className="text-[12px] font-medium uppercase tracking-[0.12em] text-gold">Bước {i + 1}</p>
+                  <p className="text-[12px] font-medium uppercase tracking-[0.12em] text-ink">Bước {i + 1}</p>
                   <p className="mt-1 text-[17px] font-medium text-navy">{title}</p>
                   <p className="mt-1.5 text-[14px] font-light leading-[1.75] text-ink-2">{desc}</p>
                 </div>

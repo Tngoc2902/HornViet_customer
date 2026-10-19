@@ -82,7 +82,7 @@ export function OrderProgress({ status }: { status: OrderStatus }) {
     <div className="flex gap-2.5">
       {ORDER_FLOW.map((k, i) => (
         <div key={k} className="flex-1">
-          <div className={cn("h-1 rounded-lg", i <= idx ? "bg-navy" : "bg-line")} />
+          <div className={cn("h-1 rounded-lg", i <= idx ? "bg-brand" : "bg-line")} />
           <p className={cn("mt-[7px] text-[12.5px]", i <= idx ? "text-navy" : "text-faint", i === idx && "font-semibold")}>
             {ORDER_STATUS[k].label}
           </p>
@@ -114,7 +114,7 @@ export function Chip({
       aria-pressed={active}
       className={cn(
         "inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-medium transition-colors disabled:cursor-not-allowed",
-        active ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2 hover:border-navy/40",
+        active ? "border-brand bg-brand text-white" : "border-line bg-white text-ink-2 hover:border-brand/40",
         className
       )}
     >
@@ -126,7 +126,7 @@ export function Chip({
 export function Radio({ checked }: { checked: boolean }) {
   return (
     <span
-      className={cn("block h-4 w-4 shrink-0 rounded-full bg-white", checked ? "border-[5px] border-navy" : "border border-line-3")}
+      className={cn("block h-4 w-4 shrink-0 rounded-full bg-white", checked ? "border-[5px] border-brand" : "border border-line-3")}
     />
   );
 }
@@ -231,7 +231,7 @@ export function Pager({ page, total, pageSize, onChange }: { page: number; total
             aria-current={n === page ? "page" : undefined}
             className={cn(
               "h-10 min-w-10 rounded-full border px-3 text-sm font-semibold",
-              n === page ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2"
+              n === page ? "border-brand bg-brand text-white" : "border-line bg-white text-ink-2"
             )}
           >
             {n}
