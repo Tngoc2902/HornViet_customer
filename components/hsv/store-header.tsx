@@ -34,7 +34,8 @@ import { Drawer, notify } from "./ui";
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="flex shrink-0 items-center gap-2.5 text-left">
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy font-serif text-xl text-champagne sm:h-[42px] sm:w-[42px]">H</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/logo-mark.svg" alt="" width={42} height={42} className="h-10 w-10 shrink-0 sm:h-[42px] sm:w-[42px]" />
       {!compact && (
         <span className="leading-[1.05]">
           <span className="block text-[17px] font-extrabold tracking-[0.01em] text-navy sm:text-[19px]">HỒN SỪNG VIỆT</span>
@@ -394,7 +395,8 @@ export function StoreFooter() {
     <footer className="border-t border-line bg-white">
       <div className="hsv-container pb-8 pt-10 sm:pt-12">
         <Link href="/" className="inline-flex items-center gap-3.5">
-          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-navy font-serif text-[26px] text-champagne">H</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/logo-mark.svg" alt="" width={52} height={52} className="h-[52px] w-[52px] shrink-0" />
           <span className="leading-[1.05]">
             <span className="block text-[22px] font-extrabold tracking-[0.01em] text-navy">HỒN SỪNG VIỆT</span>
             <span className="mt-1 block text-[11px] font-semibold tracking-[0.24em] text-gold">TRANG SỨC SỪNG</span>
