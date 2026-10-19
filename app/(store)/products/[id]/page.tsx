@@ -197,7 +197,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="animate-hin">
-      <div className="border-b border-line-2 bg-surface-2">
+      <div className="border-b border-line-2 bg-white">
         <div className="hsv-container py-3">
           <Breadcrumbs
             items={[
@@ -250,9 +250,9 @@ export default function ProductDetailPage() {
 
           <p className="mt-4 text-[26px] font-semibold leading-none text-price sm:text-[28px]">{formatVND(product.price)}</p>
           <p className="mt-1.5 text-[12.5px] font-light italic text-subtle">(Miễn phí giao hàng cho đơn từ {STORE_INFO.freeShipFrom})</p>
-          <a href={ZALO_URL} target="_blank" rel="noreferrer" className="mt-2.5 inline-flex items-center gap-1.5 text-[13.5px] text-[#0068ff] hover:underline">
+          <a href={ZALO_URL} target="_blank" rel="noreferrer" className="mt-2.5 inline-flex items-center gap-1.5 text-[13.5px] text-ink-2 hover:text-ink hover:underline">
             Ưu đãi riêng cho bạn – Tư vấn ngay qua
-            <span className="rounded-full border border-[#0068ff] px-1.5 text-[10px] font-bold leading-4">Zalo</span>
+            <span className="rounded-full border border-line-3 px-1.5 text-[10px] font-bold leading-4">Zalo</span>
           </a>
 
           {(showSizes || showStyles) && (
@@ -310,7 +310,7 @@ export default function ProductDetailPage() {
 
           <div className="mt-5 flex items-center gap-2">
             <span className={cn("h-2 w-2 rounded-full", stockTone === "danger" ? "bg-danger" : stockTone === "warn" ? "bg-[#d39a2c]" : "bg-ok-solid")} />
-            <span className={cn("text-sm font-semibold", stockTone === "danger" ? "text-danger" : stockTone === "warn" ? "text-warn" : "text-ok")}>
+            <span className={cn("text-sm font-semibold", stockTone === "danger" ? "text-danger" : stockTone === "warn" ? "text-warn" : "text-ink")}>
               {stockLabel}
             </span>
             {cur && <span className="text-[13px] text-faint">· {cur.displayName}</span>}
@@ -357,12 +357,12 @@ export default function ProductDetailPage() {
             Xem tận tay tại xưởng Thụy Ứng
           </a>
           <div className="mt-3 grid grid-cols-3 gap-2 text-[12.5px]">
-            <a href={ZALO_URL} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-[#0068ff] hover:border-[#0068ff]">
-              <span className="rounded-full border border-[#0068ff] px-1 text-[9.5px] font-bold leading-4">Zalo</span>
+            <a href={ZALO_URL} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-ink hover:border-brand">
+              <span className="rounded-full border border-line-3 px-1 text-[9.5px] font-bold leading-4">Zalo</span>
               Chat Zalo
             </a>
             {STORE_INFO.socials.facebook ? (
-              <a href={STORE_INFO.socials.facebook} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-[#1877f2] hover:border-[#1877f2]">
+              <a href={STORE_INFO.socials.facebook} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-ink hover:border-brand">
                 <Facebook className="h-4 w-4" />
                 Facebook
               </a>
@@ -370,7 +370,7 @@ export default function ProductDetailPage() {
               <span />
             )}
             <a href={`tel:${STORE_INFO.hotlineTel}`} className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-navy hover:border-brand">
-              <Phone className="h-4 w-4 text-gold" />
+              <Phone className="h-4 w-4" />
               {STORE_INFO.hotline}
             </a>
           </div>
@@ -379,7 +379,7 @@ export default function ProductDetailPage() {
 
         {/* Mô tả / nguồn gốc / chính sách */}
         <div className="lg:col-start-1">
-          <div role="tablist" className="scrollbar-none flex gap-1 overflow-x-auto rounded-xl bg-surface p-1">
+          <div role="tablist" className="scrollbar-none flex gap-6 overflow-x-auto border-b border-line">
             {(
               [
                 ["desc", "Mô tả sản phẩm"],
@@ -393,8 +393,8 @@ export default function ProductDetailPage() {
                 aria-selected={tab === k}
                 onClick={() => setTab(k)}
                 className={cn(
-                  "flex-1 whitespace-nowrap rounded-lg px-4 py-2.5 text-[13.5px] transition-colors",
-                  tab === k ? "bg-white font-medium text-navy shadow-sm" : "font-light text-subtle hover:text-navy"
+                  "-mb-px whitespace-nowrap border-b-2 py-3 text-[13px] uppercase tracking-[0.06em] transition-colors",
+                  tab === k ? "border-ink font-semibold text-ink" : "border-transparent text-subtle hover:text-ink"
                 )}
               >
                 {l}
@@ -406,7 +406,7 @@ export default function ProductDetailPage() {
               <p className="whitespace-pre-line text-[14px] font-light leading-[1.8] text-ink-2">{product.description || "Đang cập nhật mô tả."}</p>
               {vs.length > 0 && (
                 <div className="mt-5 overflow-hidden rounded-xl border border-line bg-white">
-                  <div className="grid grid-cols-[1fr_100px] bg-surface px-4 py-2.5 text-xs font-bold text-muted2">
+                  <div className="grid grid-cols-[1fr_100px] px-4 py-2.5 text-xs font-bold uppercase tracking-[0.04em] text-muted2">
                     <span>Biến thể</span>
                     <span className="text-right">Tồn kho</span>
                   </div>
@@ -428,7 +428,7 @@ export default function ProductDetailPage() {
                   ["Xuất xứ", product.material?.origin || "Đang cập nhật"],
                   ["Danh mục", product.categoryName],
                 ].map(([k, v], i) => (
-                  <div key={k} className={cn("grid grid-cols-[130px_1fr] px-4 py-3 text-sm", i % 2 === 0 ? "bg-surface-2" : "bg-white")}>
+                  <div key={k} className={cn("grid grid-cols-[130px_1fr] px-4 py-3 text-sm", i > 0 && "border-t border-line-2")}>
                     <span className="text-muted2">{k}</span>
                     <span className="font-semibold">{v}</span>
                   </div>

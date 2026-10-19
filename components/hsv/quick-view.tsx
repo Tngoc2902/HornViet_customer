@@ -87,7 +87,7 @@ export function QuickView({ productId, onClose }: { productId: number; onClose: 
           </>
         ) : (
           <>
-            <div className="bg-surface-2 p-4">
+            <div className="bg-white p-4">
               <ProductImage src={shots[img] ?? null} seed={product.id} alt={product.name} width={900} className="aspect-square rounded-xl" />
               {shots.length > 1 && (
                 <div className="mt-3 flex gap-2 overflow-x-auto">

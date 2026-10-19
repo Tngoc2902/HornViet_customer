@@ -49,10 +49,10 @@ export function ServicePerks({ variant = "grid", className }: { variant?: "grid"
             "flex items-center rounded-xl",
             variant === "grid" && "gap-3 bg-surface px-4 py-3.5 sm:px-5 sm:py-4",
             variant === "overlap" && "flex-col gap-1.5 bg-white px-2 py-3 text-center shadow-[0_6px_24px_rgba(91,55,36,.10)] sm:flex-row sm:gap-3 sm:px-5 sm:py-4 sm:text-left",
-            variant === "compact" && "flex-col gap-1.5 bg-surface-2 px-2 py-3 text-center"
+            variant === "compact" && "flex-col gap-1.5 border border-line-2 bg-white px-2 py-3 text-center"
           )}
         >
-          <span className={cn("flex shrink-0 items-center justify-center rounded-full text-ink", variant === "compact" ? "h-8 w-8 bg-white" : "h-10 w-10 bg-gold-soft sm:h-11 sm:w-11")}>
+          <span className={cn("flex shrink-0 items-center justify-center rounded-full text-ink", variant === "compact" ? "h-7 w-7" : "h-10 w-10 bg-gold-soft sm:h-11 sm:w-11")}>
             <Icon className={variant === "compact" ? "h-4 w-4" : "h-5 w-5"} strokeWidth={1.6} />
           </span>
           <span className="min-w-0">
