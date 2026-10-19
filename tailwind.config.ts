@@ -30,22 +30,23 @@ const config = {
         serif: ["var(--font-inter)", "Helvetica Neue", "Arial", "sans-serif"],
       },
       colors: {
-        // Design tokens Hồn Sừng Việt — tối giản tông "than ấm & kem": chữ / nút màu than ấm (dịu mắt hơn đen tuyền),
-        // nền dải màu kem, nâu sừng dịu chỉ làm điểm nhấn (giá, nét trang trí).
-        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: than ấm.
-        navy: { DEFAULT: "#2b2825", deep: "#1f1c1a" },
-        gold: { DEFAULT: "#a88763", dark: "#7c5a3a", soft: "#f6efe4" },
-        champagne: "#e6d6bc",
-        ink: { DEFAULT: "#2b2825", 2: "#4a4540" },
-        muted2: "#5f5952",
-        subtle: "#7a736b",
-        faint: "#9a938a",
-        line: { DEFAULT: "#ebe6df", 2: "#f2eee8", 3: "#d3cbc0" },
-        surface: { DEFAULT: "#f6f2ec", 2: "#faf8f4", active: "#f1ebe2" },
-        // Dải nền màu kem sau các băng sản phẩm.
-        band: "#f6f2ec",
-        // Giá sản phẩm (nâu sừng dịu) và nền ảnh thẻ sản phẩm.
-        price: "#7c5a3a",
+        // Design tokens Hồn Sừng Việt — tông "trắng kem & nâu" (bảng màu trang sức):
+        //   #5B3724 nâu đậm · #755543 nâu · #C09B81 nâu sữa · #ADA399 xám be · #DBD5CB be nhạt · #FFF7ED trắng kem.
+        // Nền trang, header, thẻ giữ trắng tinh; trắng kem #FFF7ED dùng cho các dải nền phụ (băng sản phẩm, dải thông báo…).
+        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: nâu đậm.
+        navy: { DEFAULT: "#5B3724", deep: "#4a2c1c" },
+        gold: { DEFAULT: "#C09B81", dark: "#755543", soft: "#f3e8db" },
+        champagne: "#eadbc8",
+        ink: { DEFAULT: "#4a3226", 2: "#5f4637" },
+        muted2: "#6e5a4d",
+        subtle: "#857266",
+        faint: "#a3958a",
+        line: { DEFAULT: "#DBD5CB", 2: "#e9e3da", 3: "#ADA399" },
+        surface: { DEFAULT: "#FFF7ED", 2: "#fffbf6", active: "#f6ebdd" },
+        // Dải nền trắng kem sau các băng sản phẩm.
+        band: "#FFF7ED",
+        // Giá sản phẩm (nâu) và nền thẻ sản phẩm (trắng).
+        price: "#755543",
         tile: "#ffffff",
         danger: { DEFAULT: "#b42318", soft: "#fbe9e6", line: "#efc5bd" },
         warn: { DEFAULT: "#8a5a12", soft: "#fbf1dc", line: "#ecd29a" },
@@ -98,9 +99,9 @@ const config = {
         hero: "0px",
       },
       boxShadow: {
-        card: "0 14px 34px rgba(43,40,37,.08)",
-        dropdown: "0 18px 44px rgba(43,40,37,.12)",
-        drawer: "-16px 0 48px rgba(43,40,37,.14)",
+        card: "0 14px 34px rgba(91,55,36,.08)",
+        dropdown: "0 18px 44px rgba(91,55,36,.12)",
+        drawer: "-16px 0 48px rgba(91,55,36,.14)",
       },
       keyframes: {
         "accordion-down": {

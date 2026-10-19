@@ -48,7 +48,7 @@ export function ServicePerks({ variant = "grid", className }: { variant?: "grid"
           className={cn(
             "flex items-center rounded-xl",
             variant === "grid" && "gap-3 bg-surface px-4 py-3.5 sm:px-5 sm:py-4",
-            variant === "overlap" && "flex-col gap-1.5 bg-white px-2 py-3 text-center shadow-[0_6px_24px_rgba(43,40,37,.10)] sm:flex-row sm:gap-3 sm:px-5 sm:py-4 sm:text-left",
+            variant === "overlap" && "flex-col gap-1.5 bg-white px-2 py-3 text-center shadow-[0_6px_24px_rgba(91,55,36,.10)] sm:flex-row sm:gap-3 sm:px-5 sm:py-4 sm:text-left",
             variant === "compact" && "flex-col gap-1.5 bg-surface-2 px-2 py-3 text-center"
           )}
         >

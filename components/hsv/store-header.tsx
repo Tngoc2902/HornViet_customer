@@ -39,7 +39,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/logo-mark.svg" alt="" width={42} height={42} className="h-10 w-10 shrink-0 sm:h-[42px] sm:w-[42px]" />
       {!compact && (
-        <span className="leading-[1.05]">
+        <span className="whitespace-nowrap leading-[1.05]">
           <span className="block text-[17px] font-extrabold tracking-[0.01em] text-navy sm:text-[19px]">HỒN SỪNG VIỆT</span>
           <span className="mt-1 block text-[10px] font-semibold tracking-[0.2em] text-gold sm:text-[10.5px]">TRANG SỨC SỪNG</span>
         </span>
@@ -276,7 +276,7 @@ export function StoreHeader() {
               <Link href="/products" className="group relative block min-h-[200px] overflow-hidden bg-surface">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/banners/banner-bracelet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/75 to-transparent" />
+                <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/75 to-transparent" />
                 <span className="absolute inset-x-0 bottom-0 p-5 text-white">
                   <span className="block text-[10.5px] font-semibold tracking-[0.22em] text-champagne">BỘ SƯU TẬP</span>
                   <span className="mt-1 block text-[18px] font-semibold">Trang sức sừng thủ công</span>
@@ -453,7 +453,7 @@ export function StoreFooter() {
         <Link href="/" className="inline-flex items-center gap-3.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo-mark.svg" alt="" width={52} height={52} className="h-[52px] w-[52px] shrink-0" />
-          <span className="leading-[1.05]">
+          <span className="whitespace-nowrap leading-[1.05]">
             <span className="block text-[22px] font-extrabold tracking-[0.01em] text-navy">HỒN SỪNG VIỆT</span>
             <span className="mt-1 block text-[11px] font-semibold tracking-[0.24em] text-gold">TRANG SỨC SỪNG</span>
           </span>

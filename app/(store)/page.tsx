@@ -51,7 +51,7 @@ const BANNERS: Banner[] = [
     sub: "Tiện nguyên khối, bo tròn mặt trong, nhiều size để chọn.",
     cta: "Xem vòng tay",
     href: "/products?cat=3",
-    bg: "linear-gradient(110deg,#2b2825 0%,#4a433c 50%,#a8977f 100%)",
+    bg: "linear-gradient(110deg,#5B3724 0%,#755543 50%,#C09B81 100%)",
     image: "/banners/banner-bracelet.jpg",
   },
   {
@@ -98,7 +98,7 @@ function HeroCarousel() {
               </picture>
             )}
             {/* Lớp phủ tối bên trái để chữ trên ảnh dễ đọc */}
-            {b.image && showText && <span className="absolute inset-0 bg-gradient-to-r from-[#1f1c1a]/85 via-[#1f1c1a]/50 to-transparent" />}
+            {b.image && showText && <span className="absolute inset-0 bg-gradient-to-r from-[#3a2417]/85 via-[#3a2417]/50 to-transparent" />}
             {/* Họa tiết vòng tròn mờ cho banner gradient */}
             {!b.image && (
               <>
@@ -188,7 +188,7 @@ function LookbookMosaic({ items }: { items?: ProductListItem[] }) {
             ) : (
               <ProductImage src={t.src} seed={i + 3} alt={t.title} width={i === 0 ? 1200 : 700} className="absolute inset-0 [&>img]:transition-transform [&>img]:duration-700 group-hover:[&>img]:scale-105" />
             )}
-            <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/80 via-[#1f1c1a]/10 to-transparent" />
+            <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/80 via-[#3a2417]/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
               <p className="text-[10.5px] font-semibold tracking-[0.24em] text-champagne sm:text-[11px]">{t.kicker}</p>
               <p className={cn("mt-1 font-serif leading-tight", i === 0 ? "text-[22px] sm:text-[30px]" : "text-[17px] sm:text-[21px]")}>{t.title}</p>
@@ -221,7 +221,7 @@ function ShopTheLook() {
         <Link href={decor ? `/products?cat=${decor.id}` : "/products"} className="group relative block aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/banners/banner-decor.jpg" alt="Góc quà tặng sừng mỹ nghệ" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/75 via-transparent to-transparent" />
+          <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/75 via-transparent to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
             <p className="text-[11px] font-semibold tracking-[0.24em] text-champagne">QUÀ BIẾU Ý NGHĨA</p>
             <p className="mt-1.5 font-serif text-[24px] leading-tight sm:text-[32px]">Món quà từ làng nghề</p>

@@ -47,7 +47,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="hsv-confirm-title"
-            className="relative w-[420px] max-w-full animate-hin rounded-card bg-white p-[26px] shadow-[0_24px_64px_rgba(43,40,37,.25)]"
+            className="relative w-[420px] max-w-full animate-hin rounded-card bg-white p-[26px] shadow-[0_24px_64px_rgba(91,55,36,.25)]"
           >
             <p id="hsv-confirm-title" className="text-[17px] font-bold">
               {pending.title}

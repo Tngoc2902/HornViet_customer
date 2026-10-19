@@ -8,7 +8,7 @@ export function PageHero({ image, crumb, kicker, title, sub }: { image: string; 
     <section className="relative h-[300px] overflow-hidden bg-navy sm:h-[400px]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-      <span className="absolute inset-0 bg-gradient-to-r from-[#1f1c1a]/90 via-[#1f1c1a]/55 to-transparent" />
+      <span className="absolute inset-0 bg-gradient-to-r from-[#3a2417]/90 via-[#3a2417]/55 to-transparent" />
       <div className="hsv-container relative flex h-full flex-col justify-center text-white">
         <Breadcrumbs items={[{ label: crumb }]} className="[&_*]:text-white/80 [&_span:last-child]:text-white" />
         <p className="mt-6 text-[11px] font-medium tracking-[0.26em] text-champagne sm:text-xs">{kicker}</p>
@@ -52,7 +52,7 @@ export function RelatedPageCard({ href, image, kicker, title, sub }: { href: str
     <Link href={href} className="group relative block overflow-hidden rounded-2xl">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={image} alt={title} loading="lazy" className="h-[220px] w-full object-cover transition-transform duration-700 group-hover:scale-105 sm:h-[260px]" />
-      <span className="absolute inset-0 bg-gradient-to-r from-[#1f1c1a]/85 via-[#1f1c1a]/45 to-transparent" />
+      <span className="absolute inset-0 bg-gradient-to-r from-[#3a2417]/85 via-[#3a2417]/45 to-transparent" />
       <div className="absolute inset-y-0 left-0 flex max-w-[520px] flex-col justify-center p-7 text-white sm:p-10">
         <p className="text-[11px] font-medium tracking-[0.24em] text-champagne">{kicker}</p>
         <p className="mt-2 font-serif text-[26px] leading-tight sm:text-[32px]">{title}</p>

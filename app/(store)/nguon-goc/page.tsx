@@ -66,7 +66,7 @@ export default function OriginPage() {
       <section className="hsv-container relative z-10 -mt-10 sm:-mt-12">
         <div className="grid gap-3 sm:grid-cols-3">
           {PROMISES.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex gap-3.5 rounded-2xl bg-white px-5 py-5 shadow-[0_8px_28px_rgba(43,40,37,.10)]">
+            <div key={title} className="flex gap-3.5 rounded-2xl bg-white px-5 py-5 shadow-[0_8px_28px_rgba(91,55,36,.10)]">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-soft text-gold-dark">
                 <Icon className="h-5 w-5" strokeWidth={1.6} />
               </span>
