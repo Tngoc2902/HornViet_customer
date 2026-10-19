@@ -135,7 +135,7 @@ export function StoreHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white">
       {/* Dải thông báo mỏng */}
-      <div className="bg-surface text-[11.5px] text-ink-2">
+      <div className="border-b border-line-2 bg-white text-[11.5px] text-ink-2">
         <div className="hsv-container flex h-8 items-center justify-center gap-6 lg:justify-between">
           <p className="truncate">
             Miễn phí giao hàng cho đơn từ {STORE_INFO.freeShipFrom}
