@@ -537,6 +537,9 @@ export default function HomePage() {
                   Chỉ đường
                 </a>
               </div>
+              <Link href="/cua-hang" className="mt-5 inline-flex w-fit items-center gap-1.5 text-[13px] text-white underline-offset-4 hover:underline">
+                Xem thông tin cửa hàng <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
             <iframe
               src={MAP_EMBED_URL}

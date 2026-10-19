@@ -52,7 +52,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
 const STORY_LINKS = [
   { href: "/cau-chuyen", label: "Câu chuyện Hồn Sừng Việt", icon: BookOpen },
   { href: "/nguon-goc", label: "Nguồn gốc nguyên liệu", icon: Gem },
-  { href: "/#cua-hang", label: "Cửa hàng", icon: Store },
+  { href: "/cua-hang", label: "Cửa hàng", icon: Store },
 ];
 
 function HeaderIcon({ label, children, badge }: { label: string; children: React.ReactNode; badge?: number }) {
@@ -164,21 +164,25 @@ export function StoreHeader() {
           <Logo />
         </div>
 
-        <nav className="hidden h-full flex-1 items-stretch justify-center gap-8 lg:flex xl:gap-10">
+        <nav className="hidden h-full flex-1 items-stretch justify-center gap-6 lg:flex xl:gap-9">
+          {/* Màn lg chật: logo đã dẫn về trang chủ nên ẩn mục này, từ xl mới hiện */}
+          <NavLink href="/" active={pathname === "/"} onEnter={closeMega} className="max-xl:hidden">
+            Trang chủ
+          </NavLink>
           <div className="flex h-full" onMouseEnter={openMega}>
             <button
               type="button"
               onClick={() => (megaOpen ? setMegaOpen(false) : openMega())}
               aria-haspopup="true"
               aria-expanded={megaOpen}
-              className={cn(navCls, (onList && !sortBest) || megaOpen ? navActive : navIdle)}
+              className={cn(navCls, onList || megaOpen ? navActive : navIdle)}
             >
               Sản phẩm
               <ChevronDown className={cn("ml-1 h-3.5 w-3.5 transition-transform", megaOpen && "rotate-180")} strokeWidth={1.8} />
             </button>
           </div>
-          <NavLink href="/products?sort=best" active={sortBest} onEnter={closeMega}>
-            Bán chạy
+          <NavLink href="/bo-suu-tap" active={pathname.startsWith("/bo-suu-tap")} onEnter={closeMega}>
+            Bộ sưu tập
           </NavLink>
           <NavLink href="/cau-chuyen" active={pathname === "/cau-chuyen"} onEnter={closeMega}>
             Câu chuyện
@@ -186,7 +190,7 @@ export function StoreHeader() {
           <NavLink href="/nguon-goc" active={pathname === "/nguon-goc"} onEnter={closeMega}>
             Nguồn gốc
           </NavLink>
-          <NavLink href="/#cua-hang" active={false} onEnter={closeMega}>
+          <NavLink href="/cua-hang" active={pathname === "/cua-hang"} onEnter={closeMega}>
             Cửa hàng
           </NavLink>
         </nav>
@@ -273,13 +277,13 @@ export function StoreHeader() {
                 <MegaLink href="/products?price=gt500">Từ 500.000₫</MegaLink>
                 <MegaLink href="/products?stock=1">Đang còn hàng</MegaLink>
               </div>
-              <Link href="/products" className="group relative block min-h-[200px] overflow-hidden bg-surface">
+              <Link href="/bo-suu-tap" className="group relative block min-h-[200px] overflow-hidden bg-surface">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/banners/banner-bracelet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/75 to-transparent" />
                 <span className="absolute inset-x-0 bottom-0 p-5 text-white">
                   <span className="block text-[10.5px] font-semibold tracking-[0.22em] text-white/80">BỘ SƯU TẬP</span>
-                  <span className="mt-1 block text-[18px] font-semibold">Trang sức sừng thủ công</span>
+                  <span className="mt-1 block text-[18px] font-semibold">Khám phá các bộ sưu tập</span>
                 </span>
               </Link>
             </div>
@@ -329,7 +333,9 @@ export function StoreHeader() {
               </Link>
             </div>
           )}
-          <p className="px-2 pb-1 pt-3 text-[11.5px] font-bold uppercase tracking-[0.12em] text-faint">Danh mục</p>
+          <DrawerLink href="/">Trang chủ</DrawerLink>
+          <DrawerLink href="/bo-suu-tap">Bộ sưu tập</DrawerLink>
+          <p className="px-2 pb-1 pt-4 text-[11.5px] font-bold uppercase tracking-[0.12em] text-faint">Danh mục</p>
           <DrawerLink href="/products">Tất cả sản phẩm</DrawerLink>
           {categories.map((c) => (
             <DrawerLink key={c.id} href={`/products?cat=${c.id}`}>
@@ -369,9 +375,21 @@ const navActive = "text-navy after:bg-brand";
 const navIdle = "text-ink-2 hover:text-navy hover:after:bg-brand/30";
 const megaHead = "mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint";
 
-function NavLink({ href, active, children, onEnter }: { href: string; active: boolean; children: React.ReactNode; onEnter?: () => void }) {
+function NavLink({
+  href,
+  active,
+  children,
+  onEnter,
+  className,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+  onEnter?: () => void;
+  className?: string;
+}) {
   return (
-    <Link href={href} onMouseEnter={onEnter} className={cn(navCls, active ? navActive : navIdle)}>
+    <Link href={href} onMouseEnter={onEnter} className={cn(navCls, active ? navActive : navIdle, className)}>
       {children}
     </Link>
   );
