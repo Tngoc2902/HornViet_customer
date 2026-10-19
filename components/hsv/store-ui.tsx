@@ -89,11 +89,29 @@ export function Breadcrumbs({ items, className }: { items: { label: string; href
 }
 
 /** Tiêu đề khu vực căn giữa (kiểu PNJ: chữ xanh đậm, không gạch chân), có dòng mô tả tùy chọn. */
-export function SectionHeader({ title, sub, className }: { title: string; sub?: ReactNode; className?: string }) {
+/** Nét trang trí dưới tiêu đề: hai vạch vàng và viên đá ở giữa (lấy từ viên đá trên logo). */
+export function TitleOrnament({ className }: { className?: string }) {
   return (
-    <div className={cn("mb-6 text-center sm:mb-7", className)}>
+    <span aria-hidden className={cn("mx-auto mt-2.5 flex w-[120px] items-center gap-2", className)}>
+      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-gold/70" />
+      <span className="h-[7px] w-[7px] rotate-45 bg-gold" />
+      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-gold/70" />
+    </span>
+  );
+}
+
+/** Tiêu đề mục: chữ in hoa căn giữa + nét trang trí; có `href` thì thêm link "Xem thêm". */
+export function SectionHeader({ title, sub, href, className }: { title: string; sub?: ReactNode; href?: string; className?: string }) {
+  return (
+    <div className={cn("mb-6 text-center sm:mb-8", className)}>
       <h2 className="hsv-section-title">{title}</h2>
-      {sub && <p className="mx-auto mt-2 max-w-[560px] text-[13.5px] font-light text-subtle">{sub}</p>}
+      <TitleOrnament />
+      {sub && <p className="mx-auto mt-3 max-w-[560px] text-[13.5px] font-light text-subtle">{sub}</p>}
+      {href && (
+        <Link href={href} className="mt-2 inline-block text-[13px] text-gold-dark underline-offset-4 hover:underline">
+          Xem thêm
+        </Link>
+      )}
     </div>
   );
 }

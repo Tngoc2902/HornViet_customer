@@ -87,7 +87,7 @@
 
   /* Tiêu đề khu vực căn giữa ở trang chủ / danh sách. */
   .hsv-section-title {
-    @apply text-center text-[20px] font-semibold text-navy sm:text-[24px];
+    @apply text-center text-[19px] font-semibold uppercase tracking-[0.06em] text-navy sm:text-[23px];
   }
 }
 

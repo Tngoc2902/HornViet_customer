@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Phone } from "lucide-react";
+import { Facebook, MapPin, Phone } from "lucide-react";
 import { ProductCarousel } from "@/components/hsv/product-card";
+import { MAP_DIRECTIONS_URL } from "@/components/hsv/store-map";
 import { Breadcrumbs, ServicePerks, STORE_INFO, ZALO_URL } from "@/components/hsv/store-ui";
 import { ErrorBox, notify, ProductImage, QtyStepper, Skeleton } from "@/components/hsv/ui";
 import { useAuth } from "@/contexts/auth-context";
@@ -258,9 +259,14 @@ export default function ProductDetailPage() {
             <div className="mt-5 flex flex-col gap-4">
               {showSizes && (
                 <div>
-                  <p className="mb-2 text-[13.5px] font-medium text-navy">
-                    Chọn kích thước{size && <span className="font-normal text-subtle">: {size}</span>}
-                  </p>
+                  <div className="mb-2 flex items-baseline justify-between gap-3">
+                    <p className="text-[13.5px] font-medium text-navy">
+                      Chọn kích thước{size && <span className="font-normal text-subtle">: {size}</span>}
+                    </p>
+                    <Link href="/ho-tro#chon-size" className="shrink-0 text-[12.5px] text-gold-dark underline-offset-2 hover:underline">
+                      Hướng dẫn chọn size
+                    </Link>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {sizes.map((sz) => (
                       <OptionButton
@@ -340,14 +346,35 @@ export default function ProductDetailPage() {
             </button>
           )}
 
+          {/* Mời khách xem tận tay tại xưởng (như "Thử ngay tại showroom") và liên hệ nhanh */}
           <a
-            href={`tel:${STORE_INFO.hotlineTel}`}
-            className="mt-4 flex items-center justify-center gap-2 rounded-md border border-line px-4 py-3 text-[13px] font-light text-ink-2"
+            href={MAP_DIRECTIONS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 flex h-12 items-center justify-center gap-2 rounded-md border border-navy text-[13.5px] font-semibold uppercase tracking-[0.04em] text-navy transition-colors hover:bg-navy hover:text-white"
           >
-            <Phone className="h-4 w-4 text-gold" />
-            Gọi đặt mua <span className="font-medium text-navy">{STORE_INFO.hotline}</span>
-            <span className="text-faint">({STORE_INFO.hours})</span>
+            <MapPin className="h-4 w-4" />
+            Xem tận tay tại xưởng Thụy Ứng
           </a>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-[12.5px]">
+            <a href={ZALO_URL} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-[#0068ff] hover:border-[#0068ff]">
+              <span className="rounded-full border border-[#0068ff] px-1 text-[9.5px] font-bold leading-4">Zalo</span>
+              Chat Zalo
+            </a>
+            {STORE_INFO.socials.facebook ? (
+              <a href={STORE_INFO.socials.facebook} target="_blank" rel="noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-[#1877f2] hover:border-[#1877f2]">
+                <Facebook className="h-4 w-4" />
+                Facebook
+              </a>
+            ) : (
+              <span />
+            )}
+            <a href={`tel:${STORE_INFO.hotlineTel}`} className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-navy hover:border-navy">
+              <Phone className="h-4 w-4 text-gold" />
+              {STORE_INFO.hotline}
+            </a>
+          </div>
+          <p className="mt-2 text-center text-[11.5px] text-faint">Hỗ trợ {STORE_INFO.hours}</p>
         </div>
 
         {/* Mô tả / nguồn gốc / chính sách */}

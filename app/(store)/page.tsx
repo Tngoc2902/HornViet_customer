@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock, MapPin, Navigation, Phone, Sparkles } from "lucide-react";
-import { ProductCarousel } from "@/components/hsv/product-card";
+import { ProductCard, ProductCardSkeleton, ProductCarousel } from "@/components/hsv/product-card";
 import { MAP_DIRECTIONS_URL, MAP_EMBED_URL } from "@/components/hsv/store-map";
 import { SectionHeader, ServicePerks, STORE_INFO } from "@/components/hsv/store-ui";
 import { ProductImage } from "@/components/hsv/ui";
@@ -156,47 +156,81 @@ function MoreButton({ href, children = "Xem thêm" }: { href: string; children?:
   );
 }
 
-/** "Bộ sưu tập nổi bật": 3 thẻ ảnh dọc lớn dẫn vào danh mục (như "Thương hiệu nổi bật" của PNJ). */
-function FeaturedCollections({ items }: { items?: ProductListItem[] }) {
+/**
+ * "Không gian Hồn Sừng Việt": lưới ảnh kiểu lookbook (ô to nhỏ xen kẽ) dẫn vào câu chuyện, danh mục, nguồn gốc — tạo cảm xúc
+ * trước khi bán hàng. Ảnh ô danh mục lấy từ ảnh sản phẩm thật của danh mục đó.
+ */
+function LookbookMosaic({ items }: { items?: ProductListItem[] }) {
   const { categories } = useCatalog();
   const find = (kw: string) => categories.find((c) => c.name.toLowerCase().includes(kw));
-  const cards = [
-    { cat: find("vòng"), title: "Trang sức sừng", sub: "Vòng tay, nhẫn, trâm cài cho mỗi ngày" },
-    { cat: find("trang trí"), title: "Quà tặng trang trí", sub: "Tượng chạm, phù điêu, đầu trâu mỹ nghệ" },
-    { cat: find("gia dụng"), title: "Đồ dùng hằng ngày", sub: "Thìa, đũa, bát sừng an toàn, bền đẹp" },
-  ].filter((c) => c.cat);
-  if (!cards.length) return null;
+  const pick = (catId?: number, skip?: string | null) =>
+    items?.find((p) => p.categoryId === catId && p.mainImage && p.mainImage !== skip)?.mainImage ?? null;
+  const bracelet = find("vòng");
+  const decor = find("trang trí");
+  const comb = find("lược");
+  const braceletImg = pick(bracelet?.id);
+  const tiles = [
+    { key: "story", href: "/cau-chuyen", kicker: "LÀNG NGHỀ THỤY ỨNG", title: "Xưởng chế tác thủ công", src: "/banners/story-workshop.jpg", local: true, cls: "col-span-2 row-span-2 aspect-[4/3] md:aspect-auto" },
+    { key: "bracelet", href: bracelet ? `/products?cat=${bracelet.id}` : "/products", kicker: "TRANG SỨC", title: "Vòng tay & nhẫn sừng", src: braceletImg, cls: "aspect-square" },
+    { key: "decor", href: decor ? `/products?cat=${decor.id}` : "/products", kicker: "QUÀ TẶNG", title: "Đồ trang trí mỹ nghệ", src: pick(decor?.id), cls: "aspect-square" },
+    { key: "origin", href: "/nguon-goc", kicker: "NGUYÊN LIỆU", title: "Sừng trâu, sừng bò có nguồn gốc", src: pick(comb?.id) ?? "/banners/banner-craft.jpg", local: !pick(comb?.id), cls: "col-span-2 aspect-[2/1]" },
+  ];
 
   return (
     <section className="hsv-container pt-12 sm:pt-16">
-      <SectionHeader title="Bộ sưu tập nổi bật" sub="Ba dòng sản phẩm được khách hàng tìm mua nhiều nhất" />
-      <div className="scrollbar-none -mx-4 flex snap-x gap-4 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0">
-        {cards.map(({ cat, title, sub }) => {
-          const img = items?.find((p) => p.categoryId === cat!.id && p.mainImage);
-          return (
-            <Link
-              key={cat!.id}
-              href={`/products?cat=${cat!.id}`}
-              className="group relative block aspect-[4/5] w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl sm:w-auto"
-            >
-              <ProductImage
-                src={img?.mainImage}
-                seed={img?.id ?? cat!.id}
-                alt={title}
-                className="absolute inset-0 [&>img]:transition-transform [&>img]:duration-700 group-hover:[&>img]:scale-105"
-              />
-              <span className="absolute inset-0 bg-gradient-to-t from-[#0b1626]/85 via-[#0b1626]/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-7">
-                <p className="text-[11px] font-medium tracking-[0.24em] text-champagne">{cat!.productCount} SẢN PHẨM</p>
-                <p className="mt-1.5 font-serif text-[26px] leading-tight sm:text-[30px]">{title}</p>
-                <p className="mt-1.5 text-[13.5px] font-light text-white/85">{sub}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 border-b border-champagne/60 pb-0.5 text-[13px] font-medium text-champagne transition group-hover:gap-2.5">
-                  Khám phá <ArrowRight className="h-4 w-4" />
-                </span>
-              </div>
-            </Link>
-          );
-        })}
+      <SectionHeader title="Không gian Hồn Sừng Việt" sub="Từ xưởng chế tác ở làng nghề Thụy Ứng đến món đồ trong tay bạn" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:grid-rows-2">
+        {tiles.map((t, i) => (
+          <Link key={t.key} href={t.href} className={cn("group relative overflow-hidden rounded-2xl bg-surface", t.cls)}>
+            {t.local ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={t.src!} alt={t.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            ) : (
+              <ProductImage src={t.src} seed={i + 3} alt={t.title} width={i === 0 ? 1200 : 700} className="absolute inset-0 [&>img]:transition-transform [&>img]:duration-700 group-hover:[&>img]:scale-105" />
+            )}
+            <span className="absolute inset-0 bg-gradient-to-t from-[#0b1626]/80 via-[#0b1626]/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
+              <p className="text-[10.5px] font-semibold tracking-[0.24em] text-champagne sm:text-[11px]">{t.kicker}</p>
+              <p className={cn("mt-1 font-serif leading-tight", i === 0 ? "text-[22px] sm:text-[30px]" : "text-[17px] sm:text-[21px]")}>{t.title}</p>
+              <span className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-champagne opacity-90 transition-all group-hover:gap-2.5">
+                Khám phá <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** "Gợi ý quà tặng": một ảnh không gian lớn bên cạnh 4 sản phẩm bán chạy (kiểu "mua theo bộ ảnh"). */
+function ShopTheLook() {
+  const { categories } = useCatalog();
+  const decor = categories.find((c) => c.name.toLowerCase().includes("trang trí"));
+  const best = useApi(
+    () => productApi.getAll({ sorting: ProductSorting.BestSelling, maxResultCount: 4, inStockOnly: true }),
+    []
+  );
+  const items = best.data?.items ?? [];
+  if (best.data && items.length < 2) return null;
+
+  return (
+    <section className="hsv-container pt-12 sm:pt-16">
+      <SectionHeader title="Gợi ý quà tặng" sub="Những món được khách chọn làm quà nhiều nhất" href="/products?sort=best" />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+        <Link href={decor ? `/products?cat=${decor.id}` : "/products"} className="group relative block aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/banners/banner-decor.jpg" alt="Góc quà tặng sừng mỹ nghệ" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <span className="absolute inset-0 bg-gradient-to-t from-[#0b1626]/75 via-transparent to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+            <p className="text-[11px] font-semibold tracking-[0.24em] text-champagne">QUÀ BIẾU Ý NGHĨA</p>
+            <p className="mt-1.5 font-serif text-[24px] leading-tight sm:text-[32px]">Món quà từ làng nghề</p>
+            <p className="mt-1.5 max-w-[420px] text-[13.5px] font-light text-white/85">Đóng hộp sẵn, kèm thiệp, giao tận nơi trên toàn quốc.</p>
+          </div>
+        </Link>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {best.data ? items.map((p) => <ProductCard key={p.id} product={p} />) : Array.from({ length: 4 }, (_, i) => <ProductCardSkeleton key={i} />)}
+        </div>
       </div>
     </section>
   );
@@ -415,7 +449,9 @@ export default function HomePage() {
 
       <ProductTabs />
 
-      <FeaturedCollections items={pool.data?.items} />
+      <LookbookMosaic items={pool.data?.items} />
+
+      <ShopTheLook />
 
       <MaterialShowcase />
 
