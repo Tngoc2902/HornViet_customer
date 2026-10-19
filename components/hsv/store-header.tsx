@@ -20,6 +20,8 @@ import {
   Store,
   UserRound,
   Youtube,
+  Search,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
@@ -55,16 +57,14 @@ const STORY_LINKS = [
 
 function HeaderIcon({ label, children, badge }: { label: string; children: React.ReactNode; badge?: number }) {
   return (
-    <span className="relative flex items-center gap-2 text-[13px] font-light text-navy">
-      <span className="relative flex h-6 w-6 items-center justify-center">
-        {children}
-        {badge !== undefined && (
-          <span className="absolute -right-2 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-danger px-1 text-[10.5px] font-bold text-white">
-            {badge}
-          </span>
-        )}
-      </span>
-      <span className="hidden lg:inline">{label}</span>
+    <span className="relative flex h-10 w-10 items-center justify-center text-navy transition-opacity hover:opacity-70">
+      {children}
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-navy px-1 text-[10px] font-semibold text-white">
+          {badge}
+        </span>
+      )}
+      <span className="sr-only">{label}</span>
     </span>
   );
 }
@@ -78,26 +78,27 @@ export function StoreHeader() {
   const params = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [matOpen, setMatOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const matRef = useRef<HTMLDivElement>(null);
+  const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setMenuOpen(false);
     setNavOpen(false);
-    setMatOpen(false);
+    setMegaOpen(false);
+    setSearchOpen(false);
   }, [pathname, params]);
   useEffect(() => {
-    if (!menuOpen && !matOpen) return;
+    if (!menuOpen && !megaOpen && !searchOpen) return;
     const onDown = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (menuRef.current && !menuRef.current.contains(t)) setMenuOpen(false);
-      if (matRef.current && !matRef.current.contains(t)) setMatOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setMenuOpen(false);
-      setMatOpen(false);
+      setMegaOpen(false);
+      setSearchOpen(false);
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -105,7 +106,17 @@ export function StoreHeader() {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [menuOpen, matOpen]);
+  }, [menuOpen, megaOpen, searchOpen]);
+
+  // Bảng "Sản phẩm" mở khi rê chuột (trễ một chút khi rời để kịp di chuột xuống bảng), hoặc bấm.
+  const openMega = () => {
+    if (megaTimer.current) clearTimeout(megaTimer.current);
+    setMegaOpen(true);
+  };
+  const closeMega = () => {
+    if (megaTimer.current) clearTimeout(megaTimer.current);
+    megaTimer.current = setTimeout(() => setMegaOpen(false), 150);
+  };
 
   const goCart = () => {
     if (!user) {
@@ -119,53 +130,90 @@ export function StoreHeader() {
   const onList = pathname === "/products";
   const activeCat = onList ? params.get("cat") : null;
   const activeMat = onList ? params.get("mat") : null;
-  const navCats = categories.slice(0, 6);
+  const sortBest = onList && params.get("sort") === "best";
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white">
-      <div className="hsv-container grid h-[64px] grid-cols-[1fr_auto_1fr] items-center gap-3 sm:h-[72px]">
-        <div className="flex items-center">
-          <button onClick={() => setNavOpen(true)} aria-label="Mở menu" className="-ml-1 flex h-10 w-10 items-center justify-center text-navy xl:hidden">
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="hidden items-center gap-5 whitespace-nowrap text-[13px] font-light text-ink-2 xl:flex">
-            {STORY_LINKS.map(({ href, label, icon: Icon }) => (
-              <Link key={href} href={href} className="flex items-center gap-1.5 hover:text-gold-dark">
-                <Icon className="h-[15px] w-[15px] text-gold" />
-                {label}
-              </Link>
-            ))}
+      {/* Dải thông báo mỏng */}
+      <div className="bg-surface text-[11.5px] text-ink-2">
+        <div className="hsv-container flex h-8 items-center justify-center gap-6 lg:justify-between">
+          <p className="truncate">
+            Miễn phí giao hàng cho đơn từ {STORE_INFO.freeShipFrom}
+            <span className="max-sm:hidden"> · Đổi sản phẩm trong 7 ngày</span>
+          </p>
+          <div className="hidden items-center gap-5 lg:flex">
+            <a href={`tel:${STORE_INFO.hotlineTel}`} className="hover:text-navy">
+              Hotline <span className="font-semibold text-navy">{STORE_INFO.hotline}</span>
+            </a>
+            <Link href="/ho-tro" className="hover:text-navy">
+              Hỗ trợ khách hàng
+            </Link>
+            <Link href="/account/orders" className="hover:text-navy">
+              Tra cứu đơn hàng
+            </Link>
           </div>
         </div>
+      </div>
 
-        <Logo />
+      {/* Hàng chính: logo | menu | icon */}
+      <div className="hsv-container relative flex h-16 items-center gap-6 lg:h-[76px]" onMouseLeave={closeMega}>
+        <button onClick={() => setNavOpen(true)} aria-label="Mở menu" className="-ml-2 flex h-10 w-10 items-center justify-center text-navy lg:hidden">
+          <Menu className="h-6 w-6" strokeWidth={1.6} />
+        </button>
+        <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
+          <Logo />
+        </div>
 
-        <div className="flex items-center justify-end gap-4 sm:gap-6">
-          <a href={`tel:${STORE_INFO.hotlineTel}`} className="hidden items-center gap-2 text-[13px] font-light text-navy xl:flex">
-            <Phone className="h-[18px] w-[18px] text-gold" />
-            {STORE_INFO.hotline}
-          </a>
+        <nav className="hidden h-full flex-1 items-stretch justify-center gap-8 lg:flex xl:gap-10">
+          <div className="flex h-full" onMouseEnter={openMega}>
+            <button
+              type="button"
+              onClick={() => (megaOpen ? setMegaOpen(false) : openMega())}
+              aria-haspopup="true"
+              aria-expanded={megaOpen}
+              className={cn(navCls, (onList && !sortBest) || megaOpen ? navActive : navIdle)}
+            >
+              Sản phẩm
+              <ChevronDown className={cn("ml-1 h-3.5 w-3.5 transition-transform", megaOpen && "rotate-180")} strokeWidth={1.8} />
+            </button>
+          </div>
+          <NavLink href="/products?sort=best" active={sortBest} onEnter={closeMega}>
+            Bán chạy
+          </NavLink>
+          <NavLink href="/cau-chuyen" active={pathname === "/cau-chuyen"} onEnter={closeMega}>
+            Câu chuyện
+          </NavLink>
+          <NavLink href="/nguon-goc" active={pathname === "/nguon-goc"} onEnter={closeMega}>
+            Nguồn gốc
+          </NavLink>
+          <NavLink href="/#cua-hang" active={false} onEnter={closeMega}>
+            Cửa hàng
+          </NavLink>
+        </nav>
+
+        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+          <button type="button" onClick={() => setSearchOpen((v) => !v)} aria-expanded={searchOpen} className="hidden lg:block">
+            <HeaderIcon label="Tìm kiếm">{searchOpen ? <X className="h-[21px] w-[21px]" strokeWidth={1.6} /> : <Search className="h-[21px] w-[21px]" strokeWidth={1.6} />}</HeaderIcon>
+          </button>
           {!user ? (
             <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="max-sm:hidden">
               <HeaderIcon label="Tài khoản">
-                <UserRound className="h-[22px] w-[22px]" strokeWidth={1.8} />
+                <UserRound className="h-[21px] w-[21px]" strokeWidth={1.6} />
               </HeaderIcon>
             </Link>
           ) : (
             <div className="relative max-sm:hidden" ref={menuRef}>
               <button onClick={() => setMenuOpen((v) => !v)} aria-haspopup="menu" aria-expanded={menuOpen}>
-                <HeaderIcon label={lastName(user.name)}>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-navy text-[11px] font-bold text-champagne">
-                    {initialOf(user.name)}
-                  </span>
+                <HeaderIcon label={`Tài khoản ${lastName(user.name)}`}>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-navy text-[11px] font-semibold text-white">{initialOf(user.name)}</span>
                 </HeaderIcon>
               </button>
               {menuOpen && (
-                <div role="menu" className="absolute right-0 top-10 z-[45] w-[250px] rounded-xl border border-line bg-white p-2 shadow-dropdown">
+                <div role="menu" className="absolute right-0 top-11 z-[45] w-[250px] border border-line bg-white p-2 shadow-dropdown">
                   <div className="mb-1.5 border-b border-line-2 px-3 pb-3 pt-2.5">
-                    <p className="text-sm font-bold">{user.name}</p>
+                    <p className="text-sm font-semibold">{user.name}</p>
                     <p className="mt-0.5 text-xs text-subtle">{user.userName}</p>
-                    <p className="mt-1.5 text-[11.5px] font-semibold text-gold">{roleLabel(user.roles)}</p>
+                    <p className="mt-1.5 text-[11.5px] font-semibold text-gold-dark">{roleLabel(user.roles)}</p>
                   </div>
                   <MenuLink href="/account/profile">Hồ sơ cá nhân</MenuLink>
                   <MenuLink href="/account/orders">Đơn hàng của tôi</MenuLink>
@@ -176,7 +224,7 @@ export function StoreHeader() {
                       notify("Đã đăng xuất");
                       router.push("/");
                     }}
-                    className="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-danger hover:bg-surface"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-danger hover:bg-surface"
                   >
                     Đăng xuất
                   </button>
@@ -186,63 +234,63 @@ export function StoreHeader() {
           )}
           <button onClick={goCart} aria-label="Giỏ hàng">
             <HeaderIcon label="Giỏ hàng" badge={cartCount}>
-              <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.8} />
+              <ShoppingBag className="h-[21px] w-[21px]" strokeWidth={1.6} />
             </HeaderIcon>
           </button>
         </div>
+
+        {/* Bảng "Sản phẩm": danh mục | chất liệu | gợi ý | ảnh */}
+        {megaOpen && (
+          <div onMouseEnter={openMega} className="absolute inset-x-0 top-full z-[45] hidden animate-hin border-y border-line bg-white shadow-dropdown lg:block">
+            <div className="hsv-container grid grid-cols-[1fr_1fr_1fr_1.3fr] gap-10 py-8">
+              <div>
+                <p className={megaHead}>Danh mục</p>
+                <MegaLink href="/products" active={onList && !activeCat && !activeMat && !sortBest}>
+                  Tất cả sản phẩm
+                </MegaLink>
+                {categories.map((c) => (
+                  <MegaLink key={c.id} href={`/products?cat=${c.id}`} active={activeCat === String(c.id)}>
+                    {c.name}
+                  </MegaLink>
+                ))}
+              </div>
+              <div>
+                <p className={megaHead}>Chất liệu</p>
+                {materials.map((m) => (
+                  <MegaLink key={m.id} href={`/products?mat=${m.id}`} active={activeMat === String(m.id)}>
+                    {m.name}
+                  </MegaLink>
+                ))}
+                <Link href="/nguon-goc" className="mt-3 inline-block text-[12.5px] text-gold-dark underline-offset-4 hover:underline">
+                  Tìm hiểu nguồn gốc nguyên liệu →
+                </Link>
+              </div>
+              <div>
+                <p className={megaHead}>Gợi ý</p>
+                <MegaLink href="/products?sort=new">Sản phẩm mới</MegaLink>
+                <MegaLink href="/products?sort=best">Bán chạy</MegaLink>
+                <MegaLink href="/products?price=lt200">Dưới 200.000₫</MegaLink>
+                <MegaLink href="/products?price=gt500">Từ 500.000₫</MegaLink>
+                <MegaLink href="/products?stock=1">Đang còn hàng</MegaLink>
+              </div>
+              <Link href="/products" className="group relative block min-h-[200px] overflow-hidden bg-surface">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/banners/banner-bracelet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/75 to-transparent" />
+                <span className="absolute inset-x-0 bottom-0 p-5 text-white">
+                  <span className="block text-[10.5px] font-semibold tracking-[0.22em] text-champagne">BỘ SƯU TẬP</span>
+                  <span className="mt-1 block text-[18px] font-semibold">Trang sức sừng thủ công</span>
+                </span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="border-t border-line-2">
-        <div className="hsv-container flex h-[52px] items-center gap-6">
-          {/* Không đặt overflow ở đây: menu "Chất liệu" xổ ra ngoài thanh này. Màn hình lg chỉ hiện 4 danh mục cho vừa. */}
-          <nav className="hidden h-full min-w-0 flex-1 items-center gap-6 lg:flex xl:gap-7">
-            <NavLink href="/products" active={onList && !activeCat && !activeMat && !params.get("q")}>
-              Tất cả sản phẩm
-            </NavLink>
-            {navCats.map((c, i) => (
-              <NavLink key={c.id} href={`/products?cat=${c.id}`} active={activeCat === String(c.id)} className={cn(i >= 4 && "lg:hidden xl:flex")}>
-                {c.name}
-              </NavLink>
-            ))}
-            {materials.length > 0 && (
-              <div ref={matRef} className="relative flex h-full shrink-0 items-center">
-                <button
-                  onClick={() => setMatOpen((v) => !v)}
-                  aria-haspopup="menu"
-                  aria-expanded={matOpen}
-                  className={cn("flex items-center gap-1 text-[14.5px] font-normal transition-colors hover:text-gold-dark", activeMat || matOpen ? "text-gold-dark" : "text-ink-2")}
-                >
-                  Chất liệu
-                  <ChevronDown className={cn("h-4 w-4 transition-transform", matOpen && "rotate-180")} />
-                </button>
-                {matOpen && (
-                  <div role="menu" className="absolute left-0 top-full z-[45] w-[300px] animate-hin rounded-b-xl border border-line bg-white p-2 shadow-dropdown">
-                    {materials.map((m) => (
-                      <Link
-                        key={m.id}
-                        role="menuitem"
-                        href={`/products?mat=${m.id}`}
-                        onClick={() => setMatOpen(false)}
-                        className={cn("block rounded-lg px-3 py-2.5 hover:bg-surface", activeMat === String(m.id) && "bg-surface-active")}
-                      >
-                        <span className="block text-sm font-semibold text-navy">{m.name}</span>
-                        {m.origin && <span className="mt-0.5 block text-xs text-subtle">{m.origin}</span>}
-                      </Link>
-                    ))}
-                    <Link
-                      role="menuitem"
-                      href="/nguon-goc"
-                      onClick={() => setMatOpen(false)}
-                      className="mt-1 block border-t border-line-2 px-3 pb-1.5 pt-2.5 text-[12.5px] font-semibold text-gold-dark hover:underline"
-                    >
-                      Tìm hiểu nguồn gốc nguyên liệu →
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-          </nav>
-          <SearchBox className="w-full lg:w-[300px] lg:shrink-0" />
+      {/* Ô tìm kiếm: điện thoại luôn hiện; máy tính mở bằng icon kính lúp */}
+      <div className={cn("border-t border-line-2", !searchOpen && "lg:hidden")}>
+        <div className="hsv-container py-2.5">
+          <SearchBox className="mx-auto w-full lg:max-w-[640px]" autoFocus={searchOpen} />
         </div>
       </div>
 
@@ -314,16 +362,24 @@ export function StoreHeader() {
   );
 }
 
-function NavLink({ href, active, children, className }: { href: string; active: boolean; children: React.ReactNode; className?: string }) {
+// Một kiểu chữ cho mọi mục menu: in hoa, cỡ 12.5px, giãn chữ vừa; mục đang xem gạch chân mảnh.
+const navCls =
+  "relative flex h-full shrink-0 items-center whitespace-nowrap text-[12.5px] font-medium uppercase tracking-[0.1em] transition-colors after:absolute after:inset-x-0 after:bottom-[22px] after:h-px";
+const navActive = "text-navy after:bg-navy";
+const navIdle = "text-ink-2 hover:text-navy hover:after:bg-navy/30";
+const megaHead = "mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint";
+
+function NavLink({ href, active, children, onEnter }: { href: string; active: boolean; children: React.ReactNode; onEnter?: () => void }) {
   return (
-    <Link
-      href={href}
-      className={cn(
-        "relative flex h-full shrink-0 items-center whitespace-nowrap text-[12.5px] font-medium uppercase tracking-[0.14em] transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px",
-        active ? "text-navy after:bg-navy" : "text-ink-2 hover:text-navy hover:after:bg-navy/40",
-        className
-      )}
-    >
+    <Link href={href} onMouseEnter={onEnter} className={cn(navCls, active ? navActive : navIdle)}>
+      {children}
+    </Link>
+  );
+}
+
+function MegaLink({ href, active, children }: { href: string; active?: boolean; children: React.ReactNode }) {
+  return (
+    <Link href={href} className={cn("block py-1.5 text-[14px] transition-colors hover:text-navy", active ? "font-semibold text-navy" : "text-ink-2")}>
       {children}
     </Link>
   );
