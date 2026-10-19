@@ -53,7 +53,7 @@ export function ProductCard({ product, className }: { product: ProductListItem; 
         <button
           type="button"
           onClick={() => setQuick(true)}
-          className="pointer-events-auto absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-navy opacity-0 shadow-[0_6px_18px_rgba(0,0,0,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
+          className="pointer-events-auto absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.1em] text-navy opacity-0 shadow-[0_6px_18px_rgba(43,40,37,.15)] transition duration-300 hover:bg-navy hover:text-white focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
         >
           <Eye className="h-4 w-4" />
           Xem nhanh

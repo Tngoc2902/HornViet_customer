@@ -219,7 +219,7 @@ function OrdersView() {
       ) : !list.data ? (
         <LoadingRows rows={4} />
       ) : items.length === 0 ? (
-        <div className="rounded-card border border-dashed border-[#d6d6d6] bg-white px-6 py-[72px] text-center">
+        <div className="rounded-card border border-dashed border-[#ddd4c8] bg-white px-6 py-[72px] text-center">
           <p className="text-[15px] text-muted2">{tab === "all" ? "Bạn chưa có đơn hàng nào." : "Không có đơn hàng ở trạng thái này."}</p>
           <Link href="/products" className="mt-4 inline-block text-sm font-semibold text-gold">
             Mua sắm ngay →

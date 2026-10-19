@@ -51,7 +51,7 @@ const BANNERS: Banner[] = [
     sub: "Tiện nguyên khối, bo tròn mặt trong, nhiều size để chọn.",
     cta: "Xem vòng tay",
     href: "/products?cat=3",
-    bg: "linear-gradient(110deg,#111111 0%,#2e2e2e 50%,#8c8278 100%)",
+    bg: "linear-gradient(110deg,#2b2825 0%,#4a433c 50%,#a8977f 100%)",
     image: "/banners/banner-bracelet.jpg",
   },
   {
@@ -98,7 +98,7 @@ function HeroCarousel() {
               </picture>
             )}
             {/* Lớp phủ tối bên trái để chữ trên ảnh dễ đọc */}
-            {b.image && showText && <span className="absolute inset-0 bg-gradient-to-r from-[#000000]/85 via-[#000000]/50 to-transparent" />}
+            {b.image && showText && <span className="absolute inset-0 bg-gradient-to-r from-[#1f1c1a]/85 via-[#1f1c1a]/50 to-transparent" />}
             {/* Họa tiết vòng tròn mờ cho banner gradient */}
             {!b.image && (
               <>
@@ -112,7 +112,7 @@ function HeroCarousel() {
                 <div className="max-w-[620px] text-white">
                   <p className="text-[11px] font-medium tracking-[0.26em] text-champagne sm:text-xs">{b.kicker}</p>
                   <h1 className="my-3 font-serif text-[30px] font-normal leading-[1.12] sm:my-4 sm:text-[44px] lg:text-[54px]">{b.title}</h1>
-                  <p className="max-w-[480px] text-[14px] font-light leading-relaxed text-[#ededed] sm:text-[15.5px]">{b.sub}</p>
+                  <p className="max-w-[480px] text-[14px] font-light leading-relaxed text-[#efe8de] sm:text-[15.5px]">{b.sub}</p>
                   <span className="mt-6 inline-block border border-white bg-white px-8 py-3 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-navy transition hover:bg-transparent hover:text-white">
                     {b.cta}
                   </span>
@@ -188,7 +188,7 @@ function LookbookMosaic({ items }: { items?: ProductListItem[] }) {
             ) : (
               <ProductImage src={t.src} seed={i + 3} alt={t.title} width={i === 0 ? 1200 : 700} className="absolute inset-0 [&>img]:transition-transform [&>img]:duration-700 group-hover:[&>img]:scale-105" />
             )}
-            <span className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-[#000000]/10 to-transparent" />
+            <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/80 via-[#1f1c1a]/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
               <p className="text-[10.5px] font-semibold tracking-[0.24em] text-champagne sm:text-[11px]">{t.kicker}</p>
               <p className={cn("mt-1 font-serif leading-tight", i === 0 ? "text-[22px] sm:text-[30px]" : "text-[17px] sm:text-[21px]")}>{t.title}</p>
@@ -221,7 +221,7 @@ function ShopTheLook() {
         <Link href={decor ? `/products?cat=${decor.id}` : "/products"} className="group relative block aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/banners/banner-decor.jpg" alt="Góc quà tặng sừng mỹ nghệ" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          <span className="absolute inset-0 bg-gradient-to-t from-[#000000]/75 via-transparent to-transparent" />
+          <span className="absolute inset-0 bg-gradient-to-t from-[#1f1c1a]/75 via-transparent to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
             <p className="text-[11px] font-semibold tracking-[0.24em] text-champagne">QUÀ BIẾU Ý NGHĨA</p>
             <p className="mt-1.5 font-serif text-[24px] leading-tight sm:text-[32px]">Món quà từ làng nghề</p>
@@ -509,7 +509,7 @@ export default function HomePage() {
             <div className="flex flex-col justify-center px-2 py-2 sm:px-4">
               <p className="text-xs font-bold tracking-[0.24em] text-champagne">GHÉ THĂM XƯỞNG</p>
               <p className="mt-2 font-serif text-[26px] leading-tight sm:text-[32px]">Cửa hàng & xưởng chế tác Hồn Sừng Việt</p>
-              <div className="mt-4 flex flex-col gap-2.5 text-[14px] text-[#d4d4d4]">
+              <div className="mt-4 flex flex-col gap-2.5 text-[14px] text-[#ddd3c6]">
                 <span className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 shrink-0 text-champagne" />
                   {STORE_INFO.address}

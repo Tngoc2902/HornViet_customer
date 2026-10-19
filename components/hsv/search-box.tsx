@@ -129,7 +129,7 @@ export function SearchBox({ className, autoFocus }: { className?: string; autoFo
       </div>
 
       {showPanel && (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-line bg-white shadow-[0_12px_32px_rgba(0,0,0,.14)] lg:left-auto lg:w-[420px]">
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-line bg-white shadow-[0_12px_32px_rgba(43,40,37,.14)] lg:left-auto lg:w-[420px]">
           {loading && items.length === 0 ? (
             <p className="px-4 py-3 text-[13px] text-muted2">Đang tìm…</p>
           ) : items.length === 0 ? (

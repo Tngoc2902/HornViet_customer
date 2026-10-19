@@ -30,21 +30,22 @@ const config = {
         serif: ["var(--font-inter)", "Helvetica Neue", "Arial", "sans-serif"],
       },
       colors: {
-        // Design tokens Hồn Sừng Việt — phong cách tối giản đen trắng, vàng sừng làm điểm nhấn.
-        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: đen.
-        navy: { DEFAULT: "#111111", deep: "#000000" },
-        gold: { DEFAULT: "#b08d57", dark: "#8f6f3f", soft: "#f6efe2" },
-        champagne: "#e7d3a8",
-        ink: { DEFAULT: "#111111", 2: "#333333" },
-        muted2: "#555555",
-        subtle: "#6b6b6b",
-        faint: "#8f8f8f",
-        line: { DEFAULT: "#e5e5e5", 2: "#efefef", 3: "#c8c8c8" },
-        surface: { DEFAULT: "#f5f5f5", 2: "#fafafa", active: "#efefef" },
-        // Dải nền xám rất nhạt sau các băng sản phẩm.
-        band: "#f5f5f5",
-        // Giá sản phẩm (vàng sừng — điểm nhấn màu duy nhất) và nền ảnh thẻ sản phẩm.
-        price: "#9a6a2e",
+        // Design tokens Hồn Sừng Việt — tối giản tông "than ấm & kem": chữ / nút màu than ấm (dịu mắt hơn đen tuyền),
+        // nền dải màu kem, nâu sừng dịu chỉ làm điểm nhấn (giá, nét trang trí).
+        // "navy" giữ tên cũ (dùng ở hàng trăm chỗ) nhưng nay là màu chữ / nút chính: than ấm.
+        navy: { DEFAULT: "#2b2825", deep: "#1f1c1a" },
+        gold: { DEFAULT: "#a88763", dark: "#7c5a3a", soft: "#f6efe4" },
+        champagne: "#e6d6bc",
+        ink: { DEFAULT: "#2b2825", 2: "#4a4540" },
+        muted2: "#5f5952",
+        subtle: "#7a736b",
+        faint: "#9a938a",
+        line: { DEFAULT: "#ebe6df", 2: "#f2eee8", 3: "#d3cbc0" },
+        surface: { DEFAULT: "#f6f2ec", 2: "#faf8f4", active: "#f1ebe2" },
+        // Dải nền màu kem sau các băng sản phẩm.
+        band: "#f6f2ec",
+        // Giá sản phẩm (nâu sừng dịu) và nền ảnh thẻ sản phẩm.
+        price: "#7c5a3a",
         tile: "#ffffff",
         danger: { DEFAULT: "#b42318", soft: "#fbe9e6", line: "#efc5bd" },
         warn: { DEFAULT: "#8a5a12", soft: "#fbf1dc", line: "#ecd29a" },
@@ -97,9 +98,9 @@ const config = {
         hero: "0px",
       },
       boxShadow: {
-        card: "0 14px 34px rgba(0,0,0,.08)",
-        dropdown: "0 18px 44px rgba(0,0,0,.12)",
-        drawer: "-16px 0 48px rgba(0,0,0,.14)",
+        card: "0 14px 34px rgba(43,40,37,.08)",
+        dropdown: "0 18px 44px rgba(43,40,37,.12)",
+        drawer: "-16px 0 48px rgba(43,40,37,.14)",
       },
       keyframes: {
         "accordion-down": {
