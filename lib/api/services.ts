@@ -6,6 +6,7 @@ import type {
   Cart,
   Category,
   CategoryInput,
+  Collection,
   CreateOrderInput,
   CreateUserInput,
   Dashboard,
@@ -84,6 +85,13 @@ export const materialApi = {
   create: (input: MaterialInput) => http.post<Material>(app("Material/Create"), input),
   update: (input: MaterialInput) => http.put<Material>(app("Material/Update"), input),
   delete: (id: number) => http.delete<null>(app("Material/Delete"), { id }),
+};
+
+export const collectionApi = {
+  /** Bộ sưu tập đang hiển thị, theo thứ tự cửa hàng sắp xếp. */
+  getAll: () => http.get<ListResult<Collection>>(app("Collection/GetAll")),
+  /** 404 nếu không có hoặc đang ẩn. */
+  getBySlug: (slug: string) => http.get<Collection>(app("Collection/Get"), { slug }),
 };
 
 export const productApi = {

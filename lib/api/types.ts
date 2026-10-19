@@ -6,7 +6,8 @@ export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 export const PaymentMethod = { Cod: 0, BankTransfer: 1 } as const;
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
-export const ProductSorting = { Newest: 0, PriceAsc: 1, PriceDesc: 2, NameAsc: 3, BestSelling: 4 } as const;
+/** Featured: theo thứ tự nhân viên xếp trong bộ sưu tập (cần kèm collectionId). */
+export const ProductSorting = { Newest: 0, PriceAsc: 1, PriceDesc: 2, NameAsc: 3, BestSelling: 4, Featured: 5 } as const;
 export type ProductSorting = (typeof ProductSorting)[keyof typeof ProductSorting];
 
 export const RevenueGroupBy = { Day: 0, Month: 1 } as const;
@@ -98,7 +99,23 @@ export type ProductListQuery = PageInput & {
   minPrice?: number;
   maxPrice?: number;
   inStockOnly?: boolean;
+  /** Chỉ sản phẩm thuộc bộ sưu tập này. */
+  collectionId?: number;
   sorting?: ProductSorting;
+};
+
+// ---------- Bộ sưu tập
+export type Collection = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  coverImage: string | null;
+  displayOrder: number;
+  /** Số sản phẩm đang bán trong bộ. */
+  productCount: number;
+  /** Ảnh vài sản phẩm đầu — ảnh bìa dự phòng. */
+  previewImages: string[];
 };
 
 export type ProductVariant = {
