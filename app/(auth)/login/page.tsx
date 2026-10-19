@@ -143,14 +143,14 @@ export default function LoginPage() {
               {busy ? "Đang đăng nhập…" : "Đăng nhập"}
             </button>
             <p className="text-right text-[12.5px]">
-              <Link href="/forgot-password" className="font-semibold text-gold">
+              <Link href="/forgot-password" className="font-semibold text-ink underline underline-offset-4">
                 Quên mật khẩu?
               </Link>
             </p>
             <GoogleLoginButton disabled={busy} onToken={submitGoogle} onError={(message) => setErrors({ form: message })} />
             <p className="text-center text-[13.5px] text-muted2">
               Chưa có tài khoản?{" "}
-              <Link href="/register" className="font-semibold text-gold">
+              <Link href="/register" className="font-semibold text-ink underline underline-offset-4">
                 Đăng ký
               </Link>
             </p>

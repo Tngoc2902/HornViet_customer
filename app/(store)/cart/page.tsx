@@ -68,7 +68,7 @@ function CartLine({ item }: { item: CartItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex justify-between gap-3">
           <div>
-            <Link href={`/products/${item.productId}`} className="text-[14.5px] font-medium text-navy hover:text-gold-dark">
+            <Link href={`/products/${item.productId}`} className="text-[14.5px] font-medium text-navy hover:underline">
               {item.productName}
             </Link>
             <p className="mt-1 text-[13px] text-muted2">Biến thể: {item.variantName}</p>
@@ -171,7 +171,7 @@ function CartView() {
       <div className="flex flex-col items-center py-14 text-center">
         <EmptyCartArt />
         <p className="mt-4 text-[15px] font-light text-ink-2">Giỏ hàng trống</p>
-        <Link href="/products" className="mt-5 inline-flex h-10 items-center rounded-md bg-navy px-6 text-[13.5px] font-medium text-white hover:bg-navy-deep">
+        <Link href="/products" className="mt-5 inline-flex h-10 items-center rounded-md bg-brand px-6 text-[13.5px] font-medium text-white hover:bg-brand-deep">
           Tiếp tục mua sắm
         </Link>
       </div>
@@ -256,7 +256,7 @@ function CartView() {
                 setErrors({});
                 setCoErr("");
               }}
-              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left disabled:opacity-60", addrId === a.id ? "border-navy" : "border-line")}
+              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left disabled:opacity-60", addrId === a.id ? "border-brand" : "border-line")}
             >
               <span className="mt-0.5">
                 <Radio checked={addrId === a.id} />
@@ -264,11 +264,11 @@ function CartView() {
               <span className="flex-1">
                 <span className="block text-[13.5px] font-semibold">
                   {a.receiverName} · {a.phoneNumber}
-                  {a.isDefault && <span className="ml-2 text-[11px] font-bold text-gold">Mặc định</span>}
+                  {a.isDefault && <span className="ml-2 text-[11px] font-bold text-ink">Mặc định</span>}
                 </span>
                 <span className="mt-0.5 block text-[13px] leading-snug text-muted2">{a.address}</span>
                 {!usable(a) && (
-                  <Link href="/account/profile?tab=addr" className="mt-1 block text-[12.5px] font-semibold text-gold">
+                  <Link href="/account/profile?tab=addr" className="mt-1 block text-[12.5px] font-semibold text-ink underline underline-offset-4">
                     Cần cập nhật Tỉnh / Phường trong sổ địa chỉ →
                   </Link>
                 )}
@@ -278,7 +278,7 @@ function CartView() {
           <button
             type="button"
             onClick={() => setAddrId(null)}
-            className={cn("flex items-center gap-3 rounded-card border px-3.5 py-3 text-left", addrId === null ? "border-navy" : "border-line")}
+            className={cn("flex items-center gap-3 rounded-card border px-3.5 py-3 text-left", addrId === null ? "border-brand" : "border-line")}
           >
             <Radio checked={addrId === null} />
             <span className="text-[13.5px] font-semibold">{list.length ? "Giao đến địa chỉ khác" : "Nhập địa chỉ giao hàng"}</span>
@@ -309,7 +309,7 @@ function CartView() {
                 <AddressPicker value={area} onChange={setArea} error={areaErr} />
               </div>
             )}
-            <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-gold">
+            <Link href="/account/profile?tab=addr" className="col-span-2 text-[12.5px] font-semibold text-ink underline underline-offset-4">
               Quản lý sổ địa chỉ →
             </Link>
           </div>
@@ -320,7 +320,7 @@ function CartView() {
           rows={2}
           maxLength={500}
           placeholder="Ghi chú cho cửa hàng (không bắt buộc)"
-          className="mt-2.5 w-full resize-y rounded-card border border-line px-3 py-2.5 text-sm outline-none focus:border-navy"
+          className="mt-2.5 w-full resize-y rounded-card border border-line px-3 py-2.5 text-sm outline-none focus:border-brand"
         />
 
         <p className="mb-3 mt-5 text-[15px] font-medium text-navy">Phương thức thanh toán</p>
@@ -330,7 +330,7 @@ function CartView() {
               key={m.key}
               type="button"
               onClick={() => setPay(m.key)}
-              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left", pay === m.key ? "border-navy" : "border-line")}
+              className={cn("flex gap-3 rounded-card border px-3.5 py-3 text-left", pay === m.key ? "border-brand" : "border-line")}
             >
               <span className="mt-0.5">
                 <Radio checked={pay === m.key} />

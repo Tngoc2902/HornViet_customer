@@ -52,7 +52,7 @@ export function ServicePerks({ variant = "grid", className }: { variant?: "grid"
             variant === "compact" && "flex-col gap-1.5 bg-surface-2 px-2 py-3 text-center"
           )}
         >
-          <span className={cn("flex shrink-0 items-center justify-center rounded-full text-gold-dark", variant === "compact" ? "h-8 w-8 bg-white" : "h-10 w-10 bg-gold-soft sm:h-11 sm:w-11")}>
+          <span className={cn("flex shrink-0 items-center justify-center rounded-full text-ink", variant === "compact" ? "h-8 w-8 bg-white" : "h-10 w-10 bg-gold-soft sm:h-11 sm:w-11")}>
             <Icon className={variant === "compact" ? "h-4 w-4" : "h-5 w-5"} strokeWidth={1.6} />
           </span>
           <span className="min-w-0">
@@ -108,7 +108,7 @@ export function SectionHeader({ title, sub, href, className }: { title: string; 
       <TitleOrnament />
       {sub && <p className="mx-auto mt-3 max-w-[560px] text-[13.5px] font-light text-subtle">{sub}</p>}
       {href && (
-        <Link href={href} className="mt-2 inline-block text-[13px] text-gold-dark underline-offset-4 hover:underline">
+        <Link href={href} className="mt-2 inline-block text-[13px] text-ink underline-offset-4 hover:underline">
           Xem thêm
         </Link>
       )}

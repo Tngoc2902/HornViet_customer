@@ -205,7 +205,7 @@ function AddressTab() {
                 area: EMPTY_AREA,
               });
             }}
-            className="text-[13.5px] font-semibold text-gold"
+            className="text-[13.5px] font-semibold text-ink"
           >
             + Thêm địa chỉ
           </button>
@@ -224,7 +224,7 @@ function AddressTab() {
                   <span className="text-sm font-semibold">
                     {a.receiverName} · {a.phoneNumber}
                   </span>
-                  {a.isDefault && <span className="rounded-lg bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-gold">Mặc định</span>}
+                  {a.isDefault && <span className="rounded-lg bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-ink">Mặc định</span>}
                 </div>
                 <p className="mt-1 text-[13.5px] text-ink-2">{a.address}</p>
                 {a.needsUpdate && (
@@ -252,7 +252,7 @@ function AddressTab() {
         </div>
       )}
       {form && (
-        <div className="mt-3 grid grid-cols-2 gap-2.5 rounded-card border border-navy p-4">
+        <div className="mt-3 grid grid-cols-2 gap-2.5 rounded-card border border-brand p-4">
           <p className="col-span-2 text-sm font-bold">{form.id ? "Sửa địa chỉ" : "Thêm địa chỉ"}</p>
           {(
             [
@@ -285,7 +285,7 @@ function AddressTab() {
             <button onClick={() => setForm(null)} className="px-4 py-2.5 text-[13.5px]">
               Hủy
             </button>
-            <button onClick={save} disabled={busy} className="rounded-lg bg-navy px-5 py-2.5 text-[13.5px] font-semibold text-white disabled:opacity-60">
+            <button onClick={save} disabled={busy} className="rounded-lg bg-brand px-5 py-2.5 text-[13.5px] font-semibold text-white disabled:opacity-60">
               Lưu địa chỉ
             </button>
           </div>
@@ -346,7 +346,7 @@ function PasswordTab() {
           hãy tạo mật khẩu qua mục Quên mật khẩu — liên kết tạo mật khẩu sẽ được gửi tới{" "}
           <span className="font-semibold">{profile.data.emailAddress}</span>.
         </p>
-        <Link href="/forgot-password" className="mt-2 inline-block font-semibold text-gold">
+        <Link href="/forgot-password" className="mt-2 inline-block font-semibold text-ink underline underline-offset-4">
           Tạo mật khẩu →
         </Link>
       </div>

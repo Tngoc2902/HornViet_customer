@@ -34,7 +34,7 @@ export function StoreMap({ className, compact }: { className?: string; compact?:
           target="_blank"
           rel="noreferrer"
           className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 bg-navy font-semibold uppercase tracking-[0.06em] text-white hover:bg-navy-deep",
+            "inline-flex shrink-0 items-center gap-1.5 bg-brand font-semibold uppercase tracking-[0.06em] text-white hover:bg-brand-deep",
             compact ? "px-3 py-1 text-[12px]" : "px-4 py-1.5 text-[13px]"
           )}
         >

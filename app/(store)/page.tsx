@@ -78,7 +78,7 @@ function HeroCarousel() {
     "absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-navy shadow-md transition hover:bg-white sm:flex";
 
   return (
-    <section className="relative h-[300px] overflow-hidden bg-navy sm:h-[380px] lg:h-[460px]" aria-roledescription="carousel">
+    <section className="relative h-[300px] overflow-hidden bg-brand sm:h-[380px] lg:h-[460px]" aria-roledescription="carousel">
       {BANNERS.map((b, i) => {
         const showText = !b.image || b.textOnImage !== false;
         return (
@@ -110,7 +110,7 @@ function HeroCarousel() {
             {showText && (
               <div className="hsv-container relative flex h-full items-center pb-10 sm:pb-12">
                 <div className="max-w-[620px] text-white">
-                  <p className="text-[11px] font-medium tracking-[0.26em] text-champagne sm:text-xs">{b.kicker}</p>
+                  <p className="text-[11px] font-medium tracking-[0.26em] text-white/80 sm:text-xs">{b.kicker}</p>
                   <h1 className="my-3 font-serif text-[30px] font-normal leading-[1.12] sm:my-4 sm:text-[44px] lg:text-[54px]">{b.title}</h1>
                   <p className="max-w-[480px] text-[14px] font-light leading-relaxed text-[#efe8de] sm:text-[15.5px]">{b.sub}</p>
                   <span className="mt-6 inline-block border border-white bg-white px-8 py-3 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-navy transition hover:bg-transparent hover:text-white">
@@ -148,7 +148,7 @@ function MoreButton({ href, children = "Xem thêm" }: { href: string; children?:
     <div className="mt-7 text-center">
       <Link
         href={href}
-        className="inline-flex h-10 items-center rounded-md border border-line-3 bg-white px-8 text-[13.5px] font-normal text-navy transition hover:border-navy hover:bg-navy hover:text-white"
+        className="inline-flex h-10 items-center rounded-md border border-line-3 bg-white px-8 text-[13.5px] font-normal text-navy transition hover:border-brand hover:bg-brand hover:text-white"
       >
         {children}
       </Link>
@@ -190,9 +190,9 @@ function LookbookMosaic({ items }: { items?: ProductListItem[] }) {
             )}
             <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/80 via-[#3a2417]/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
-              <p className="text-[10.5px] font-semibold tracking-[0.24em] text-champagne sm:text-[11px]">{t.kicker}</p>
+              <p className="text-[10.5px] font-semibold tracking-[0.24em] text-white/80 sm:text-[11px]">{t.kicker}</p>
               <p className={cn("mt-1 font-serif leading-tight", i === 0 ? "text-[22px] sm:text-[30px]" : "text-[17px] sm:text-[21px]")}>{t.title}</p>
-              <span className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-champagne opacity-90 transition-all group-hover:gap-2.5">
+              <span className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-white/80 opacity-90 transition-all group-hover:gap-2.5">
                 Khám phá <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </div>
@@ -223,7 +223,7 @@ function ShopTheLook() {
           <img src="/banners/banner-decor.jpg" alt="Góc quà tặng sừng mỹ nghệ" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
           <span className="absolute inset-0 bg-gradient-to-t from-[#3a2417]/75 via-transparent to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
-            <p className="text-[11px] font-semibold tracking-[0.24em] text-champagne">QUÀ BIẾU Ý NGHĨA</p>
+            <p className="text-[11px] font-semibold tracking-[0.24em] text-white/80">QUÀ BIẾU Ý NGHĨA</p>
             <p className="mt-1.5 font-serif text-[24px] leading-tight sm:text-[32px]">Món quà từ làng nghề</p>
             <p className="mt-1.5 max-w-[420px] text-[13.5px] font-light text-white/85">Đóng hộp sẵn, kèm thiệp, giao tận nơi trên toàn quốc.</p>
           </div>
@@ -267,7 +267,7 @@ function MaterialShowcase() {
             {!cover && <span className="absolute -right-16 -top-16 h-64 w-64 rounded-full border border-white/20" />}
             <span className="absolute inset-0 bg-gradient-to-t from-[#1a1410]/80 via-[#1a1410]/20 to-transparent" />
             <div className="relative">
-              <p className="text-[11px] font-medium tracking-[0.24em] text-champagne">CHẤT LIỆU</p>
+              <p className="text-[11px] font-medium tracking-[0.24em] text-white/80">CHẤT LIỆU</p>
               <p className="mt-2 font-serif text-[34px] leading-tight sm:text-[42px]">{mat.name}</p>
               <p className="mt-2 flex items-center gap-1.5 text-sm text-white/85">
                 <MapPin className="h-4 w-4" />
@@ -284,7 +284,7 @@ function MaterialShowcase() {
                   aria-pressed={m.id === mat.id}
                   className={cn(
                     "rounded-md border px-4 py-2 text-[13px] transition-colors",
-                    m.id === mat.id ? "border-navy bg-navy font-medium text-white" : "border-line-3 bg-white font-light text-navy hover:border-navy"
+                    m.id === mat.id ? "border-brand bg-brand font-medium text-white" : "border-line-3 bg-white font-light text-navy hover:border-brand"
                   )}
                 >
                   {m.name}
@@ -313,7 +313,7 @@ function MaterialShowcase() {
             <p className="mt-4 flex gap-2.5 rounded-xl bg-gold-soft px-4 py-3 text-[13px] font-light leading-relaxed text-ink-2">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-gold-dark" />
               <span>
-                <span className="font-medium text-gold-dark">Bảo quản: </span>
+                <span className="font-medium text-ink">Bảo quản: </span>
                 {CARE_TIP}
               </span>
             </p>
@@ -321,7 +321,7 @@ function MaterialShowcase() {
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href={`/products?mat=${mat.id}`}
-                className="inline-flex h-11 items-center gap-2 rounded-md bg-navy px-6 text-[13.5px] font-medium text-white transition hover:bg-navy-deep"
+                className="inline-flex h-11 items-center gap-2 rounded-md bg-brand px-6 text-[13.5px] font-medium text-white transition hover:bg-brand-deep"
               >
                 Xem {products.data ? `${products.data.totalCount} ` : ""}sản phẩm {mat.name.toLowerCase()}
                 <ArrowRight className="h-4 w-4" />
@@ -329,7 +329,7 @@ function MaterialShowcase() {
               {/* Nhảy tới đúng thẻ của nguyên liệu này trên trang Nguồn gốc */}
               <Link
                 href={`/nguon-goc#nguyen-lieu-${mat.id}`}
-                className="inline-flex h-11 items-center gap-2 rounded-md border border-line-3 px-6 text-[13.5px] font-light text-navy transition hover:border-navy"
+                className="inline-flex h-11 items-center gap-2 rounded-md border border-line-3 px-6 text-[13.5px] font-light text-navy transition hover:border-brand"
               >
                 <BookOpen className="h-4 w-4 text-gold" />
                 Đọc tiếp về nguồn gốc
@@ -379,7 +379,7 @@ function ProductTabs() {
               onClick={() => setTab(k)}
               className={cn(
                 "h-9 rounded-md px-4 text-[13.5px] transition-colors sm:h-10 sm:px-5 sm:text-[14px]",
-                tab === k ? "bg-navy font-medium text-white" : "border border-line-3 bg-white font-light text-navy hover:border-navy"
+                tab === k ? "bg-brand font-medium text-white" : "border border-line-3 bg-white font-light text-navy hover:border-brand"
               )}
             >
               {label}
@@ -440,7 +440,7 @@ export default function HomePage() {
                   alt={t.label}
                   className="aspect-square w-full rounded-2xl transition group-hover:shadow-card [&>img]:transition-transform [&>img]:duration-500 group-hover:[&>img]:scale-105"
                 />
-                <span className="text-center text-[13px] font-light text-ink group-hover:text-gold-dark sm:text-[15px]">{t.label}</span>
+                <span className="text-center text-[13px] font-light text-ink group-hover:underline sm:text-[15px]">{t.label}</span>
               </Link>
             ))}
           </div>
@@ -467,7 +467,7 @@ export default function HomePage() {
             <span className="absolute bottom-5 left-5 bg-white/90 px-4 py-2 text-[12.5px] font-medium text-navy">Làng nghề Thụy Ứng · Thường Tín, Hà Nội</span>
           </div>
           <div>
-            <p className="text-xs font-medium tracking-[0.24em] text-gold">CÂU CHUYỆN HỒN SỪNG VIỆT</p>
+            <p className="text-xs font-medium tracking-[0.24em] text-ink">CÂU CHUYỆN HỒN SỪNG VIỆT</p>
             <h2 className="mt-3 font-serif text-[30px] leading-tight text-navy sm:text-[38px]">Giữ hồn sừng Việt trong từng món đồ</h2>
             {/* Đoạn giới thiệu ngắn — nội dung đầy đủ ở trang /cau-chuyen. */}
             <p className="mt-4 text-[14.5px] font-light leading-[1.85] text-ink-2">
@@ -475,12 +475,12 @@ export default function HomePage() {
               hoàn toàn bằng tay. Mỗi sản phẩm ghi rõ chất liệu và nơi thu mua; vân sừng tự nhiên khiến không món nào giống món nào.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/cau-chuyen" className="inline-flex h-11 items-center gap-2 rounded-md bg-navy px-6 text-[13.5px] font-medium text-white hover:bg-navy-deep">
+              <Link href="/cau-chuyen" className="inline-flex h-11 items-center gap-2 rounded-md bg-brand px-6 text-[13.5px] font-medium text-white hover:bg-brand-deep">
                 Đọc câu chuyện của chúng tôi <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/cau-chuyen#quy-trinh"
-                className="inline-flex h-11 items-center rounded-md border border-line-3 px-6 text-[13.5px] font-light text-navy hover:border-navy"
+                className="inline-flex h-11 items-center rounded-md border border-line-3 px-6 text-[13.5px] font-light text-navy hover:border-brand"
               >
                 Xem quy trình chế tác
               </Link>
@@ -502,20 +502,20 @@ export default function HomePage() {
       </section>
 
       <section id="cua-hang" className="hsv-container scroll-mt-[140px] pb-14 sm:pb-16">
-        <div className="relative overflow-hidden rounded-2xl bg-navy p-5 text-white sm:p-7 lg:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-brand p-5 text-white sm:p-7 lg:p-8">
           <span className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-champagne/20" />
           <span className="absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-champagne/10 max-md:hidden" />
           <div className="relative grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:items-stretch lg:gap-8">
             <div className="flex flex-col justify-center px-2 py-2 sm:px-4">
-              <p className="text-xs font-bold tracking-[0.24em] text-champagne">GHÉ THĂM XƯỞNG</p>
+              <p className="text-xs font-bold tracking-[0.24em] text-white/80">GHÉ THĂM XƯỞNG</p>
               <p className="mt-2 font-serif text-[26px] leading-tight sm:text-[32px]">Cửa hàng & xưởng chế tác Hồn Sừng Việt</p>
               <div className="mt-4 flex flex-col gap-2.5 text-[14px] text-[#ddd3c6]">
                 <span className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 shrink-0 text-champagne" />
+                  <MapPin className="h-4 w-4 shrink-0 text-white/80" />
                   {STORE_INFO.address}
                 </span>
                 <span className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 shrink-0 text-champagne" />
+                  <Clock className="h-4 w-4 shrink-0 text-white/80" />
                   {STORE_INFO.hours}
                 </span>
               </div>

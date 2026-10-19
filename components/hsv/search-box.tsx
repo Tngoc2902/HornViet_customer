@@ -94,7 +94,7 @@ export function SearchBox({ className, autoFocus }: { className?: string; autoFo
       }}
       className={cn("relative", className)}
     >
-      <div className="flex h-10 items-center border border-line bg-white pl-4 pr-1 focus-within:border-navy">
+      <div className="flex h-10 items-center border border-line bg-white pl-4 pr-1 focus-within:border-brand">
         <input
           value={q}
           onChange={(e) => {
@@ -162,7 +162,7 @@ export function SearchBox({ className, autoFocus }: { className?: string; autoFo
             <button
               type="button"
               onClick={goResults}
-              className="block w-full border-t border-line px-4 py-2.5 text-left text-[13px] font-semibold text-gold hover:bg-surface"
+              className="block w-full border-t border-line px-4 py-2.5 text-left text-[13px] font-semibold text-ink hover:bg-surface"
             >
               Xem tất cả {total} kết quả cho “{q.trim()}” →
             </button>

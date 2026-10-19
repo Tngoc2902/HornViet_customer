@@ -60,7 +60,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <button
                 ref={okRef}
                 onClick={() => close(true)}
-                className={`rounded-lg px-5 py-[11px] text-sm font-semibold text-white ${pending.danger ? "bg-danger" : "bg-navy"}`}
+                className={`rounded-lg px-5 py-[11px] text-sm font-semibold text-white ${pending.danger ? "bg-danger" : "bg-brand"}`}
               >
                 {pending.okLabel ?? "Xác nhận"}
               </button>

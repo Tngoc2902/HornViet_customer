@@ -5,17 +5,17 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 21 43% 25%;
+    --foreground: 0 0% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 21 43% 25%;
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 21 43% 25%;
+    --popover-foreground: 0 0% 10%;
     --primary: 21 43% 25%;
     --primary-foreground: 0 0% 100%;
     --secondary: 33 47% 92%;
-    --secondary-foreground: 21 43% 25%;
+    --secondary-foreground: 0 0% 10%;
     --muted: 33 47% 92%;
-    --muted-foreground: 22 13% 46%;
+    --muted-foreground: 0 0% 42%;
     --accent: 24 33% 63%;
     --accent-foreground: 0 0% 100%;
     --destructive: 4 76% 40%;
@@ -53,7 +53,7 @@
   }
 
   .hsv-input {
-    @apply h-12 w-full rounded-card border border-line bg-white px-3.5 text-[14.5px] text-navy outline-none transition-colors placeholder:text-faint focus:border-navy;
+    @apply h-12 w-full rounded-card border border-line bg-white px-3.5 text-[14.5px] text-navy outline-none transition-colors placeholder:text-faint focus:border-brand;
   }
 
   .hsv-input-error {
@@ -65,11 +65,11 @@
   }
 
   .hsv-btn-primary {
-    @apply hsv-btn h-12 bg-navy text-white hover:bg-navy-deep;
+    @apply hsv-btn h-12 bg-brand text-white hover:bg-brand-deep;
   }
 
   .hsv-btn-outline {
-    @apply hsv-btn h-12 border border-navy text-navy hover:bg-navy hover:text-white;
+    @apply hsv-btn h-12 border border-brand text-ink hover:bg-brand hover:text-white;
   }
 
   .hsv-btn-gold {

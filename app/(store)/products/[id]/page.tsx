@@ -27,7 +27,7 @@ function OptionButton({ label, on, empty, onClick }: { label: string; on: boolea
       aria-pressed={on}
       className={cn(
         "min-h-[42px] min-w-[52px] rounded-lg border px-4 text-sm font-medium transition-colors",
-        on ? "border-navy bg-navy text-white" : "border-line bg-white hover:border-navy/50",
+        on ? "border-brand bg-brand text-white" : "border-line bg-white hover:border-brand/50",
         !on && empty && "text-line-3 opacity-55",
         empty && "line-through"
       )}
@@ -220,7 +220,7 @@ export default function ProductDetailPage() {
                   key={i}
                   onClick={() => setGal(i)}
                   aria-label={`Ảnh ${i + 1}`}
-                  className={cn("w-[68px] shrink-0 rounded-xl border-2 p-0.5 sm:w-full", gal === i ? "border-navy" : "border-transparent hover:border-line-3")}
+                  className={cn("w-[68px] shrink-0 rounded-xl border-2 p-0.5 sm:w-full", gal === i ? "border-brand" : "border-transparent hover:border-line-3")}
                 >
                   <ProductImage src={src} seed={product.id + i} width={180} className="aspect-square w-full rounded-lg" />
                 </button>
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
             {product.material?.name && (
               <>
                 <span className="text-line-3">|</span>
-                <Link href={`/products?mat=${product.material.id}`} className="text-gold-dark hover:underline">
+                <Link href={`/products?mat=${product.material.id}`} className="text-ink underline underline-offset-4 hover:underline">
                   {product.material.name}
                 </Link>
               </>
@@ -263,7 +263,7 @@ export default function ProductDetailPage() {
                     <p className="text-[13.5px] font-medium text-navy">
                       Chọn kích thước{size && <span className="font-normal text-subtle">: {size}</span>}
                     </p>
-                    <Link href="/ho-tro#chon-size" className="shrink-0 text-[12.5px] text-gold-dark underline-offset-2 hover:underline">
+                    <Link href="/ho-tro#chon-size" className="shrink-0 text-[12.5px] text-ink underline-offset-2 hover:underline">
                       Hướng dẫn chọn size
                     </Link>
                   </div>
@@ -334,7 +334,7 @@ export default function ProductDetailPage() {
             disabled={!canAdd}
             className={cn(
               "mt-4 flex h-[54px] w-full flex-col items-center justify-center rounded-md transition-colors",
-              canAdd ? "bg-navy text-white hover:bg-navy-deep" : "cursor-not-allowed bg-line-2 text-faint"
+              canAdd ? "bg-brand text-white hover:bg-brand-deep" : "cursor-not-allowed bg-line-2 text-faint"
             )}
           >
             <span className="text-[14.5px] font-semibold uppercase tracking-[0.05em]">{buyLabel === "Mua ngay" ? "Đặt mua" : buyLabel}</span>
@@ -351,7 +351,7 @@ export default function ProductDetailPage() {
             href={MAP_DIRECTIONS_URL}
             target="_blank"
             rel="noreferrer"
-            className="mt-4 flex h-12 items-center justify-center gap-2 rounded-md border border-navy text-[13.5px] font-semibold uppercase tracking-[0.04em] text-navy transition-colors hover:bg-navy hover:text-white"
+            className="mt-4 flex h-12 items-center justify-center gap-2 rounded-md border border-brand text-[13.5px] font-semibold uppercase tracking-[0.04em] text-navy transition-colors hover:bg-brand hover:text-white"
           >
             <MapPin className="h-4 w-4" />
             Xem tận tay tại xưởng Thụy Ứng
@@ -369,7 +369,7 @@ export default function ProductDetailPage() {
             ) : (
               <span />
             )}
-            <a href={`tel:${STORE_INFO.hotlineTel}`} className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-navy hover:border-navy">
+            <a href={`tel:${STORE_INFO.hotlineTel}`} className="flex h-10 items-center justify-center gap-1.5 rounded-md border border-line text-navy hover:border-brand">
               <Phone className="h-4 w-4 text-gold" />
               {STORE_INFO.hotline}
             </a>

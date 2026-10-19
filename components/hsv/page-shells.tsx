@@ -62,12 +62,12 @@ export function CheckoutSteps({ current }: { current: number }) {
     <ol className="flex items-center gap-2 text-[12.5px] sm:gap-3 sm:text-[13.5px]">
       {STEPS.map((s, i) => (
         <li key={s} className="flex items-center gap-2 sm:gap-3">
-          {i > 0 && <span className={cn("h-px w-5 sm:w-12", i <= current ? "bg-navy" : "bg-line-3")} />}
+          {i > 0 && <span className={cn("h-px w-5 sm:w-12", i <= current ? "bg-brand" : "bg-line-3")} />}
           <span className={cn("flex items-center gap-2 font-semibold", i <= current ? "text-navy" : "text-faint")}>
             <span
               className={cn(
                 "flex h-6 w-6 items-center justify-center rounded-full text-[11.5px] font-bold",
-                i <= current ? "bg-navy text-white" : "border border-line-3 bg-white text-faint"
+                i <= current ? "bg-brand text-white" : "border border-line-3 bg-white text-faint"
               )}
             >
               {i + 1}
@@ -109,7 +109,7 @@ export function AccountShell({ title, children }: { title: string; children: Rea
           <aside className="overflow-hidden rounded-2xl border border-line bg-white md:sticky md:top-[140px]">
             {session && (
               <div className="flex items-center gap-3 border-b border-line-2 px-5 py-5">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-lg font-bold text-champagne">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-lg font-bold text-white/80">
                   {initialOf(session.name)}
                 </span>
                 <div className="min-w-0">
@@ -131,7 +131,7 @@ export function AccountShell({ title, children }: { title: string; children: Rea
                       on ? "bg-surface-active font-semibold text-navy" : "text-ink-2 hover:bg-surface"
                     )}
                   >
-                    <l.icon className={cn("h-[18px] w-[18px]", on ? "text-gold-dark" : "text-faint")} />
+                    <l.icon className={cn("h-[18px] w-[18px]", on ? "text-ink" : "text-faint")} />
                     {l.label}
                   </Link>
                 );
