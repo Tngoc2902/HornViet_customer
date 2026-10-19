@@ -391,13 +391,13 @@ export default function HomePage() {
 
       {/* Thẻ dịch vụ đè mép dưới banner */}
       <section className="hsv-container relative z-10 -mt-8 sm:-mt-11">
-        <ServicePerks variant="overlap" className="mx-auto max-w-[960px]" />
+        <ServicePerks variant="overlap" className="mx-auto max-w-[960px] 2xl:max-w-[1120px] min-[1800px]:max-w-[1240px]" />
       </section>
 
       {categories.length > 0 && (
         <section className="hsv-container pt-12 sm:pt-14">
           <SectionHeader title="Bạn đang tìm gì hôm nay?" />
-          <div className="mx-auto grid max-w-[1100px] grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 sm:gap-x-6 sm:gap-y-7 lg:grid-cols-6 lg:gap-x-8">
+          <div className="mx-auto grid max-w-[1100px] grid-cols-3 2xl:max-w-[1300px] min-[1800px]:max-w-[1440px] gap-x-3 gap-y-5 sm:grid-cols-4 sm:gap-x-6 sm:gap-y-7 lg:grid-cols-6 lg:gap-x-8">
             {tiles.map((t) => (
               <Link key={t.key} href={t.href} className="group flex flex-col items-center gap-2.5">
                 <ProductImage

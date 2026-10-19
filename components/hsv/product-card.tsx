@@ -73,7 +73,7 @@ export function ProductGrid({
 }) {
   if (error && !items) return <ErrorBox error={error} onRetry={onRetry} />;
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 min-[1800px]:grid-cols-6">
       {items
         ? items.map((p) => <ProductCard key={p.id} product={p} />)
         : Array.from({ length: skeletons }, (_, i) => <ProductCardSkeleton key={i} />)}
@@ -115,7 +115,7 @@ export function ProductCarousel({
 
   if (error && !items) return <ErrorBox error={error} onRetry={onRetry} />;
 
-  const cell = "w-[calc((100%-12px)/2)] shrink-0 snap-start sm:w-[calc((100%-32px)/3)] lg:w-[calc((100%-48px)/4)] xl:w-[calc((100%-64px)/5)]";
+  const cell = "w-[calc((100%-12px)/2)] shrink-0 snap-start sm:w-[calc((100%-32px)/3)] lg:w-[calc((100%-48px)/4)] xl:w-[calc((100%-64px)/5)] min-[1800px]:w-[calc((100%-80px)/6)]";
   const arrow =
     "absolute top-[38%] hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-navy shadow-dropdown hover:bg-surface md:flex";
 
