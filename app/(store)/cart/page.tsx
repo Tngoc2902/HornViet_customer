@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Clock, MapPin, Store, Truck } from "lucide-react";
 import { RequireCustomer } from "@/components/hsv/guards";
 import { CheckoutSteps } from "@/components/hsv/page-shells";
 import { ErrorBox, FieldError, FormAlert, notify, ProductImage, QtyStepper, Radio, Skeleton } from "@/components/hsv/ui";
@@ -13,7 +13,9 @@ import { useApi } from "@/hooks/use-api";
 import { toApiError } from "@/lib/api/http";
 import { orderApi, profileApi, shippingApi } from "@/lib/api/services";
 import { AddressPicker, EMPTY_AREA, type Area } from "@/components/hsv/address-picker";
-import { PaymentMethod, type CartItem } from "@/lib/api/types";
+import { DeliveryMethod, PaymentMethod, type CartItem } from "@/lib/api/types";
+import { MAP_DIRECTIONS_URL } from "@/components/hsv/store-map";
+import { STORE_INFO } from "@/components/hsv/store-ui";
 import { BANK_INFO, formatVND } from "@/lib/hsv/format";
 import { isValidPhone, normalizePhone, type FieldErrors } from "@/lib/hsv/validation";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,17 @@ import { cn } from "@/lib/utils";
 const PAYMENTS: { key: PaymentMethod; label: string; desc: string }[] = [
   { key: PaymentMethod.Cod, label: "Thanh toán khi nhận hàng (COD)", desc: "Trả tiền mặt cho nhân viên giao hàng" },
   { key: PaymentMethod.BankTransfer, label: "Chuyển khoản ngân hàng", desc: "Chuyển khoản trước, cửa hàng xác nhận rồi giao" },
+];
+
+/** Nhận tại cửa hàng: COD nghĩa là trả tiền khi đến lấy hàng. */
+const PICKUP_PAYMENTS: typeof PAYMENTS = [
+  { key: PaymentMethod.Cod, label: "Thanh toán tại cửa hàng", desc: "Trả tiền mặt hoặc chuyển khoản khi đến nhận hàng" },
+  { key: PaymentMethod.BankTransfer, label: "Chuyển khoản trước", desc: "Cửa hàng xác nhận rồi chuẩn bị hàng cho bạn" },
+];
+
+const DELIVERIES: { key: DeliveryMethod; label: string; desc: string; icon: typeof Truck }[] = [
+  { key: DeliveryMethod.Shipping, label: "Giao tận nơi", desc: "Giao Hàng Nhanh, phí tính theo khu vực", icon: Truck },
+  { key: DeliveryMethod.StorePickup, label: "Nhận tại cửa hàng", desc: "Miễn phí · đến lấy khi cửa hàng báo hàng đã sẵn sàng", icon: Store },
 ];
 
 type ShipKey = "receiverName" | "phoneNumber" | "shippingAddress";
@@ -118,6 +131,8 @@ function CartView() {
   const [ship, setShip] = useState({ receiverName: "", phoneNumber: "", shippingAddress: "" });
   const [note, setNote] = useState("");
   const [pay, setPay] = useState<PaymentMethod>(PaymentMethod.Cod);
+  const [delivery, setDelivery] = useState<DeliveryMethod>(DeliveryMethod.Shipping);
+  const pickup = delivery === DeliveryMethod.StorePickup;
   const [errors, setErrors] = useState<FieldErrors<ShipKey>>({});
   const [coErr, setCoErr] = useState("");
   const [placing, setPlacing] = useState(false);
@@ -138,7 +153,7 @@ function CartView() {
   // Tính phí ship mỗi khi đổi khu vực hoặc giỏ hàng (số lượng đổi → cân nặng đổi).
   const cartKey = cart ? `${cart.totalQuantity}-${cart.subTotal}` : "";
   useEffect(() => {
-    if (!shippingOn || !effArea.provinceId || !effArea.wardCode) {
+    if (pickup || !shippingOn || !effArea.provinceId || !effArea.wardCode) {
       setFee(null);
       setFeeErr("");
       return;
@@ -153,7 +168,7 @@ function CartView() {
     return () => {
       cancelled = true;
     };
-  }, [shippingOn, effArea.provinceId, effArea.wardCode, cartKey]);
+  }, [pickup, shippingOn, effArea.provinceId, effArea.wardCode, cartKey]);
 
   if (placing && cart?.items.length === 0) return null;
 
@@ -178,7 +193,50 @@ function CartView() {
     );
   }
 
-  const submit = async () => {
+  const submit = () => (pickup ? submitPickup() : submitShipping());
+
+  const place = async (input: Parameters<typeof orderApi.create>[0], info?: typeof ship) => {
+    setPlacing(true);
+    try {
+      const order = await orderApi.create(input);
+      clearLocal();
+      router.push(`/order-success/${order.id}`);
+    } catch (err) {
+      const api = toApiError(err);
+      const f = api.fieldErrors() as FieldErrors<ShipKey>;
+      if (Object.keys(f).length) {
+        if (info) {
+          setAddrId(null);
+          setShip(info);
+        }
+        setErrors(f);
+      }
+      setCoErr(api.fullMessage);
+      // Thiếu hàng (400) hoặc tồn kho vừa đổi (409) → tải lại giỏ để thấy số còn lại mới nhất.
+      if (api.status === 400 || api.status === 409) void refresh();
+      setPlacing(false);
+    }
+  };
+
+  // Nhận tại cửa hàng: chỉ cần tên + số điện thoại người đến nhận.
+  const submitPickup = async () => {
+    const e: FieldErrors<ShipKey> = {};
+    if (!ship.receiverName.trim()) e.receiverName = "Vui lòng nhập tên người nhận";
+    if (!ship.phoneNumber.trim()) e.phoneNumber = "Vui lòng nhập số điện thoại";
+    else if (!isValidPhone(ship.phoneNumber)) e.phoneNumber = "Số điện thoại không hợp lệ";
+    setErrors(e);
+    setCoErr("");
+    if (Object.keys(e).length) return;
+    await place({
+      receiverName: ship.receiverName.trim(),
+      phoneNumber: normalizePhone(ship.phoneNumber),
+      paymentMethod: pay,
+      deliveryMethod: DeliveryMethod.StorePickup,
+      note: note.trim() || undefined,
+    });
+  };
+
+  const submitShipping = async () => {
     const info = picked
       ? { receiverName: picked.receiverName, phoneNumber: picked.phoneNumber, shippingAddress: (shippingOn && picked.street) || picked.address }
       : ship;
@@ -200,31 +258,18 @@ function CartView() {
     setCoErr(picked && Object.keys(e).length ? "Địa chỉ đã chọn thiếu thông tin, vui lòng chọn địa chỉ khác." : "");
     if (Object.keys(e).length || missingArea) return;
 
-    setPlacing(true);
-    try {
-      const order = await orderApi.create({
+    await place(
+      {
         receiverName: info.receiverName.trim(),
         phoneNumber: normalizePhone(info.phoneNumber),
         shippingAddress: info.shippingAddress.trim(),
         paymentMethod: pay,
+        deliveryMethod: DeliveryMethod.Shipping,
         note: note.trim() || undefined,
         ...(shippingOn ? { toProvinceId: effArea.provinceId!, toWardCode: effArea.wardCode } : {}),
-      });
-      clearLocal();
-      router.push(`/order-success/${order.id}`);
-    } catch (err) {
-      const api = toApiError(err);
-      const f = api.fieldErrors() as FieldErrors<ShipKey>;
-      if (Object.keys(f).length) {
-        setAddrId(null);
-        setShip(info);
-        setErrors(f);
-      }
-      setCoErr(api.fullMessage);
-      // Thiếu hàng (400) hoặc tồn kho vừa đổi (409) → tải lại giỏ để thấy số còn lại mới nhất.
-      if (api.status === 400 || api.status === 409) void refresh();
-      setPlacing(false);
-    }
+      },
+      info
+    );
   };
 
   return (
@@ -243,6 +288,34 @@ function CartView() {
       </div>
 
       <div className="rounded-2xl bg-surface-2 p-5 sm:p-[26px] lg:sticky lg:top-[140px]">
+        <p className="mb-3 text-[15px] font-medium text-navy">Hình thức nhận hàng</p>
+        <div className="mb-5 grid grid-cols-2 gap-2">
+          {DELIVERIES.map(({ key, label, desc, icon: Icon }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                setDelivery(key);
+                setErrors({});
+                setCoErr("");
+              }}
+              aria-pressed={delivery === key}
+              className={cn("flex flex-col gap-1 rounded-card border bg-white px-3.5 py-3 text-left", delivery === key ? "border-brand" : "border-line")}
+            >
+              <span className="flex items-center gap-2 text-[13.5px] font-semibold">
+                <Radio checked={delivery === key} />
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={1.7} />
+                {label}
+              </span>
+              <span className="text-[12px] leading-snug text-muted2">{desc}</span>
+            </button>
+          ))}
+        </div>
+
+        {pickup ? (
+          <PickupInfo ship={ship} setShip={setShip} errors={errors} />
+        ) : (
+          <>
         <p className="mb-3.5 text-[15px] font-medium text-navy">Thông tin giao hàng</p>
         {addresses.error && <ErrorBox error={addresses.error} onRetry={addresses.reload} className="mb-2" />}
         <div className="flex flex-col gap-2">
@@ -314,6 +387,8 @@ function CartView() {
             </Link>
           </div>
         )}
+          </>
+        )}
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -325,7 +400,7 @@ function CartView() {
 
         <p className="mb-3 mt-5 text-[15px] font-medium text-navy">Phương thức thanh toán</p>
         <div className="flex flex-col gap-2">
-          {PAYMENTS.map((m) => (
+          {(pickup ? PICKUP_PAYMENTS : PAYMENTS).map((m) => (
             <button
               key={m.key}
               type="button"
@@ -350,16 +425,23 @@ function CartView() {
           </div>
         )}
 
-        {shippingOn && (
+        {pickup ? (
           <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm">
-            <span className="text-muted2">Phí giao hàng (Giao Hàng Nhanh)</span>
-            <span className="font-semibold">{fee !== null ? formatVND(fee) : feeErr ? "—" : "Chọn khu vực để tính"}</span>
+            <span className="text-muted2">Phí giao hàng</span>
+            <span className="font-semibold">Miễn phí</span>
           </div>
+        ) : (
+          shippingOn && (
+            <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm">
+              <span className="text-muted2">Phí giao hàng (Giao Hàng Nhanh)</span>
+              <span className="font-semibold">{fee !== null ? formatVND(fee) : feeErr ? "—" : "Chọn khu vực để tính"}</span>
+            </div>
+          )
         )}
-        {shippingOn && feeErr && <p className="mt-1 text-[12.5px] text-danger">{feeErr}</p>}
-        <div className={cn("flex items-baseline justify-between pt-4", shippingOn ? "" : "mt-5 border-t border-line")}>
+        {!pickup && shippingOn && feeErr && <p className="mt-1 text-[12.5px] text-danger">{feeErr}</p>}
+        <div className={cn("flex items-baseline justify-between pt-4", pickup || shippingOn ? "" : "mt-5 border-t border-line")}>
           <span className="text-[15px] font-medium text-navy">Tổng thanh toán</span>
-          <span className="text-[22px] font-semibold text-price">{formatVND(cart.subTotal + (fee ?? 0))}</span>
+          <span className="text-[22px] font-semibold text-price">{formatVND(cart.subTotal + (pickup ? 0 : fee ?? 0))}</span>
         </div>
         {!cart.canCheckout && (
           <div className="mt-3">
@@ -376,6 +458,49 @@ function CartView() {
         </button>
       </div>
     </div>
+  );
+}
+
+type ShipInfo = { receiverName: string; phoneNumber: string; shippingAddress: string };
+
+/** Nhận tại cửa hàng: tên + số điện thoại người đến lấy, kèm địa chỉ / giờ mở cửa của cửa hàng. */
+function PickupInfo({ ship, setShip, errors }: { ship: ShipInfo; setShip: (s: ShipInfo) => void; errors: FieldErrors<ShipKey> }) {
+  return (
+    <>
+      <p className="mb-3 text-[15px] font-medium text-navy">Người đến nhận hàng</p>
+      <div className="grid grid-cols-2 gap-2.5">
+        {(
+          [
+            ["receiverName", "Tên người nhận"],
+            ["phoneNumber", "Số điện thoại"],
+          ] as const
+        ).map(([k, label]) => (
+          <div key={k}>
+            <input
+              value={ship[k]}
+              onChange={(e) => setShip({ ...ship, [k]: e.target.value })}
+              placeholder={label}
+              aria-label={label}
+              className={cn("hsv-input h-11 text-sm", errors[k] && "hsv-input-error")}
+            />
+            <FieldError message={errors[k]} />
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 rounded-card border border-line bg-white px-3.5 py-3 text-[13px] leading-relaxed text-ink-2">
+        <p className="font-semibold text-ink">Cửa hàng Hồn Sừng Việt</p>
+        <p className="mt-1 flex items-start gap-1.5">
+          <MapPin className="mt-[3px] h-3.5 w-3.5 shrink-0" /> {STORE_INFO.address}
+        </p>
+        <p className="mt-0.5 flex items-start gap-1.5">
+          <Clock className="mt-[3px] h-3.5 w-3.5 shrink-0" /> {STORE_INFO.hours}
+        </p>
+        <p className="mt-1.5 text-[12.5px] text-muted2">Cửa hàng sẽ báo khi hàng đã sẵn sàng. Khi đến nhận, đọc mã đơn hoặc số điện thoại đặt hàng.</p>
+        <a href={MAP_DIRECTIONS_URL} target="_blank" rel="noreferrer" className="mt-1.5 inline-block text-[12.5px] font-semibold text-ink underline underline-offset-4">
+          Chỉ đường đến cửa hàng →
+        </a>
+      </div>
+    </>
   );
 }
 

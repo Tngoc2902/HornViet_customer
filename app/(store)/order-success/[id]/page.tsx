@@ -10,7 +10,8 @@ import { ErrorBox, Skeleton } from "@/components/hsv/ui";
 import { useApi } from "@/hooks/use-api";
 import { orderApi } from "@/lib/api/services";
 import { PaymentMethod } from "@/lib/api/types";
-import { formatVND, PAYMENT_LABEL } from "@/lib/hsv/format";
+import { formatVND, isPickup, paymentLabel } from "@/lib/hsv/format";
+import { STORE_INFO } from "@/components/hsv/store-ui";
 
 function SuccessView() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +36,9 @@ function SuccessView() {
       </div>
       <h1 className="text-[22px] font-semibold text-navy">Đặt hàng thành công</h1>
       <p className="mt-2.5 text-[14.5px] leading-relaxed text-muted2">
-        Đơn hàng đang ở trạng thái “Chờ xử lý”. Bạn có thể theo dõi hoặc hủy đơn trong mục Đơn hàng của tôi.
+        {isPickup(order)
+          ? "Cửa hàng đang chuẩn bị hàng và sẽ báo khi hàng sẵn sàng để bạn đến nhận. Bạn có thể theo dõi hoặc hủy đơn trong mục Đơn hàng của tôi."
+          : "Đơn hàng đang ở trạng thái “Chờ xử lý”. Bạn có thể theo dõi hoặc hủy đơn trong mục Đơn hàng của tôi."}
       </p>
       <div className="hsv-card my-7 grid grid-cols-2 gap-3.5 p-[22px] text-left">
         <div>
@@ -48,8 +51,15 @@ function SuccessView() {
         </div>
         <div className="col-span-2">
           <p className="text-xs text-subtle">Phương thức</p>
-          <p className="mt-1 text-sm font-semibold">{PAYMENT_LABEL[order.paymentMethod]}</p>
+          <p className="mt-1 text-sm font-semibold">{paymentLabel(order)}</p>
         </div>
+        {isPickup(order) && (
+          <div className="col-span-2">
+            <p className="text-xs text-subtle">Nhận tại cửa hàng</p>
+            <p className="mt-1 text-sm font-semibold">{STORE_INFO.address}</p>
+            <p className="mt-0.5 text-[13px] text-muted2">Mở cửa {STORE_INFO.hours}</p>
+          </div>
+        )}
         {order.paymentMethod === PaymentMethod.BankTransfer && (
           <BankTransferQr amount={order.payableAmount ?? order.totalAmount} content={order.code} className="col-span-2" />
         )}
