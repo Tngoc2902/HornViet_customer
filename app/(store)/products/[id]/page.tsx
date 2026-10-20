@@ -152,6 +152,13 @@ export default function ProductDetailPage() {
   const gallery = [product.mainImage, ...(product.images ?? [])].filter((x, i, a): x is string => !!x && a.indexOf(x) === i);
   const shots = gallery.length ? gallery : [null];
   const main = shots[Math.min(gal, shots.length - 1)];
+  // Sản phẩm có biến thể mang ảnh riêng: chọn biến thể → ảnh lớn chuyển sang ảnh của biến thể, biến thể không có ảnh → ảnh đại diện.
+  // Sản phẩm không dùng ảnh theo biến thể thì giữ nguyên ảnh khách đang xem.
+  const showVariant = (v?: ProductVariant) => {
+    if (!v || !vs.some((x) => x.imageUrl)) return;
+    const idx = v.imageUrl ? gallery.indexOf(v.imageUrl) : -1;
+    setGal(idx >= 0 ? idx : 0);
+  };
 
   const stockTone = !cur || !cur.inStock ? "danger" : cur.isLowStock ? "warn" : "ok";
   const stockLabel = !cur
@@ -278,6 +285,8 @@ export default function ProductDetailPage() {
                           setSelSize(sz);
                           setSelStyle(null);
                           setQty(1);
+                          const ofSize = vs.filter((x) => sizeOf(x) === sz);
+                          showVariant(ofSize.find((x) => x.inStock) ?? ofSize[0]);
                         }}
                       />
                     ))}
@@ -299,6 +308,7 @@ export default function ProductDetailPage() {
                         onClick={() => {
                           setSelStyle(styleOf(v));
                           setQty(1);
+                          showVariant(v);
                         }}
                       />
                     ))}
