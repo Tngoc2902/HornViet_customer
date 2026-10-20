@@ -5,7 +5,7 @@ import { MAP_DIRECTIONS_URL, MAP_EMBED_URL } from "@/components/hsv/store-map";
 import { SectionHeader, STORE_INFO, ZALO_URL } from "@/components/hsv/store-ui";
 
 // Trang Cửa hàng: thông tin ghé thăm, bản đồ, trải nghiệm tại cửa hàng, đường đi.
-// Nội dung mẫu — chỉnh lại theo dịch vụ, giờ mở cửa và ảnh thật của cửa hàng (ảnh hiện tại là ảnh minh họa, xem public/banners/NGUON-ANH.md).
+// Nội dung mẫu — chỉnh lại theo dịch vụ, giờ mở cửa và ảnh thật của cửa hàng (ảnh hiện tại là ảnh minh họa Unsplash, xem public/banners/NGUON-ANH.md).
 
 export const metadata = {
   title: "Cửa hàng – Hồn Sừng Việt",
@@ -32,18 +32,23 @@ const DIRECTIONS = [
   { title: "Gọi trước khi đến", desc: `Gọi ${STORE_INFO.hotline} để cửa hàng chuẩn bị sẵn mẫu bạn quan tâm, nhất là khi đi theo nhóm.` },
 ];
 
+/** Ảnh Unsplash (Unsplash License — dùng thương mại miễn phí), nạp thẳng từ CDN của Unsplash, thu nhỏ theo `w`. */
+const unsplash = (id: string, w: number) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&q=75&w=${w}`;
+
+const HERO_IMAGE = unsplash("1765835065498-5df7ae12bcf2", 1920);
+
 const GALLERY = [
-  { src: "/banners/story-workshop.jpg", alt: "Xưởng chế tác", cls: "sm:col-span-2 sm:row-span-2" },
-  { src: "/banners/banner-craft.jpg", alt: "Đồ thủ công từ sừng", cls: "" },
-  { src: "/banners/banner-bracelet.jpg", alt: "Vòng tay sừng", cls: "" },
-  { src: "/banners/banner-decor.jpg", alt: "Đồ trang trí", cls: "sm:col-span-2" },
+  { src: unsplash("1606077089563-cff5a4f3d3d9", 1200), alt: "Bàn thợ với những phôi đang chế tác", cls: "sm:col-span-2 sm:row-span-2" },
+  { src: unsplash("1774301844178-c9ce96b76d92", 700), alt: "Lược thủ công", cls: "" },
+  { src: unsplash("1496769843785-93aa0be525dc", 700), alt: "Món đồ chạm khắc nhỏ trên tay người thợ", cls: "" },
+  { src: unsplash("1644351291309-f86c0c77ecbe", 1200), alt: "Người thợ chạm khắc", cls: "sm:col-span-2" },
 ];
 
 export default function StorePage() {
   return (
     <div className="animate-hin">
       <PageHero
-        image="/banners/story-workshop.jpg"
+        image={HERO_IMAGE}
         crumb="Cửa hàng"
         kicker="CỬA HÀNG HỒN SỪNG VIỆT"
         title="Ghé thăm cửa hàng & xưởng chế tác"
@@ -128,6 +133,7 @@ export default function StorePage() {
             </div>
           ))}
         </div>
+        <p className="mt-3 text-center text-[11.5px] text-faint">Ảnh minh họa</p>
       </section>
 
       {/* Đường đến cửa hàng */}
