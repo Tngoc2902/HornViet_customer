@@ -1,4 +1,5 @@
-import { Clock, Gift, Hammer, Hand, Mail, MapPin, MessageCircle, Navigation, Phone, Sparkles, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { Clock, Gift, Hammer, Hand, Mail, MapPin, MessageCircle, Navigation, PackageCheck, Phone, Sparkles, type LucideIcon } from "lucide-react";
 import { PageCta, PageHero } from "@/components/hsv/content-blocks";
 import { MAP_DIRECTIONS_URL, MAP_EMBED_URL } from "@/components/hsv/store-map";
 import { SectionHeader, STORE_INFO, ZALO_URL } from "@/components/hsv/store-ui";
@@ -141,6 +142,13 @@ export default function StorePage() {
             </li>
           ))}
         </ol>
+        <p className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[13.5px] text-ink-2">
+          <PackageCheck className="h-4 w-4" />
+          Đặt online và chọn <b>Nhận tại cửa hàng</b> ở bước thanh toán — miễn phí giao hàng, cửa hàng báo khi hàng sẵn sàng.
+          <Link href="/products" className="font-semibold underline underline-offset-4">
+            Chọn sản phẩm →
+          </Link>
+        </p>
       </section>
 
       <PageCta title="Chưa tiện ghé cửa hàng?" sub={`Đặt online, giao tận nơi — miễn phí giao hàng cho đơn từ ${STORE_INFO.freeShipFrom}.`} />

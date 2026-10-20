@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Package } from "lucide-react";
+import { Package, Store } from "lucide-react";
 import { useConfirm } from "@/components/hsv/confirm-provider";
 import { RequireCustomer } from "@/components/hsv/guards";
 import { AccountShell } from "@/components/hsv/page-shells";
@@ -16,7 +16,9 @@ import { isShipmentStale, SHIPMENT_STATUS, shipmentLabel, TONE_STYLE } from "@/l
 import { ShipmentProgress } from "@/components/hsv/shipment-progress";
 import { OrderStatus, PaymentMethod, type OrderListItem } from "@/lib/api/types";
 import { BankTransferQr } from "@/components/hsv/bank-transfer-qr";
-import { formatDateTime, formatVND, ORDER_TABS, parseOrderTab, PAYMENT_LABEL } from "@/lib/hsv/format";
+import { DELIVERY_LABEL, formatDateTime, formatVND, isPickup, ORDER_TABS, parseOrderTab, paymentLabel } from "@/lib/hsv/format";
+import { STORE_INFO } from "@/components/hsv/store-ui";
+import { MAP_DIRECTIONS_URL } from "@/components/hsv/store-map";
 
 const PAGE_SIZE = 8;
 
@@ -68,8 +70,19 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
   return (
     <div className="mt-[18px] border-t border-line-2 pt-[18px]">
       <div className="mb-[18px]">
-        <OrderProgress status={data.status} />
+        <OrderProgress status={data.status} deliveryMethod={data.deliveryMethod} />
       </div>
+      {isPickup(data) && data.status === OrderStatus.ReadyForPickup && (
+        <div className="mb-[18px] border border-brand px-4 py-3 text-[13.5px] leading-relaxed">
+          <p className="font-semibold">Hàng đã sẵn sàng — mời bạn đến cửa hàng nhận</p>
+          <p className="mt-0.5 text-ink-2">
+            {STORE_INFO.address} · {STORE_INFO.hours}. Đọc mã đơn <b>{data.code}</b> hoặc số điện thoại đặt hàng khi đến.
+          </p>
+          <a href={MAP_DIRECTIONS_URL} target="_blank" rel="noreferrer" className="mt-1 inline-block text-[13px] font-semibold underline underline-offset-4">
+            Chỉ đường đến cửa hàng →
+          </a>
+        </div>
+      )}
       <div className="flex flex-col gap-2.5">
         {data.items.map((i) => (
           <div key={i.id} className="flex items-center gap-3">
@@ -85,7 +98,7 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
       </div>
       <div className="mt-[18px] grid gap-4 rounded-card bg-surface p-4 text-[13.5px] sm:grid-cols-2">
         <div>
-          <p className="text-xs text-subtle">Người nhận</p>
+          <p className="text-xs text-subtle">{isPickup(data) ? "Nhận tại cửa hàng · Người nhận" : "Người nhận"}</p>
           <p className="mt-[3px] font-semibold">
             {data.receiverName} · {data.phoneNumber}
           </p>
@@ -94,7 +107,7 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
         </div>
         <div>
           <p className="text-xs text-subtle">Thanh toán</p>
-          <p className="mt-[3px] font-semibold">{PAYMENT_LABEL[data.paymentMethod]}</p>
+          <p className="mt-[3px] font-semibold">{paymentLabel(data)}</p>
           {!!data.shippingFee && <p className="mt-0.5 text-ink-2">Tiền hàng {formatVND(data.totalAmount)} · Phí giao {formatVND(data.shippingFee)}</p>}
           <p className="mt-0.5 text-ink-2">Tổng {formatVND(data.payableAmount ?? data.totalAmount)}</p>
           {data.lastStatusChangeTime && <p className="mt-0.5 text-muted2">Cập nhật lúc {formatDateTime(data.lastStatusChangeTime)}</p>}
@@ -143,7 +156,11 @@ function OrderDetail({ order, onChanged }: { order: OrderListItem; onChanged: ()
       )}
       {data.status !== OrderStatus.Canceled && data.status !== OrderStatus.Completed && (
         <div className="mt-4 flex items-center justify-end gap-3">
-          {!data.canCancel && <span className="text-[12.5px] text-faint">Đơn đang giao, không thể hủy</span>}
+          {!data.canCancel && (
+            <span className="text-[12.5px] text-faint">
+              {isPickup(data) ? "Hàng đã được chuẩn bị — liên hệ cửa hàng nếu muốn hủy" : "Đơn đang giao, không thể hủy"}
+            </span>
+          )}
           {data.canCancel && (
             <button
               onClick={onCancel}
@@ -232,13 +249,14 @@ function OrdersView() {
             return (
               <div key={o.id} className="hsv-card px-6 py-[22px]">
                 <div className="flex items-center gap-[18px]">
-                  <div className="flex h-[60px] w-[52px] shrink-0 items-center justify-center rounded-card bg-surface text-ink">
-                    <Package className="h-6 w-6" />
+                  <div className="flex h-[60px] w-[52px] shrink-0 items-center justify-center rounded-card border border-line-2 text-ink">
+                    {isPickup(o) ? <Store className="h-6 w-6" strokeWidth={1.6} /> : <Package className="h-6 w-6" strokeWidth={1.6} />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2.5">
                       <span className="text-[15px] font-bold">{o.code}</span>
                       <StatusBadge status={o.status} />
+                      {isPickup(o) && <span className="text-[12px] font-medium text-muted2">{DELIVERY_LABEL[o.deliveryMethod!]}</span>}
                     </div>
                     <p className="mt-[5px] truncate text-sm text-ink-2">Người nhận: {o.receiverName}</p>
                     <p className="mt-[3px] text-[12.5px] text-faint">
