@@ -12,6 +12,7 @@ import {
   Home,
   Instagram,
   Landmark,
+  Layers,
   LayoutGrid,
   Mail,
   Menu,
@@ -236,7 +237,7 @@ export function StoreHeader() {
               )}
             </div>
           )}
-          <button onClick={goCart} aria-label="Giỏ hàng" className="max-md:hidden">
+          <button onClick={goCart} aria-label="Giỏ hàng">
             <HeaderIcon label="Giỏ hàng" badge={cartCount}>
               <ShoppingBag className="h-[21px] w-[21px]" strokeWidth={1.6} />
             </HeaderIcon>
@@ -624,12 +625,12 @@ export function FloatingContact() {
 /** Thanh điều hướng cố định ở đáy màn hình điện thoại. */
 export function MobileBottomNav() {
   const { session } = useAuth();
-  const { count } = useCart();
   const pathname = usePathname();
-  const items = [
+  // Giỏ hàng nằm ở góc phải header (mọi kích thước) nên thanh dưới không lặp lại.
+  const items: { href: string; label: string; icon: typeof Home; on: boolean; badge?: number }[] = [
     { href: "/", label: "Trang chủ", icon: Home, on: pathname === "/" },
     { href: "/products", label: "Sản phẩm", icon: LayoutGrid, on: pathname.startsWith("/products") },
-    { href: session ? "/cart" : "/login?returnUrl=/cart", label: "Giỏ hàng", icon: ShoppingBag, on: pathname === "/cart", badge: count },
+    { href: "/bo-suu-tap", label: "Bộ sưu tập", icon: Layers, on: pathname.startsWith("/bo-suu-tap") },
     { href: session ? "/account/profile" : `/login?returnUrl=${encodeURIComponent(pathname)}`, label: "Tài khoản", icon: UserRound, on: pathname.startsWith("/account") },
   ];
   return (
