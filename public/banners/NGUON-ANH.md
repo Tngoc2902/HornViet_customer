@@ -22,3 +22,16 @@ Mỗi ảnh xem lại tại `https://unsplash.com/photos/<mã>` (mã là phần 
 | Nhẫn | photo-1589207212797-cfd546dea0fe, photo-1694708864523-af6313925bad, photo-1780427827602-d69705948dc7, photo-1565619601015-e57cced38f39 |
 
 Ảnh sản phẩm được upload qua API vào `HornViet.Api/wwwroot/uploads/202610/` (thư mục này không đưa lên git).
+
+## Trang Cửa hàng (/cua-hang)
+
+Không lưu file trong `public/` mà nạp thẳng từ CDN của Unsplash (`https://images.unsplash.com/photo-<mã>`), cùng Unsplash License. Đã chọn ảnh không có logo / chữ của thương hiệu khác.
+Vẫn là ảnh **minh họa** (trang có ghi "Ảnh minh họa") — thay bằng ảnh tự chụp ở cửa hàng / xưởng khi có.
+
+| Dùng cho | Mã ảnh Unsplash |
+|---|---|
+| Banner đầu trang (kệ gỗ trưng bày) | photo-1765835065498-5df7ae12bcf2 |
+| Không gian — bàn thợ, phôi đang chế tác (ảnh lớn) | photo-1606077089563-cff5a4f3d3d9 |
+| Không gian — lược thủ công | photo-1774301844178-c9ce96b76d92 |
+| Không gian — món chạm khắc trên tay thợ | photo-1496769843785-93aa0be525dc |
+| Không gian — thợ chạm khắc (ảnh ngang) | photo-1644351291309-f86c0c77ecbe |
