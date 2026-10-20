@@ -133,7 +133,6 @@ export default function StorePage() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-center text-[11.5px] text-faint">Ảnh minh họa</p>
       </section>
 
       {/* Đường đến cửa hàng */}

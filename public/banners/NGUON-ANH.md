@@ -26,7 +26,7 @@ Mỗi ảnh xem lại tại `https://unsplash.com/photos/<mã>` (mã là phần 
 ## Trang Cửa hàng (/cua-hang)
 
 Không lưu file trong `public/` mà nạp thẳng từ CDN của Unsplash (`https://images.unsplash.com/photo-<mã>`), cùng Unsplash License. Đã chọn ảnh không có logo / chữ của thương hiệu khác.
-Vẫn là ảnh **minh họa** (trang có ghi "Ảnh minh họa") — thay bằng ảnh tự chụp ở cửa hàng / xưởng khi có.
+Hiển thị như ảnh của cửa hàng (không ghi chú trên trang) — khi có ảnh tự chụp ở cửa hàng / xưởng thì thay mã ảnh trong app/(store)/cua-hang/page.tsx.
 
 | Dùng cho | Mã ảnh Unsplash |
 |---|---|
