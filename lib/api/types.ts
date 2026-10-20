@@ -128,6 +128,8 @@ export type ProductVariant = {
   size: string | null;
   style: string | null;
   displayName: string;
+  /** Ảnh hiện khi khách chọn biến thể này; null = ảnh đại diện. Backend cũ chưa trả. */
+  imageUrl?: string | null;
   stockQuantity: number;
   inStock: boolean;
   isLowStock: boolean;
