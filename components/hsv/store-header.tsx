@@ -200,13 +200,13 @@ export function StoreHeader() {
             <HeaderIcon label="Tìm kiếm">{searchOpen ? <X className="h-[21px] w-[21px]" strokeWidth={1.6} /> : <Search className="h-[21px] w-[21px]" strokeWidth={1.6} />}</HeaderIcon>
           </button>
           {!user ? (
-            <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="max-sm:hidden">
+            <Link href={`/login?returnUrl=${encodeURIComponent(pathname)}`} className="max-md:hidden">
               <HeaderIcon label="Tài khoản">
                 <UserRound className="h-[21px] w-[21px]" strokeWidth={1.6} />
               </HeaderIcon>
             </Link>
           ) : (
-            <div className="relative max-sm:hidden" ref={menuRef}>
+            <div className="relative max-md:hidden" ref={menuRef}>
               <button onClick={() => setMenuOpen((v) => !v)} aria-haspopup="menu" aria-expanded={menuOpen}>
                 <HeaderIcon label={`Tài khoản ${lastName(user.name)}`}>
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{initialOf(user.name)}</span>
@@ -236,7 +236,7 @@ export function StoreHeader() {
               )}
             </div>
           )}
-          <button onClick={goCart} aria-label="Giỏ hàng">
+          <button onClick={goCart} aria-label="Giỏ hàng" className="max-md:hidden">
             <HeaderIcon label="Giỏ hàng" badge={cartCount}>
               <ShoppingBag className="h-[21px] w-[21px]" strokeWidth={1.6} />
             </HeaderIcon>
@@ -639,7 +639,7 @@ export function MobileBottomNav() {
           <span className="relative">
             <Icon className="h-[21px] w-[21px]" strokeWidth={on ? 2 : 1.6} />
             {!!badge && (
-              <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9.5px] font-bold text-white">{badge}</span>
+              <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[9.5px] font-bold text-white">{badge}</span>
             )}
           </span>
           {label}
