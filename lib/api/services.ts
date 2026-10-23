@@ -6,6 +6,9 @@ import type {
   Cart,
   Category,
   CategoryInput,
+  ChatAccess,
+  ChatConversation,
+  ChatSendResult,
   Collection,
   CreateOrderInput,
   CreateUserInput,
@@ -85,6 +88,16 @@ export const materialApi = {
   create: (input: MaterialInput) => http.post<Material>(app("Material/Create"), input),
   update: (input: MaterialInput) => http.put<Material>(app("Material/Update"), input),
   delete: (id: number) => http.delete<null>(app("Material/Delete"), { id }),
+};
+
+/** Ô chat (bot + chat với nhân viên). Khóa khách luôn gửi trong thân request, không đặt trên URL. */
+export const chatApi = {
+  /** Hội thoại đang mở (null = chưa có). */
+  get: (access: ChatAccess) => http.post<ChatConversation | null>(app("Chat/Get"), access),
+  send: (access: ChatAccess, text: string) => http.post<ChatSendResult>(app("Chat/Send"), { ...access, text }),
+  requestStaff: (access: ChatAccess) => http.post<ChatConversation>(app("Chat/RequestStaff"), access),
+  cancelStaff: (access: ChatAccess) => http.post<ChatConversation>(app("Chat/CancelStaff"), access),
+  close: (access: ChatAccess) => http.post<null>(app("Chat/Close"), access),
 };
 
 export const collectionApi = {
