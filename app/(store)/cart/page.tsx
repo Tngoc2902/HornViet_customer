@@ -125,6 +125,7 @@ function CartView() {
   const [area, setArea] = useState<Area>(EMPTY_AREA);
   const [areaErr, setAreaErr] = useState("");
   const [fee, setFee] = useState<number | null>(null);
+  const [freeByServer, setFreeByServer] = useState(false);
   const [feeErr, setFeeErr] = useState("");
 
   const [addrId, setAddrId] = useState<number | null | undefined>(undefined);
@@ -163,7 +164,11 @@ function CartView() {
     setFeeErr("");
     shippingApi
       .calculateFee(effArea.provinceId, effArea.wardCode)
-      .then((r) => !cancelled && setFee(r.fee))
+      .then((r) => {
+        if (cancelled) return;
+        setFee(r.fee);
+        setFreeByServer(r.freeShipping);
+      })
       .catch((e) => !cancelled && setFeeErr(toApiError(e).message));
     return () => {
       cancelled = true;
@@ -432,10 +437,29 @@ function CartView() {
           </div>
         ) : (
           shippingOn && (
-            <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm">
-              <span className="text-muted2">Phí giao hàng (Giao Hàng Nhanh)</span>
-              <span className="font-semibold">{fee !== null ? formatVND(fee) : feeErr ? "—" : "Chọn khu vực để tính"}</span>
-            </div>
+            <>
+              <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm">
+                <span className="text-muted2">Phí giao hàng (Giao Hàng Nhanh)</span>
+                <span className="font-semibold">
+                  {fee !== null
+                    ? fee === 0 && freeByServer
+                      ? "Miễn phí"
+                      : formatVND(fee)
+                    : feeErr
+                      ? "—"
+                      : cart.subTotal >= STORE_INFO.freeShipFromAmount
+                        ? "Miễn phí"
+                        : "Chọn khu vực để tính"}
+                </span>
+              </div>
+              {cart.subTotal >= STORE_INFO.freeShipFromAmount ? (
+                <p className="mt-1 text-[12.5px] text-ink">Đơn từ {STORE_INFO.freeShipFrom} được miễn phí giao hàng.</p>
+              ) : (
+                <p className="mt-1 text-[12.5px] text-muted2">
+                  Mua thêm {formatVND(STORE_INFO.freeShipFromAmount - cart.subTotal)} để được miễn phí giao hàng.
+                </p>
+              )}
+            </>
           )
         )}
         {!pickup && shippingOn && feeErr && <p className="mt-1 text-[12.5px] text-danger">{feeErr}</p>}

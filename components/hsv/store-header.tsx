@@ -600,8 +600,9 @@ export function StoreFooter() {
 /** Hai nút tròn nổi góc phải: chat Zalo và gọi hotline (như PNJ). */
 export function FloatingContact() {
   return (
-    // Nằm phía trên nút mở ô chat (ChatWidget) ở góc phải.
-    <div className="fixed bottom-[152px] right-4 z-30 flex flex-col gap-3 md:bottom-[100px] md:right-6">
+    // Máy tính: nằm phía trên nút mở ô chat (ChatWidget). Điện thoại: ẩn để góc màn hình chỉ còn một nút chat —
+    // Zalo và gọi điện nằm ở đầu khung chat.
+    <div className="fixed bottom-[100px] right-6 z-30 hidden flex-col gap-3 md:flex">
       <a
         href={ZALO_URL}
         target="_blank"

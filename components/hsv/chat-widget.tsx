@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Headset, Loader2, MessageCircle, Sparkles, X } from "lucide-react";
+import { ArrowUp, Headset, Loader2, MessageCircle, Phone, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useWatchChat } from "@/contexts/realtime-context";
+import { STORE_INFO, ZALO_URL } from "@/components/hsv/store-ui";
 import { useRealtime } from "@/hooks/use-realtime";
 import { imageUrl, toApiError } from "@/lib/api/http";
 import { chatApi } from "@/lib/api/services";
@@ -178,7 +179,7 @@ export function ChatWidget() {
         ? `${staffName ?? "Nhân viên"} đang hỗ trợ bạn`
         : status === ChatStatus.Closed
           ? "Cuộc trò chuyện đã kết thúc"
-          : "Trợ lý tự động · trả lời ngay";
+          : "Trợ lý tự động";
   const botMode = status === ChatStatus.Bot;
   const lastBot = [...messages].reverse().find((m) => m.sender !== ChatSender.Customer);
 
@@ -214,11 +215,23 @@ export function ChatWidget() {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[14.5px] font-semibold text-ink">Hồn Sừng Việt</p>
-              <p className="flex items-center gap-1.5 text-[12px] text-subtle">
-                {status === ChatStatus.WithStaff && <span className="h-1.5 w-1.5 rounded-full bg-ok-solid" />}
+              <p className="truncate text-[12px] text-subtle">
+                {status === ChatStatus.WithStaff && <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-ok-solid align-middle" />}
                 {subtitle}
               </p>
             </div>
+            <a
+              href={ZALO_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Chat Zalo với cửa hàng"
+              className="flex h-9 items-center justify-center px-1.5 text-[12px] font-extrabold text-[#0068ff] hover:bg-surface-2"
+            >
+              Zalo
+            </a>
+            <a href={`tel:${STORE_INFO.hotlineTel}`} aria-label={`Gọi ${STORE_INFO.hotline}`} className="flex h-9 w-9 items-center justify-center text-ink hover:bg-surface-2">
+              <Phone className="h-[18px] w-[18px]" />
+            </a>
             <button type="button" onClick={() => setOpen(false)} aria-label="Đóng ô chat" className="flex h-9 w-9 items-center justify-center text-ink hover:bg-surface-2">
               <X className="h-5 w-5" />
             </button>
