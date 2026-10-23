@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { ChatWidget } from "@/components/hsv/chat-widget";
 import { FloatingContact, MobileBottomNav, StoreFooter, StoreHeader } from "@/components/hsv/store-header";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       </main>
       <StoreFooter />
       <FloatingContact />
+      <ChatWidget />
       <MobileBottomNav />
     </div>
   );

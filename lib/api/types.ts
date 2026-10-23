@@ -368,3 +368,53 @@ export type VariantCost = {
 
 export type StockReceiptInput = { productVariantId: number; quantity: number; unitCost: number; note?: string };
 export type StockReceiptUpdateInput = { id: number; quantity: number; unitCost: number; note?: string };
+
+// ---------- Chatbot / chat với nhân viên
+
+export const ChatSender = { Customer: 0, Bot: 1, Staff: 2, System: 3 } as const;
+export type ChatSender = (typeof ChatSender)[keyof typeof ChatSender];
+
+/** Bot: bot trả lời; WaitingStaff: đã bấm "Chat với nhân viên"; WithStaff: nhân viên đang trả lời; Closed: đã kết thúc. */
+export const ChatStatus = { Bot: 0, WaitingStaff: 1, WithStaff: 2, Closed: 3 } as const;
+export type ChatStatus = (typeof ChatStatus)[keyof typeof ChatStatus];
+
+export type ChatProductCard = { id: number; name: string; mainImage: string; price: number; inStock: boolean; variants: string[] | null };
+export type ChatOrderCard = {
+  id: number;
+  code: string;
+  status: OrderStatus;
+  deliveryMethod: DeliveryMethod;
+  payableAmount: number;
+  itemCount: number;
+  creationTime: string;
+};
+
+export type ChatMessage = {
+  id: number;
+  sender: ChatSender;
+  content: string;
+  staffName: string | null;
+  creationTime: string;
+  products: ChatProductCard[] | null;
+  orders: ChatOrderCard[] | null;
+  links: { label: string; url: string }[] | null;
+  quickReplies: string[] | null;
+  /** Bot gợi ý chuyển sang nhân viên. */
+  suggestStaff: boolean;
+  /** Câu trả lời do trợ lý AI soạn (câu bot tự huấn luyện chưa hiểu). */
+  ai: boolean;
+};
+
+export type ChatConversation = {
+  id: number;
+  status: ChatStatus;
+  /** Khách vãng lai: khóa để mở lại hội thoại (lưu ở trình duyệt). */
+  guestKey: string | null;
+  staffOnline: boolean;
+  staffName: string | null;
+  messages: ChatMessage[];
+  creationTime: string;
+};
+
+export type ChatAccess = { conversationId?: number; guestKey?: string };
+export type ChatSendResult = { conversationId: number; status: ChatStatus; guestKey: string | null; messages: ChatMessage[] };
