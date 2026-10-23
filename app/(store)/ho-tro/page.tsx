@@ -137,8 +137,8 @@ const SECTIONS: Section[] = [
       <Bullets
         items={[
           <>
-            <span className="font-normal text-navy">Miễn phí giao hàng</span> toàn quốc cho đơn từ {STORE_INFO.freeShipFrom}; đơn dưới mức này phí giao hàng
-            được báo khi xác nhận đơn.
+            <span className="font-normal text-navy">Miễn phí giao hàng</span> toàn quốc cho đơn có tiền hàng từ {STORE_INFO.freeShipFrom}; đơn dưới mức này phí giao
+            hàng tính theo địa chỉ và hiện ngay ở giỏ hàng trước khi đặt.
           </>,
           "Nội thành Hà Nội: 1 – 2 ngày làm việc. Các tỉnh, thành khác: 2 – 5 ngày làm việc.",
           "Cửa hàng gọi điện xác nhận trước khi giao; đơn chuyển khoản được giao sau khi nhận đủ tiền.",

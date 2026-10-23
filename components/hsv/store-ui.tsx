@@ -13,6 +13,8 @@ export const STORE_INFO = {
   /** Địa điểm hiện trên Google Maps (địa chỉ hoặc tên địa điểm như khi tìm trên Google Maps). */
   mapQuery: "Làng nghề sừng Thụy Ứng, Thường Tín, Hà Nội",
   freeShipFrom: "500.000₫",
+  /** Tiền hàng được miễn phí giao hàng — khớp AppConsts.FreeShippingThreshold ở backend (backend mới là nơi quyết định phí). */
+  freeShipFromAmount: 500_000,
   /** Mạng xã hội ở footer — điền link thật; để trống thì chỉ hiện biểu tượng, không bấm được. */
   socials: { 
     facebook: "https://www.facebook.com/trinh.khanh.ngoc.361444", 

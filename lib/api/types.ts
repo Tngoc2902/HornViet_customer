@@ -215,7 +215,8 @@ export type CreateOrderInput = {
 
 export type ShippingProvince = { id: number; name: string };
 export type ShippingWard = { code: string; provinceId: number; name: string };
-export type ShippingFeeResult = { isEnabled: boolean; fee: number };
+/** freeShipping: tiền hàng đạt freeShippingThreshold → miễn phí giao hàng (fee = 0). */
+export type ShippingFeeResult = { isEnabled: boolean; fee: number; freeShipping: boolean; freeShippingThreshold: number };
 
 /** Tiến trình giao hàng của một đơn (GET Shipment/Get). */
 export type Shipment = {
