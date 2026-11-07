@@ -54,6 +54,7 @@ const STORY_LINKS = [
   { href: "/cau-chuyen", label: "Câu chuyện Hồn Sừng Việt", icon: BookOpen },
   { href: "/nguon-goc", label: "Nguồn gốc nguyên liệu", icon: Gem },
   { href: "/cua-hang", label: "Cửa hàng", icon: Store },
+  { href: "/bo-suu-tap", label: "Bộ sưu tập", icon: LayoutGrid },
 ];
 
 function HeaderIcon({ label, children, badge }: { label: string; children: React.ReactNode; badge?: number }) {
