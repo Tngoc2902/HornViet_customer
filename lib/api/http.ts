@@ -98,15 +98,14 @@ function buildQuery(params?: Params) {
   return s ? `?${s}` : "";
 }
 
-type RequestOptions = { params?: Params; body?: unknown; form?: FormData };
+type RequestOptions = { params?: Params; body?: unknown };
 
 async function request<T>(method: string, path: string, opts: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json" };
   const token = memoryToken ?? tokenStore.get();
   if (token) headers.Authorization = `Bearer ${token}`;
   let body: BodyInit | undefined;
-  if (opts.form) body = opts.form;
-  else if (opts.body !== undefined) {
+  if (opts.body !== undefined) {
     headers["Content-Type"] = "application/json";
     body = JSON.stringify(opts.body);
   }
@@ -141,11 +140,10 @@ export const http = {
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, { body }),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, { body }),
   delete: <T>(path: string, params?: Params) => request<T>("DELETE", path, { params }),
-  upload: <T>(path: string, form: FormData) => request<T>("POST", path, { form }),
 };
 
 /** Ảnh trả về dạng tương đối /uploads/... → ghép với base URL của backend. */
-export function assetUrl(path?: string | null) {
+function assetUrl(path?: string | null) {
   if (!path) return undefined;
   if (/^(https?:|data:|blob:)/.test(path)) return path;
   return API_BASE_URL + (path.startsWith("/") ? path : `/${path}`);

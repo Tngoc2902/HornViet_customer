@@ -1,7 +1,7 @@
 export type Tones = [string, string, string];
 
 /** Bảng màu sừng dùng cho ảnh giữ chỗ khi sản phẩm chưa có ảnh hoặc ảnh lỗi. */
-export const PLACEHOLDER_TONES: Tones[] = [
+const PLACEHOLDER_TONES: Tones[] = [
   ["#d9c6a5", "#8b7254", "#4a3c2d"],
   ["#333333", "#6e5d4a", "#5B3724"],
   ["#e6d8bf", "#b89c78", "#7d6448"],

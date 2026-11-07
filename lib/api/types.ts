@@ -15,9 +15,6 @@ export type DeliveryMethod = (typeof DeliveryMethod)[keyof typeof DeliveryMethod
 export const ProductSorting = { Newest: 0, PriceAsc: 1, PriceDesc: 2, NameAsc: 3, BestSelling: 4, Featured: 5 } as const;
 export type ProductSorting = (typeof ProductSorting)[keyof typeof ProductSorting];
 
-export const RevenueGroupBy = { Day: 0, Month: 1 } as const;
-export type RevenueGroupBy = (typeof RevenueGroupBy)[keyof typeof RevenueGroupBy];
-
 export type RoleName = "Admin" | "Staff" | "Customer";
 
 export type PagedResult<T> = { totalCount: number; items: T[] };
@@ -76,10 +73,8 @@ export type AddressInput = {
 
 // ---------- Catalog
 export type Category = { id: number; name: string; description: string | null; productCount: number; creationTime: string };
-export type CategoryInput = { id?: number; name: string; description?: string | null };
 
 export type Material = { id: number; name: string; origin: string | null; description: string | null; image?: string | null };
-export type MaterialInput = { id?: number; name: string; origin?: string | null; description?: string | null; image?: string | null };
 
 export type ProductListItem = {
   id: number;
@@ -149,35 +144,6 @@ export type ProductDetail = {
   variants: ProductVariant[];
   totalStock: number;
   creationTime: string;
-};
-
-export type ProductAdminListItem = {
-  id: number;
-  name: string;
-  mainImage: string | null;
-  price: number;
-  categoryName: string;
-  materialName: string;
-  variantCount: number;
-  totalStock: number;
-  isLowStock: boolean;
-  isActive: boolean;
-  creationTime: string;
-};
-
-export type ProductAdminQuery = PageInput & { keyword?: string; categoryId?: number; isActive?: boolean; lowStockOnly?: boolean };
-
-export type ProductInput = {
-  id?: number;
-  categoryId: number;
-  materialId: number;
-  name: string;
-  price: number;
-  mainImage: string;
-  description?: string | null;
-  isActive: boolean;
-  variants: { id?: number; size?: string | null; style?: string | null; stockQuantity: number }[];
-  images: string[];
 };
 
 // ---------- Cart
@@ -275,100 +241,6 @@ export type Order = Omit<OrderListItem, "items"> & {
   ghnExpectedDeliveryTime?: string | null;
   ghnStatusTime?: string | null;
 };
-
-export type OrderQuery = PageInput & { status?: OrderStatus; deliveryMethod?: DeliveryMethod; keyword?: string; fromDate?: string; toDate?: string };
-
-// ---------- Users (Admin)
-export type User = {
-  id: number;
-  userName: string;
-  name: string;
-  emailAddress: string;
-  phoneNumber: string | null;
-  isActive: boolean;
-  creationTime: string;
-  roleNames: RoleName[];
-};
-
-export type Role = { id: number; name: RoleName; displayName: string };
-
-export type UserQuery = PageInput & { keyword?: string; roleName?: RoleName; isActive?: boolean };
-
-export type CreateUserInput = {
-  name: string;
-  emailAddress: string;
-  userName?: string;
-  phoneNumber?: string;
-  password: string;
-  roleNames: RoleName[];
-};
-
-// ---------- Statistics
-export type LowStockVariant = { productId: number; productName: string; variantId: number; variantName: string; stockQuantity: number };
-
-export type Dashboard = {
-  pendingOrderCount: number;
-  shippingOrderCount: number;
-  todayOrderCount: number;
-  customerCount: number;
-  /** null khi Nhân viên gọi. */
-  todayRevenue: number | null;
-  monthRevenue: number | null;
-  /** Lợi nhuận gộp tháng này — null khi Nhân viên gọi. */
-  monthProfit: number | null;
-  lowStockVariants: LowStockVariant[];
-};
-
-/** cost / profit chỉ tính trên sản phẩm có giá vốn; uncostedQuantity = số sp đã bán chưa có giá vốn (đơn cũ). */
-export type RevenuePoint = { period: string; revenue: number; orderCount: number; cost: number; profit: number; uncostedQuantity: number };
-export type RevenueReport = {
-  fromDate: string;
-  toDate: string;
-  totalRevenue: number;
-  orderCount: number;
-  totalCost: number;
-  totalProfit: number;
-  /** % — null nếu chưa có sản phẩm nào có giá vốn. */
-  profitMargin: number | null;
-  uncostedQuantity: number;
-  items: RevenuePoint[];
-};
-export type TopProduct = { productId: number; productName: string; quantitySold: number; revenue: number; profit: number; uncostedQuantity: number };
-
-// ---------- Nhập kho & giá vốn (chỉ Quản trị viên)
-export type StockReceipt = {
-  id: number;
-  creationTime: string;
-  productId: number;
-  productName: string;
-  productVariantId: number;
-  variantName: string;
-  quantity: number;
-  unitCost: number;
-  totalCost: number;
-  note: string | null;
-  creatorUserName: string | null;
-  lastModificationTime: string | null;
-  /** Phiếu mới nhất của biến thể → được sửa / hủy. */
-  canEdit: boolean;
-};
-
-export type VariantCost = {
-  productVariantId: number;
-  productId: number;
-  productName: string;
-  variantName: string;
-  salePrice: number;
-  stockQuantity: number;
-  /** null = chưa có phiếu nhập. */
-  averageCost: number | null;
-  stockValue: number | null;
-  unitProfit: number | null;
-  lastReceiptTime: string | null;
-};
-
-export type StockReceiptInput = { productVariantId: number; quantity: number; unitCost: number; note?: string };
-export type StockReceiptUpdateInput = { id: number; quantity: number; unitCost: number; note?: string };
 
 // ---------- Chatbot / chat với nhân viên
 

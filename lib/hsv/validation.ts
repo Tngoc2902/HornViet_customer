@@ -2,8 +2,8 @@
 // lỗi theo trường từ server (validationErrors) được ghép vào cùng form.
 
 /** Di động Việt Nam: 0xxxxxxxxx hoặc +84xxxxxxxxx. */
-export const PHONE_RE = /^(0|\+84)\d{9}$/;
-export const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const PHONE_RE = /^(0|\+84)\d{9}$/;
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export function normalizePhone(value: string) {
   return value.replace(/\s/g, "");
@@ -23,7 +23,3 @@ export function isStrongPassword(value: string) {
 }
 
 export type FieldErrors<K extends string = string> = Partial<Record<K, string>>;
-
-export function hasErrors(errors: FieldErrors) {
-  return Object.values(errors).some(Boolean);
-}

@@ -4,7 +4,7 @@ import { HubConnection, HubConnectionBuilder, LogLevel, type ILogger } from "@mi
 import { API_BASE_URL } from "@/lib/api/http";
 import type { ChatMessage, ChatStatus, OrderStatus } from "@/lib/api/types";
 
-export const HUB_URL = `${API_BASE_URL}/hubs/notifications`;
+const HUB_URL = `${API_BASE_URL}/hubs/notifications`;
 
 /** Tên sự kiện và dữ liệu — khớp INotificationClient / *Message trong HornViet.Api/Realtime/NotificationHub.cs. */
 export type RealtimeEvents = {

@@ -5,20 +5,15 @@ import type {
   AuthenticateResult,
   Cart,
   Category,
-  CategoryInput,
   ChatAccess,
   ChatConversation,
   ChatSendResult,
   Collection,
   CreateOrderInput,
-  CreateUserInput,
-  Dashboard,
   ListResult,
   Material,
-  MaterialInput,
   Order,
   OrderListItem,
-  OrderQuery,
   OrderStatus,
   PagedResult,
   PageInput,
@@ -26,25 +21,11 @@ import type {
   ShippingFeeResult,
   ShippingProvince,
   ShippingWard,
-  ProductAdminListItem,
-  ProductAdminQuery,
   ProductDetail,
-  ProductInput,
   ProductListItem,
   ProductListQuery,
   Profile,
   RegisterInput,
-  RevenueGroupBy,
-  RevenueReport,
-  Role,
-  RoleName,
-  StockReceipt,
-  StockReceiptInput,
-  StockReceiptUpdateInput,
-  TopProduct,
-  User,
-  UserQuery,
-  VariantCost,
 } from "./types";
 
 const app = (path: string) => `/api/services/app/${path}`;
@@ -78,16 +59,10 @@ export const profileApi = {
 
 export const categoryApi = {
   getAll: () => http.get<ListResult<Category>>(app("Category/GetAll")),
-  create: (input: CategoryInput) => http.post<Category>(app("Category/Create"), input),
-  update: (input: CategoryInput) => http.put<Category>(app("Category/Update"), input),
-  delete: (id: number) => http.delete<null>(app("Category/Delete"), { id }),
 };
 
 export const materialApi = {
   getAll: () => http.get<ListResult<Material>>(app("Material/GetAll")),
-  create: (input: MaterialInput) => http.post<Material>(app("Material/Create"), input),
-  update: (input: MaterialInput) => http.put<Material>(app("Material/Update"), input),
-  delete: (id: number) => http.delete<null>(app("Material/Delete"), { id }),
 };
 
 /** Ô chat (bot + chat với nhân viên). Khóa khách luôn gửi trong thân request, không đặt trên URL. */
@@ -111,20 +86,6 @@ export const productApi = {
   getAll: (q: ProductListQuery = {}) => http.get<PagedResult<ProductListItem>>(app("Product/GetAll"), q),
   /** Khách: chỉ sản phẩm đang bán (404 nếu ẩn/xóa). Quản lý: cả sản phẩm đang ẩn. */
   get: (id: number) => http.get<ProductDetail>(app("Product/Get"), { id }),
-  getAdminList: (q: ProductAdminQuery = {}) => http.get<PagedResult<ProductAdminListItem>>(app("Product/GetAdminList"), q),
-  create: (input: ProductInput) => http.post<ProductDetail>(app("Product/Create"), input),
-  update: (input: ProductInput) => http.put<ProductDetail>(app("Product/Update"), input),
-  setActive: (id: number, isActive: boolean) => http.put<null>(app("Product/SetActive"), { id, isActive }),
-  delete: (id: number) => http.delete<null>(app("Product/Delete"), { id }),
-};
-
-export const fileApi = {
-  /** JPG, PNG, WEBP, tối đa 5 MB → { url: "/uploads/..." }. */
-  uploadImage: (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    return http.upload<{ url: string }>(app("File/UploadImage"), form);
-  },
 };
 
 export const cartApi = {
@@ -139,8 +100,6 @@ export const orderApi = {
   getMine: (q: PageInput & { status?: OrderStatus } = {}) => http.get<PagedResult<OrderListItem>>(app("Order/GetMyOrders"), q),
   get: (id: number) => http.get<Order>(app("Order/Get"), { id }),
   cancel: (id: number) => http.post<Order>(app("Order/Cancel"), { id }),
-  getAll: (q: OrderQuery = {}) => http.get<PagedResult<OrderListItem>>(app("Order/GetAll"), q),
-  updateStatus: (id: number, status: OrderStatus) => http.put<Order>(app("Order/UpdateStatus"), { id, status }),
 };
 
 export const shippingApi = {
@@ -153,31 +112,4 @@ export const shippingApi = {
 
 export const shipmentApi = {
   get: (orderId: number, refresh = false) => http.get<Shipment>(app("Shipment/Get"), { orderId, refresh }),
-};
-
-export const userApi = {
-  getAll: (q: UserQuery = {}) => http.get<PagedResult<User>>(app("User/GetAll"), q),
-  getRoles: () => http.get<ListResult<Role>>(app("User/GetRoles")),
-  create: (input: CreateUserInput) => http.post<User>(app("User/Create"), input),
-  setRoles: (userId: number, roleNames: RoleName[]) => http.put<User>(app("User/SetRoles"), { userId, roleNames }),
-  setActive: (userId: number, isActive: boolean) => http.put<User>(app("User/SetActive"), { userId, isActive }),
-};
-
-export const statisticApi = {
-  getDashboard: () => http.get<Dashboard>(app("Statistic/GetDashboard")),
-  getRevenue: (q: { fromDate?: string; toDate?: string; groupBy?: RevenueGroupBy }) =>
-    http.get<RevenueReport>(app("Statistic/GetRevenue"), q),
-  getTopProducts: (q: { fromDate?: string; toDate?: string; top?: number }) =>
-    http.get<ListResult<TopProduct>>(app("Statistic/GetTopProducts"), q),
-};
-
-/** Nhập kho & giá vốn — chỉ Quản trị viên. */
-export const stockReceiptApi = {
-  getAll: (q: PageInput & { productVariantId?: number; keyword?: string } = {}) =>
-    http.get<PagedResult<StockReceipt>>(app("StockReceipt/GetAll"), q),
-  getVariantCosts: (q: PageInput & { keyword?: string } = {}) => http.get<PagedResult<VariantCost>>(app("StockReceipt/GetVariantCosts"), q),
-  create: (input: StockReceiptInput) => http.post<StockReceipt>(app("StockReceipt/Create"), input),
-  /** Chỉ phiếu mới nhất của biến thể; giá vốn các đơn bán sau phiếu được tính lại. */
-  update: (input: StockReceiptUpdateInput) => http.put<StockReceipt>(app("StockReceipt/Update"), input),
-  delete: (id: number) => http.delete<null>(app("StockReceipt/Delete"), { id }),
 };
