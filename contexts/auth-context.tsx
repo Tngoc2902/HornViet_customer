@@ -29,7 +29,7 @@ type AuthValue = {
   setName: (name: string) => void;
 };
 
-export const STAFF_ACCOUNT_MESSAGE = "Tài khoản Nhân viên / Quản trị viên vui lòng đăng nhập tại trang quản trị.";
+const STAFF_ACCOUNT_MESSAGE = "Tài khoản Nhân viên / Quản trị viên vui lòng đăng nhập tại trang quản trị.";
 
 const AuthContext = createContext<AuthValue | null>(null);
 

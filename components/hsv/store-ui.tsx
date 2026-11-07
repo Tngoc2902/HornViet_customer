@@ -27,7 +27,7 @@ export const STORE_INFO = {
 /** Link chat Zalo: dùng socials.zalo nếu có, không thì mở Zalo theo số hotline. */
 export const ZALO_URL = STORE_INFO.socials.zalo || `https://zalo.me/${STORE_INFO.hotlineTel}`;
 
-export const SERVICE_PERKS: { icon: LucideIcon; title: string; desc: string }[] = [
+const SERVICE_PERKS: { icon: LucideIcon; title: string; desc: string }[] = [
   { icon: Truck, title: "Miễn phí giao hàng", desc: `Cho đơn từ ${STORE_INFO.freeShipFrom}` },
   { icon: Headset, title: "Phục vụ tận tâm", desc: STORE_INFO.hours },
   { icon: RefreshCcw, title: "Đổi trong 7 ngày", desc: "Đổi sản phẩm dễ dàng" },

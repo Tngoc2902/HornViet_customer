@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 /** OAuth Client ID (Google Cloud Console) — trùng Google:ClientId của backend. Để trống thì ẩn nút Google. */
-export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 const GSI_SRC = "https://accounts.google.com/gsi/client";
 

@@ -11,13 +11,6 @@ export function formatVND(value: number | null | undefined) {
   return (value ?? 0).toLocaleString("vi-VN") + "₫";
 }
 
-/** 1.250.000 → "1,3tr", 95.000 → "95k" (nhãn cột biểu đồ). */
-export function formatShortVND(value: number) {
-  if (!value) return "";
-  if (value >= 1_000_000) return (Math.round(value / 100_000) / 10).toString().replace(".", ",") + "tr";
-  return Math.round(value / 1000) + "k";
-}
-
 export function gradient(tones: Tones) {
   return `linear-gradient(150deg, ${tones[0]}, ${tones[1]} 60%, ${tones[2]})`;
 }
@@ -29,14 +22,8 @@ export function formatDateTime(iso: string) {
 }
 
 /** → "05/10/2026" */
-export function formatDate(iso: string) {
+function formatDate(iso: string) {
   return iso.slice(0, 10).split("-").reverse().join("/");
-}
-
-/** Tham số lọc ngày gửi dạng yyyy-MM-dd theo giờ địa phương. */
-export function toDateParam(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export const ORDER_STATUS: Record<OrderStatus, { label: string; fg: string; bg: string; bd: string }> = {
@@ -79,7 +66,7 @@ export function parseOrderTab(v: string | null): OrderTab {
   return v !== null && v !== "" && [0, 1, 2, 3, 4].includes(n) ? (n as OrderStatus) : "all";
 }
 
-export const ROLE_LABEL: Record<RoleName, string> = {
+const ROLE_LABEL: Record<RoleName, string> = {
   Customer: "Khách hàng",
   Staff: "Nhân viên",
   Admin: "Quản trị viên",
@@ -91,7 +78,7 @@ export function roleLabel(roles: RoleName[]) {
   return ROLE_LABEL.Customer;
 }
 
-export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
+const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   [PaymentMethod.Cod]: "Thanh toán khi nhận hàng (COD)",
   [PaymentMethod.BankTransfer]: "Chuyển khoản ngân hàng",
 };
